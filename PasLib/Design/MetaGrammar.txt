@@ -1,0 +1,27 @@
+﻿#	Comments & interleaves
+rule(interleave = false) Comment = "#" (. - ("\r" | "\n"))+;
+rule interleave = (" " | "\r" | "\n" | "\t") | Comment;
+
+#	tokens
+rule(interleave = false) identifier = ("a".."z" | "A".."Z" | "0".."9")+;
+rule(interleave = false) number = ("0".."9")+;
+rule(interleave = false) character = . - "\"" - "\r" - "\n";
+rule(interleave = false) quotedCharacter = "\"" c:character "\"";
+rule(interleave = false) literal = "\"" l:character* "\"";
+rule(interleave = false) any = ".";
+
+#	rules
+rule range = lower:quotedCharacter ".." upper:quotedCharacter;
+rule exactCardinality = "{" n:number "}";
+rule minMaxCardinality = "{" min:number "," max:number "}";
+rule cardinality = star:"*" | plus:"+" | question:"?" | exact:exactCardinality | minMax : minMaxCardinality;
+rule repeat = rule:ruleBody cardinality:cardinality;
+rule disjunction = head:ruleBody tail:("|" d:ruleBody)+;
+rule sequence = (ruleBody){2,};
+rule substract = primary:ruleBody "-" excluded:ruleBody;
+rule braket = "(" r:ruleBody ")";
+rule ruleBody = braket | substract | sequence | disjunction | repeat:repeat | literal:literal | any:any | range:range;
+rule ruleDeclaration = "rule" id:identifier "=" body:ruleBody ";";
+
+#	main rule
+rule main = ::(ruleDeclaration)*;

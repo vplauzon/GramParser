@@ -1,0 +1,4 @@
+﻿rule a = "a";
+rule c = "c";
+rule F = "F";
+rule zero = "0";

@@ -1,0 +1,3 @@
+﻿rule ac = "a".."c";
+rule DG = "D".."G";
+rule num = "0".."9";

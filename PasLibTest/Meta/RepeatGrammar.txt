@@ -1,0 +1,7 @@
+﻿rule a = "a"*;
+rule ab = "ab"*;
+rule abc = "abc"*;
+rule optional = "Hi"?;
+rule atLeast = "ab"+;
+rule exact3 = "abc"{3};
+rule between34 = "def"{3,4};

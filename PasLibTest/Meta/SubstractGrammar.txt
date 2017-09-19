@@ -1,0 +1,2 @@
+﻿rule a = "a"+ - "aa";
+rule hiBang = ("Hi" | "Bob" | "!") - "Bob";

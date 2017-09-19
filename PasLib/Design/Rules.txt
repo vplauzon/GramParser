@@ -1,0 +1,44 @@
+﻿Composition rules:
+
+any (matches anything, one character long):
+
+	rule = .
+
+literal:
+
+	rule = "Hi" -> { "Rule" : "rule", "Content" : "Hi" }
+
+range:
+
+	rule = "a".."z" -> { "Rule" : "rule", "Content" : "g" }
+
+repeat:
+
+	rule = ruleX{a,b} -> { "Rule" : "rule", "Content" : "abababab" }
+	rule = (:ruleX){a,b} -> { "Rule" : "rule", "Contents" : [{Rule":"ruleX", Content:"bob"},...] }
+	rule = (::ruleX){a,b} -> { "Rule" : "rule", "Contents" : [{Rule":"ruleX", "Fragments" : {"first" : "bo", "last":  "b"}},...] }
+
+disjunction:
+
+	rule = ruleX | ruleY -> { "Rule" : "rule", "Content" : "Hi" }
+	rule = a:ruleX | b:ruleX -> { "Rule" : "rule", "Fragment"s: {a : {Content:"Hi"}} }
+
+sequence:
+
+	rule = ruleX ruleY -> { "Rule" : "rule", "Content" : "Hi Bob" }
+	rule = a:ruleX b:ruleY -> { "Rule" : "rule", "Fragments": {a : {Content:"Hi"}, b: {Content:"Bob"}} }
+	                       -> { "Rule" : "rule", "Fragments": {a : {"Rule":"ruleX", "Fragments":{"h":"H", "vowel":"i"}}, b: {Content:"Bob"}} }
+	rule = a:ruleX a:ruleY -> { "Rule" : "rule", "Fragments": {a : {"Contents" : [{Content : "Hi"}, {"Content" : "Bob"}] } } }
+
+substract:
+
+	rule = ruleX - ruleY -> { "Rule" : "rule", "Content" : "Hi Bob" }
+	rule = a:ruleX - ruleY -> { "Rule" : "rule", "Fragments": {a : {Content:"Hi Bob"}} }
+
+interleave:
+
+	rule interleave = (" " | "\r" | "\n" | "\t")+
+
+exclude interleave:
+
+	rule(interleave = false) = rule...
