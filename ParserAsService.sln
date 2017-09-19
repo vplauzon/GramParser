@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasLib", "PasLib\PasLib.csproj", "{388655D2-4FAA-4A81-A592-E1DC69A3482B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasLibTest", "PasLibTest\PasLibTest.csproj", "{FB7F067C-91C3-49BB-8A17-C52AC873EF57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|x64.Build.0 = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Debug|x86.Build.0 = Debug|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|x64.ActiveCfg = Release|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|x64.Build.0 = Release|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|x86.ActiveCfg = Release|Any CPU
+		{388655D2-4FAA-4A81-A592-E1DC69A3482B}.Release|x86.Build.0 = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|x64.Build.0 = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Debug|x86.Build.0 = Debug|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|x64.ActiveCfg = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|x64.Build.0 = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|x86.ActiveCfg = Release|Any CPU
+		{FB7F067C-91C3-49BB-8A17-C52AC873EF57}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {880AA330-629C-4E52-BD2E-ABD6DF2F42EE}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://vincentlauzon.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PasLib\\PasLib.csproj
+		SccProjectName1 = PasLib
+		SccLocalPath1 = PasLib
+		SccProjectUniqueName2 = PasLibTest\\PasLibTest.csproj
+		SccProjectName2 = PasLibTest
+		SccLocalPath2 = PasLibTest
+	EndGlobalSection
+EndGlobal
