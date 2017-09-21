@@ -463,5 +463,36 @@ namespace PasLibTest
             }
         }
         #endregion
+
+        #region Recursion
+        //  Proove the design flaw
+        [Ignore]
+        [TestMethod]
+        public void PotentialInfiniteRecurse()
+        {
+            //  Equivalent to:
+            //  rule A = "a".."z";
+            //  rule B = C "," C;
+            //  rule C = B | A;
+            //  Try to match "a" with C
+            var ruleA = new RangeRule("A", null, 'a', 'z');
+            var proxyC = new RuleProxy();
+            var ruleB = new SequenceRule("B", null, new[]{
+                new TaggedRule(proxyC),
+                new TaggedRule(new LiteralRule(null, null, ",")),
+                new TaggedRule(proxyC)
+            });
+            var ruleC = new DisjunctionRule("C", null, new[] {
+                new TaggedRule(ruleB),
+                new TaggedRule(ruleA)
+            });
+
+            proxyC.ReferencedRule = ruleC;
+
+            var result = ruleC.Match("a", TracePolicy.NoTrace);
+
+            Assert.IsTrue(result.IsSuccess, "Should be a success");
+        }
+        #endregion
     }
 }
