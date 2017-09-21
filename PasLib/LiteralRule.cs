@@ -9,7 +9,8 @@ namespace PasLib
     {
         private readonly char[] _literal;
 
-        public LiteralRule(string ruleName, IRule interleave, IEnumerable<char> literal) : base(ruleName, interleave)
+        public LiteralRule(string ruleName, IRule interleave, IEnumerable<char> literal)
+            : base(ruleName, interleave)
         {
             if (literal == null || !literal.Any())
             {
@@ -19,7 +20,8 @@ namespace PasLib
             _literal = literal.ToArray();
         }
 
-        public LiteralRule(string ruleName, IRule interleave, string literal) : base(ruleName, interleave)
+        public LiteralRule(string ruleName, IRule interleave, string literal)
+            : base(ruleName, interleave)
         {
             if (string.IsNullOrEmpty(literal))
             {
@@ -29,17 +31,20 @@ namespace PasLib
             _literal = literal.ToCharArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             if (text.HasContent
                 && text.Length >= _literal.Length
                 && text.Enumerate().Take(_literal.Length).SequenceEqual(_literal))
             {
-                return new RuleResult(new RuleMatch(RuleName, _literal.Length, text.Take(_literal.Length)));
+                return new RuleResult(
+                    this,
+                    new RuleMatch(RuleName, _literal.Length, text.Take(_literal.Length)),
+                    tracePolicy.EmptyTrials);
             }
             else
             {
-                return new RuleResult(text);
+                return new RuleResult(this, text, tracePolicy.EmptyTrials);
             }
         }
 

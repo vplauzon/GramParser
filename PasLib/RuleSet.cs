@@ -29,7 +29,7 @@ namespace PasLib
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
 
-        public RuleResult Match(string ruleName, SubString text)
+        public RuleResult Match(string ruleName, SubString text, TracePolicy tracePolicy)
         {
             if (text.IsNull)
             {
@@ -41,8 +41,10 @@ namespace PasLib
             }
 
             var rule = _ruleMap[ruleName];
-            var result = rule.Match(text, new RuleTrace());
+            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
+            var result = rule.Match(text, tracePolicy);
 
+            tracePolicy.AddTrial(trialAccumulator, result);
             if (result.IsFailure || result.Match.MatchLength == text.Length)
             {
                 return result;
@@ -54,19 +56,30 @@ namespace PasLib
 
                 if (Interleave == null)
                 {   //  Failure
-                    return new RuleResult(remainingText);
+                    return new RuleResult(
+                        rule,
+                        remainingText,
+                        tracePolicy.ExtractTrials(trialAccumulator));
                 }
                 else
                 {
-                    var interleaveResult = _drainInterleavesRule.Match(remainingText, new RuleTrace());
+                    var interleaveResult = _drainInterleavesRule.Match(remainingText, tracePolicy);
 
-                    if (interleaveResult.IsSuccess && interleaveResult.Match.MatchLength == remainingText.Length)
+                    tracePolicy.AddTrial(trialAccumulator, interleaveResult);
+                    if (interleaveResult.IsSuccess
+                        && interleaveResult.Match.MatchLength == remainingText.Length)
                     {
-                        return new RuleResult(result.Match.IncreaseMatchLength(remainingText.Length));
+                        return new RuleResult(
+                            rule,
+                            result.Match.IncreaseMatchLength(remainingText.Length),
+                            tracePolicy.ExtractTrials(trialAccumulator));
                     }
                     else
                     {
-                        return new RuleResult(remainingText);
+                        return new RuleResult(
+                            rule,
+                            remainingText,
+                            tracePolicy.ExtractTrials(trialAccumulator));
                     }
                 }
             }

@@ -13,9 +13,9 @@ namespace PasLib
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
-            return new RuleResult(text);
+            return new RuleResult(this, text, tracePolicy.EmptyTrials);
         }
 
         public override string ToString()

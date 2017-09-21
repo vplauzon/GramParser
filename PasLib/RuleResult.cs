@@ -6,24 +6,24 @@ namespace PasLib
 {
     internal struct RuleResult
     {
-        public RuleResult(RuleMatch match)
+        internal RuleResult(IRule rule, RuleMatch match, RuleResult[] trials)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
-            Match = match;
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
+            Match = match ?? throw new ArgumentNullException(nameof(match));
             Unmatched = new SubString();
+            Trials = trials ?? throw new ArgumentNullException(nameof(trials));
         }
 
-        public RuleResult(SubString unmatched)
+        internal RuleResult(IRule rule, SubString unmatched, RuleResult[] trials)
         {
             if (unmatched.IsNull)
             {
                 throw new ArgumentNullException(nameof(unmatched));
             }
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             Match = null;
             Unmatched = unmatched;
+            Trials = trials ?? throw new ArgumentNullException(nameof(trials));
         }
 
         public bool IsSuccess
@@ -64,8 +64,13 @@ namespace PasLib
             }
         }
 
+        public IRule Rule { get; private set; }
+
         public RuleMatch Match { get; private set; }
+
         public SubString Unmatched { get; private set; }
+
+        public RuleResult[] Trials { get; private set; }
 
         #region object methods
         public override string ToString()

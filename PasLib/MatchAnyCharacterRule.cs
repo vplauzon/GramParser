@@ -10,15 +10,18 @@ namespace PasLib
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             if (text.Length == 0)
             {
-                return new RuleResult(text);
+                return new RuleResult(this, text, tracePolicy.EmptyTrials);
             }
             else
             {
-                return new RuleResult(new RuleMatch(RuleName, 1, text.Take(1)));
+                return new RuleResult(
+                    this,
+                    new RuleMatch(RuleName, 1, text.Take(1)),
+                    tracePolicy.EmptyTrials);
             }
         }
 

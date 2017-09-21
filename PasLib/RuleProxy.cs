@@ -37,6 +37,7 @@ namespace PasLib
 
         string IRule.RuleName => _referencedRule.RuleName;
 
-        RuleResult IRule.Match(SubString text, RuleTrace trace) => _referencedRule.Match(text, trace);
+        RuleResult IRule.Match(SubString text, TracePolicy tracePolicy)
+            => _referencedRule.Match(text, tracePolicy);
     }
 }

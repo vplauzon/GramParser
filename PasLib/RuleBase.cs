@@ -20,34 +20,22 @@ namespace PasLib
 
         public IRule Interleave { get; private set; }
 
-        public RuleResult Match(SubString text, RuleTrace trace)
+        public RuleResult Match(SubString text, TracePolicy tracePolicy)
         {
-#if DEBUG
-            Func<string, string> escape = s => s.Replace("\n", "\\n").Replace("\r", "\\r");
-            var textExtract = escape(text.Take(Math.Min(20, text.Length)).ToString());
-            var ruleRep = escape(ToString().Substring(0, Math.Min(15, ToString().Length)));
-
-            System.Diagnostics.Debug.WriteLine($"'{textExtract}' with '{ruleRep}' ");
-#endif
-
             if (Interleave == null)
             {
-                var result = OnMatch(text, trace);
-
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine(result.IsSuccess ? " (Success)" : " (Fail)");
-#endif
+                var result = OnMatch(text, tracePolicy);
 
                 return result;
             }
             else
             {
                 //  Remove interleaves before
-                int before = SeekInterleaves(text, trace);
+                int before = SeekInterleaves(text, tracePolicy);
 
                 text = text.Skip(before);
 
-                var result = OnMatch(text, trace);
+                var result = OnMatch(text, tracePolicy);
 
                 if (result.IsFailure)
                 {
@@ -58,16 +46,19 @@ namespace PasLib
                     //  Remove interleaves after
                     text = text.Skip(result.Match.MatchLength);
 
-                    var after = SeekInterleaves(text, trace);
+                    var after = SeekInterleaves(text, tracePolicy);
 
-                    return new RuleResult(result.Match.IncreaseMatchLength(before + after));
+                    return new RuleResult(
+                        result.Rule,
+                        result.Match.IncreaseMatchLength(before + after),
+                        result.Trials);
                 }
             }
         }
 
-        protected abstract RuleResult OnMatch(SubString text, RuleTrace trace);
+        protected abstract RuleResult OnMatch(SubString text, TracePolicy tracePolicy);
 
-        protected int SeekInterleaves(SubString text, RuleTrace trace)
+        protected int SeekInterleaves(SubString text, TracePolicy tracePolicy)
         {
             if (Interleave == null)
             {
@@ -79,7 +70,7 @@ namespace PasLib
 
                 while (true)
                 {
-                    var result = Interleave.Match(text, trace);
+                    var result = Interleave.Match(text, tracePolicy);
 
                     if (result.IsSuccess && result.Match.MatchLength != 0)
                     {

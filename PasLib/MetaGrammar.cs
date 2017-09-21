@@ -11,9 +11,9 @@ namespace PasLib
 
         private static readonly RuleSet _metaSet = CreateMetaGrammar();
 
-        public static RuleSet ParseGrammar(SubString text)
+        public static RuleSet ParseGrammar(SubString text, TracePolicy tracePolicy)
         {
-            var result = _metaSet.Match(MAIN_RULE, text);
+            var result = _metaSet.Match(MAIN_RULE, text, tracePolicy);
 
             if (result.IsFailure)
             {

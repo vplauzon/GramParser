@@ -44,17 +44,19 @@ namespace PasLib
             _doIncludeGrandChildren = doIncludeGrandChildren;
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             var children = new List<RuleMatch>();
             var originalText = text;
             int totalMatchLength = 0;
             int i = 0;
+            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             while (true)
             {
-                var result = _rule.Match(text, trace);
+                var result = _rule.Match(text, tracePolicy);
 
+                tracePolicy.AddTrial(trialAccumulator, result);
                 if (result.IsSuccess)
                 {
                     if (_doIncludeChildren)
@@ -83,12 +85,21 @@ namespace PasLib
                         && (!_max.HasValue || i <= _max.Value))
                     {
                         return _doIncludeGrandChildren
-                            ? new RuleResult(new RuleMatch(RuleName, totalMatchLength, children))
-                            : new RuleResult(new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)));
+                            ? new RuleResult(
+                                this,
+                                new RuleMatch(RuleName, totalMatchLength, children),
+                                tracePolicy.ExtractTrials(trialAccumulator))
+                            : new RuleResult(
+                                this,
+                                new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)),
+                                tracePolicy.ExtractTrials(trialAccumulator));
                     }
                     else
                     {
-                        return result;
+                        return new RuleResult(
+                            this,
+                            text,
+                            tracePolicy.ExtractTrials(trialAccumulator));
                     }
                 }
             }

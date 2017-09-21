@@ -13,7 +13,7 @@ namespace PasLibTest
         public void EmptyNone()
         {
             var rule = MatchNoneRule.Instance;
-            var result = rule.Match("", new RuleTrace());
+            var result = rule.Match("", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsFailure);
         }
@@ -22,7 +22,7 @@ namespace PasLibTest
         public void EmptyAny()
         {
             var rule = new MatchAnyCharacterRule(null, null) as IRule;
-            var result = rule.Match("", new RuleTrace());
+            var result = rule.Match("", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsFailure);
         }
@@ -44,7 +44,7 @@ namespace PasLibTest
 
             for (int i = 0; i != samples.Length; ++i)
             {
-                var result = rule.Match(samples[i], new RuleTrace());
+                var result = rule.Match(samples[i], TracePolicy.NoTrace);
 
                 Assert.IsTrue(result.IsSuccess, $"Success - {i}");
                 Assert.AreEqual(rule.RuleName, result.Match.RuleName, $"Rule - {i}");
@@ -69,7 +69,7 @@ namespace PasLibTest
 
             for (int i = 0; i != samples.Length; ++i)
             {
-                var result = rule.Match(samples[i], new RuleTrace());
+                var result = rule.Match(samples[i], TracePolicy.NoTrace);
 
                 Assert.IsTrue(result.IsSuccess, $"Success - {i}");
                 Assert.AreEqual(rule.RuleName, result.Match.RuleName, $"Rule - {i}");
@@ -84,8 +84,8 @@ namespace PasLibTest
         public void Literal()
         {
             var rule = new LiteralRule("Lit", null, "great") as IRule;
-            var result = rule.Match("great", new RuleTrace());
-            var noResult = rule.Match("h", new RuleTrace());
+            var result = rule.Match("great", TracePolicy.NoTrace);
+            var noResult = rule.Match("h", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -99,8 +99,8 @@ namespace PasLibTest
         {
             var interleave = new LiteralRule("ws", null, " ") as IRule;
             var rule = new LiteralRule("Lit", interleave, "g") as IRule;
-            var result = rule.Match("  g  ", new RuleTrace());
-            var noResult = rule.Match("  h  ", new RuleTrace());
+            var result = rule.Match("  g  ", TracePolicy.NoTrace);
+            var noResult = rule.Match("  h  ", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -131,7 +131,7 @@ namespace PasLibTest
                 var test = samples[i].Item3;
                 var isSuccess = samples[i].Item4;
                 var rule = new RangeRule("Range", null, first, last) as IRule;
-                var result = rule.Match(test.ToString(), new RuleTrace());
+                var result = rule.Match(test.ToString(), TracePolicy.NoTrace);
 
                 if (isSuccess)
                 {
@@ -154,7 +154,7 @@ namespace PasLibTest
             var interleave = new LiteralRule("ws", null, " ");
             var oneCharRule = new LiteralRule("oneChar", null, "g");
             var rule = new RepeatRule("Repeat", interleave, oneCharRule, null, null, true, true) as IRule;
-            var result = rule.Match("    ", new RuleTrace());
+            var result = rule.Match("    ", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -169,7 +169,7 @@ namespace PasLibTest
             var interleave = new LiteralRule("ws", null, " ");
             var oneCharRule = new LiteralRule("oneChar", interleave, "g");
             var rule = new RepeatRule("Repeat", interleave, oneCharRule, null, null, true, true) as IRule;
-            var result = rule.Match("  ggggg  ", new RuleTrace());
+            var result = rule.Match("  ggggg  ", TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -201,7 +201,7 @@ namespace PasLibTest
                 var max = testSet[i].Item3;
                 var isSuccess = testSet[i].Item4;
                 var rule = new RepeatRule("Repeat", null, oneCharRule, min, max, true, true) as IRule;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {
@@ -242,7 +242,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {
@@ -280,7 +280,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {
@@ -325,7 +325,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {
@@ -357,7 +357,7 @@ namespace PasLibTest
                 new TaggedRule(null, new LiteralRule(null, null, "!"))
             });
             var text = "  Hi Bob !  ";
-            var result = rule.Match(text, new RuleTrace());
+            var result = rule.Match(text, TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -376,7 +376,7 @@ namespace PasLibTest
                 new TaggedRule(null, new LiteralRule(null, null, "!"))
             });
             var text = "  Hi Bob !  ";
-            var result = rule.Match(text, new RuleTrace());
+            var result = rule.Match(text, TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(rule.RuleName, result.Match.RuleName, "Rule");
@@ -409,7 +409,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1.ToString();
                 var isSuccess = samples[i].Item2;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {
@@ -445,7 +445,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1.ToString();
                 var isSuccess = samples[i].Item2;
-                var result = rule.Match(text, new RuleTrace());
+                var result = rule.Match(text, TracePolicy.NoTrace);
 
                 if (!isSuccess)
                 {

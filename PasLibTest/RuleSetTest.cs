@@ -23,7 +23,7 @@ namespace PasLibTest
                 false);
             var ruleSet = new RuleSet(interleave, new[] { rule });
             var text = " abababab  ";
-            var result = ruleSet.Match("all", text);
+            var result = ruleSet.Match("all", text, TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual(text.Length, result.Match.MatchLength, "MatchLength");
@@ -44,7 +44,7 @@ namespace PasLibTest
                 false);
             var ruleSet = new RuleSet(interleave, new[] { rule });
             var text = " ababababkebab  ";
-            var result = ruleSet.Match("all", text);
+            var result = ruleSet.Match("all", text, TracePolicy.NoTrace);
 
             Assert.IsTrue(result.IsFailure, "Failure");
             Assert.AreEqual("kebab  ", result.Unmatched.ToString(), "Unmatched");

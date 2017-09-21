@@ -19,16 +19,18 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             var fragments = new Dictionary<string, RuleMatch>();
             var totalMatchLength = 0;
             var originalText = text;
+            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             foreach (var rule in _rules)
             {
-                var result = rule.Rule.Match(text, trace);
+                var result = rule.Rule.Match(text, tracePolicy);
 
+                tracePolicy.AddTrial(trialAccumulator, result);
                 if (result.IsSuccess)
                 {
                     if (rule.Tag != null)
@@ -49,7 +51,7 @@ namespace PasLib
                     }
                     text = text.Skip(result.Match.MatchLength);
 
-                    var interleaves = SeekInterleaves(text, trace);
+                    var interleaves = SeekInterleaves(text, tracePolicy);
 
                     text = text.Skip(interleaves);
                     totalMatchLength += result.Match.MatchLength + interleaves;
@@ -61,9 +63,14 @@ namespace PasLib
             }
 
             return fragments.Any()
-                ? new RuleResult(new RuleMatch(RuleName, totalMatchLength, fragments))
+                ? new RuleResult(
+                    this,
+                    new RuleMatch(RuleName, totalMatchLength, fragments),
+                    tracePolicy.ExtractTrials(trialAccumulator))
                 : new RuleResult(
-                    new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)));
+                    this,
+                    new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)),
+                    tracePolicy.ExtractTrials(trialAccumulator));
         }
 
         public override string ToString()

@@ -21,7 +21,7 @@ namespace PasLib
 
         public char Last { get; private set; }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             if (text.HasContent)
             {
@@ -29,11 +29,14 @@ namespace PasLib
 
                 if (peek >= First && peek <= Last)
                 {
-                    return new RuleResult(new RuleMatch(RuleName, 1, text.Take(1)));
+                    return new RuleResult(
+                        this,
+                        new RuleMatch(RuleName, 1, text.Take(1)),
+                        tracePolicy.EmptyTrials);
                 }
             }
 
-            return new RuleResult(text);
+            return new RuleResult(this, text, tracePolicy.EmptyTrials);
         }
 
         public override string ToString()

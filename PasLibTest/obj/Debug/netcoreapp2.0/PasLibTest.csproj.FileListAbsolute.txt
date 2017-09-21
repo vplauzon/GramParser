@@ -1,0 +1,16 @@
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLibTest.deps.json
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLibTest.runtimeconfig.json
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLibTest.runtimeconfig.dev.json
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLibTest.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLibTest.pdb
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLib.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\bin\Debug\netcoreapp2.0\PasLib.pdb
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.csprojResolveAssemblyReference.cache
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.csproj.CoreCompileInputs.cache
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.AssemblyInfoInputs.cache
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.AssemblyInfo.cs
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.dll
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLibTest\obj\Debug\netcoreapp2.0\PasLibTest.pdb

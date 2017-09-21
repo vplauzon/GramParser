@@ -19,17 +19,16 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
             var shortestUnmatched = new SubString();
+            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             foreach (var rule in _rules)
             {
-                var subTrace = trace.Stack(rule.Rule, text);
-                var result = subTrace == null
-                    ? new RuleResult(text)
-                    : rule.Rule.Match(text, subTrace);
+                var result = rule.Rule.Match(text, tracePolicy);
 
+                tracePolicy.AddTrial(trialAccumulator, result);
                 if (result.IsSuccess && result.Match.MatchLength != 0)
                 {
                     if (rule.Tag == null)
@@ -39,13 +38,17 @@ namespace PasLib
                             result.Match.MatchLength,
                             text.Take(result.Match.MatchLength));
 
-                        return new RuleResult(trimmedMatch);
+                        return new RuleResult(result.Rule, trimmedMatch, result.Trials);
                     }
                     else
                     {
-                        var fragments = new Dictionary<string, RuleMatch>() { { rule.Tag, result.Match } };
+                        var fragments = new Dictionary<string, RuleMatch>() {
+                            { rule.Tag, result.Match } };
 
-                        return new RuleResult(new RuleMatch(RuleName, result.Match.MatchLength, fragments));
+                        return new RuleResult(
+                            result.Rule,
+                            new RuleMatch(RuleName, result.Match.MatchLength, fragments),
+                            result.Trials);
                     }
                 }
                 else if (result.IsFailure)
@@ -58,8 +61,8 @@ namespace PasLib
             }
 
             return shortestUnmatched.IsNull
-                ? new RuleResult(text)
-                : new RuleResult(shortestUnmatched);
+                ? new RuleResult(this, text, tracePolicy.ExtractTrials(trialAccumulator))
+                : new RuleResult(this, shortestUnmatched, tracePolicy.ExtractTrials(trialAccumulator));
         }
 
         public override string ToString()

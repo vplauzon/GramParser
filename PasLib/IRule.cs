@@ -12,6 +12,6 @@ namespace PasLib
         /// <summary>Interleave rule.  Can be <c>null</c> if no interleave are defined for this rule.</summary>
         IRule Interleave { get; }
 
-        RuleResult Match(SubString text, RuleTrace trace);
+        RuleResult Match(SubString text, TracePolicy tracePolicy);
     }
 }

@@ -25,32 +25,35 @@ namespace PasLib
             _excluded = excluded;
         }
 
-        protected override RuleResult OnMatch(SubString text, RuleTrace trace)
+        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
         {
-            var primaryResult = _primary.Rule.Match(text, trace);
+            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
+            var primaryResult = _primary.Rule.Match(text, tracePolicy);
 
-            if (primaryResult.IsFailure)
-            {   //  Failure
-                return primaryResult;
-            }
-            else
+            tracePolicy.AddTrial(trialAccumulator, primaryResult);
+            if (primaryResult.IsSuccess)
             {
                 var primaryText = text.Take(primaryResult.Match.MatchLength);
-                var excludedResult = _excluded.Match(primaryText, trace);
+                var excludedResult = _excluded.Match(primaryText, tracePolicy);
 
+                tracePolicy.AddTrial(trialAccumulator, excludedResult);
                 if (excludedResult.IsFailure || excludedResult.Match.MatchLength != primaryText.Length)
                 {   //  Success
                     var match = primaryResult.Match;
 
                     return _primary.HasTag
-                        ? new RuleResult(new RuleMatch(RuleName, match.MatchLength, CreateFragments(match, text)))
-                        : new RuleResult(new RuleMatch(RuleName, match.MatchLength, text.Take(match.MatchLength)));
-                }
-                else
-                {   //  Failure
-                    return new RuleResult(text);
+                        ? new RuleResult(
+                            this,
+                            new RuleMatch(RuleName, match.MatchLength, CreateFragments(match, text)),
+                            tracePolicy.ExtractTrials(trialAccumulator))
+                        : new RuleResult(
+                            this,
+                            new RuleMatch(RuleName, match.MatchLength, text.Take(match.MatchLength)),
+                            tracePolicy.ExtractTrials(trialAccumulator));
                 }
             }
+            //  Failure
+            return new RuleResult(this, text, tracePolicy.ExtractTrials(trialAccumulator));
         }
 
         private IDictionary<string, RuleMatch> CreateFragments(RuleMatch match, SubString text)
