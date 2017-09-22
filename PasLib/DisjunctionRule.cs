@@ -19,42 +19,29 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
-            var shortestUnmatched = new SubString();
-
             foreach (var rule in _rules)
             {
-                var result = rule.Rule.Match(text, depth - 1);
+                var matches = rule.Rule.Match(text, depth - 1);
 
-                if (result.IsSuccess)
+                foreach (var m in matches)
                 {
-                    if (rule.Tag == null)
+                    if (rule.HasTag)
                     {
-                        return RuleResult.Success(result.Match.ChangeRule(this));
+                        var fragments = new Dictionary<string, RuleMatch>() { { rule.Tag, m } };
+
+                        yield return new RuleMatch(
+                            this,
+                            m.Content,
+                            fragments);
                     }
                     else
                     {
-                        var fragments = new Dictionary<string, RuleMatch>() {
-                            { rule.Tag, result.Match } };
-
-                        return RuleResult.Success(
-                            new RuleMatch(this, result.Match.Content, fragments));
-                    }
-                }
-                else
-                {
-                    if (shortestUnmatched.IsNull
-                        || result.Unmatched.Length < shortestUnmatched.Length)
-                    {
-                        shortestUnmatched = result.Unmatched;
+                        yield return m.ChangeRule(this);
                     }
                 }
             }
-
-            return shortestUnmatched.IsNull
-                ? RuleResult.Failure(this, text)
-                : RuleResult.Failure(this, shortestUnmatched);
         }
 
         public override string ToString()

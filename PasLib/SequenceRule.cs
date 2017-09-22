@@ -6,6 +6,9 @@ namespace PasLib
 {
     internal class SequenceRule : RuleBase
     {
+        private static readonly KeyValuePair<string, RuleMatch>[] EMPTY_FRAGMENTS =
+            new KeyValuePair<string, RuleMatch>[0];
+
         private readonly TaggedRule[] _rules;
 
         public SequenceRule(string ruleName, IEnumerable<TaggedRule> rules)
@@ -19,37 +22,15 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
-            var fragments = new Dictionary<string, RuleMatch>();
-            var totalMatchLength = 0;
-            var originalText = text;
-
-            foreach (var rule in _rules)
-            {
-                var result = rule.Rule.Match(text, depth - 1);
-
-                if (result.IsSuccess)
-                {
-                    if (rule.Tag != null)
-                    {
-                        fragments[rule.Tag] = result.Match;
-                    }
-                    text = text.Skip(result.Match.Content.Length);
-
-                    totalMatchLength += result.Match.Content.Length;
-                }
-                else
-                {
-                    return result;
-                }
-            }
-
-            var content = originalText.Take(totalMatchLength);
-
-            return fragments.Any()
-                ? RuleResult.Success(new RuleMatch(this, content, fragments))
-                : RuleResult.Success(new RuleMatch(this, content));
+            return RecurseMatch(
+                _rules,
+                text,
+                text,
+                0,
+                depth,
+                EMPTY_FRAGMENTS);
         }
 
         public override string ToString()
@@ -58,6 +39,56 @@ namespace PasLib
                         select t.Rule.ToString();
 
             return "<" + RuleName + "> (" + string.Join(" ", rules) + ")";
+        }
+
+        private IEnumerable<RuleMatch> RecurseMatch(
+            IEnumerable<TaggedRule> rules,
+            SubString originalText,
+            SubString text,
+            int totalMatchLength,
+            int depth,
+            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
+        {
+            var currentRule = rules.First();
+            var remainingRules = rules.Skip(1);
+            var matches = currentRule.Rule.Match(text, depth - 1);
+
+            foreach (var match in matches)
+            {
+                var newTotalMatchLength = totalMatchLength + match.Content.Length;
+                var newFragments = currentRule.Tag == null
+                    ? fragments
+                    : fragments.Prepend(new KeyValuePair<string, RuleMatch>(
+                        currentRule.Tag, match));
+
+                if (remainingRules.Any())
+                {   //  Recurse
+                    var remainingText = text.Skip(match.Content.Length);
+                    var downstreamMatches = RecurseMatch(
+                        remainingRules,
+                        originalText,
+                        remainingText,
+                        newTotalMatchLength,
+                        depth,
+                        newFragments);
+
+                    foreach (var m in downstreamMatches)
+                    {
+                        yield return m;
+                    }
+                }   //  End recursion
+                else if (newFragments.Any())
+                {
+                    yield return new RuleMatch(
+                        this,
+                        originalText.Take(newTotalMatchLength),
+                        new Dictionary<string, RuleMatch>(newFragments));
+                }
+                else
+                {
+                    yield return new RuleMatch(this, originalText.Take(newTotalMatchLength));
+                }
+            }
         }
     }
 }

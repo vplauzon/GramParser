@@ -33,9 +33,8 @@ namespace PasLib
             }
         }
 
-        string IRule.RuleName => _referencedRule.RuleName;
+        string IRule.RuleName => ReferencedRule.RuleName;
 
-        RuleResult IRule.Match(SubString text, int depth)
-            => _referencedRule.Match(text, depth);
+        IEnumerable<RuleMatch> IRule.Match(SubString text, int depth) => ReferencedRule.Match(text, depth);
     }
 }

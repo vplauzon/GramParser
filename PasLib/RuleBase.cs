@@ -6,6 +6,8 @@ namespace PasLib
 {
     internal abstract class RuleBase : IRule
     {
+        protected RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
+
         protected RuleBase(string ruleName)
         {
             if (ruleName == string.Empty)
@@ -17,7 +19,7 @@ namespace PasLib
 
         public string RuleName { get; private set; }
 
-        public RuleResult Match(SubString text, int depth)
+        public IEnumerable<RuleMatch> Match(SubString text, int depth)
         {
             if (depth <= 0)
             {
@@ -29,6 +31,6 @@ namespace PasLib
             }
         }
 
-        protected abstract RuleResult OnMatch(SubString text, int depth);
+        protected abstract IEnumerable<RuleMatch> OnMatch(SubString text, int depth);
     }
 }

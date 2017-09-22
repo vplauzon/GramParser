@@ -31,17 +31,17 @@ namespace PasLib
             _literal = literal.ToCharArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
             if (text.HasContent
                 && text.Length >= _literal.Length
                 && text.Enumerate().Take(_literal.Length).SequenceEqual(_literal))
             {
-                return RuleResult.Success(new RuleMatch(this, text.Take(_literal.Length)));
+                return new[] { new RuleMatch(this, text.Take(_literal.Length)) };
             }
             else
             {
-                return RuleResult.Failure(this, text);
+                return EmptyMatch;
             }
         }
 

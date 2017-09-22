@@ -13,9 +13,9 @@ namespace PasLib
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
-            return RuleResult.Failure(this, text);
+            return EmptyMatch;
         }
 
         public override string ToString()

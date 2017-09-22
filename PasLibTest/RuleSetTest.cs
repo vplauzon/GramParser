@@ -23,10 +23,9 @@ namespace PasLibTest
                 false);
             var ruleSet = new RuleSet(interleave, new[] { rule });
             var text = " ababababkebab  ";
-            var result = ruleSet.Match("all", text, RuleSet.DEFAULT_MAX_DEPTH);
+            var match = ruleSet.Match("all", text, RuleSet.DEFAULT_MAX_DEPTH);
 
-            Assert.IsTrue(result.IsFailure, "Failure");
-            Assert.AreEqual("kebab  ", result.Unmatched.ToString(), "Unmatched");
+            Assert.IsNull(match, "Failure");
         }
         #endregion
     }

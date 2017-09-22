@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace PasLib
 {
     internal class RuleMatch
     {
+        private static readonly RuleMatch[] EMPTY_CONTENTS = new RuleMatch[0];
+
         private RuleMatch(IRule rule)
         {
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
@@ -36,7 +37,7 @@ namespace PasLib
 
         public SubString Content { get; private set; }
 
-        public IEnumerable<RuleMatch> Contents { get; private set; }
+        public IEnumerable<RuleMatch> Contents { get; private set; } = EMPTY_CONTENTS;
 
         public IDictionary<string, RuleMatch> Fragments { get; private set; }
 

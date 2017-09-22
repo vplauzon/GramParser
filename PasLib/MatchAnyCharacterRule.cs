@@ -10,16 +10,18 @@ namespace PasLib
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
             if (text.Length == 0)
             {
-                return RuleResult.Failure(this, text);
+                return EmptyMatch;
             }
             else
             {
-                return RuleResult.Success(
-                    new RuleMatch(this, text.Take(1)));
+                return new[]
+                {
+                    new RuleMatch(this, text.Take(1))
+                };
             }
         }
 

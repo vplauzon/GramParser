@@ -18,10 +18,10 @@ namespace PasLibTest
         {
             var dots = new RepeatRule(
                 null, new LiteralRule(null, "."), 2, 2, false, false);
-            var result = dots.Match("..", RuleSet.DEFAULT_MAX_DEPTH);
+            var match = dots.Match("..", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
 
-            Assert.IsTrue(result.IsSuccess, "Success");
-            Assert.AreEqual("..", result.Match.Content, "Content");
+            Assert.IsNotNull(match, "Success");
+            Assert.AreEqual("..", match.Content, "Content");
         }
         #endregion
 
@@ -198,14 +198,14 @@ namespace PasLibTest
                 var ruleName = samples[i].Item2;
                 var text = samples[i].Item3;
                 var ruleSet = MetaGrammar.ParseGrammar(grammar);
-                var result = ruleSet.Match(ruleName, text, RuleSet.DEFAULT_MAX_DEPTH);
+                var match = ruleSet.Match(ruleName, text, RuleSet.DEFAULT_MAX_DEPTH);
 
-                Assert.AreEqual(isSuccess, result.IsSuccess, $"Success - {i}");
+                Assert.AreEqual(isSuccess, match == null, $"Success - {i}");
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(ruleName, result.Match.Rule.RuleName, $"Rule Name - {i}");
-                    Assert.AreEqual(text, result.Match.Content.ToString(), $"Content - {i}");
+                    Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
+                    Assert.AreEqual(text, match.Content.ToString(), $"Content - {i}");
                 }
             }
         }

@@ -13,17 +13,17 @@ namespace PasLib
 
         public static RuleSet ParseGrammar(SubString text)
         {
-            var result = _metaSet.Match(MAIN_RULE, text);
+            var match = _metaSet.Match(MAIN_RULE, text);
 
-            if (result.IsFailure)
+            if (match != null)
             {
-                throw new ArgumentException("Problem parsing from:  " + result.Unmatched.ToString(), nameof(text));
+                var grammar = CreateGrammar(match);
+
+                return grammar;
             }
             else
             {
-                var grammar = CreateGrammar(result.Match);
-
-                return grammar;
+                return null;
             }
         }
 

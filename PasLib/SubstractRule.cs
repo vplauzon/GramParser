@@ -16,29 +16,35 @@ namespace PasLib
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
         }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
-            var primaryResult = _primary.Rule.Match(text, depth - 1);
+            var primaryMatches = _primary.Rule.Match(text, depth - 1);
 
-            if (primaryResult.IsSuccess)
+            foreach (var primaryMatch in primaryMatches)
             {
-                var primaryText = text.Take(primaryResult.Match.Content.Length);
-                var excludedResult = _excluded.Match(primaryText, depth - 1);
+                var primaryText = primaryMatch.Content;
+                var excludedMatches = _excluded.Match(primaryText, depth - 1);
+                var excludedExactLength = from ex in excludedMatches
+                                          where ex.Content.Length == primaryText.Length
+                                          select ex;
 
-                if (excludedResult.IsFailure
-                    || excludedResult.Match.Content.Length != primaryText.Length)
-                {   //  Success
-                    var match = primaryResult.Match;
+                if (!excludedExactLength.Any())
+                {
+                    if (_primary.HasTag)
+                    {
+                        var fragments = new Dictionary<string, RuleMatch>() { { _primary.Tag, primaryMatch } };
 
-                    return _primary.HasTag
-                        ? RuleResult.Success(
-                            new RuleMatch(this, match.Content, CreateFragments(match, text)))
-                        : RuleResult.Success(
-                            new RuleMatch(this, match.Content));
+                        yield return new RuleMatch(
+                            this,
+                            primaryMatch.Content,
+                            fragments);
+                    }
+                    else
+                    {
+                        yield return primaryMatch.ChangeRule(this);
+                    }
                 }
             }
-
-            return RuleResult.Failure(this, text);
         }
 
         private IDictionary<string, RuleMatch> CreateFragments(RuleMatch match, SubString text)

@@ -19,11 +19,11 @@ namespace PasLib
             Last = last;
         }
 
-        public char First { get; private set; }
+        public char First { get; }
 
-        public char Last { get; private set; }
+        public char Last { get; }
 
-        protected override RuleResult OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
             if (text.HasContent)
             {
@@ -31,11 +31,14 @@ namespace PasLib
 
                 if (peek >= First && peek <= Last)
                 {
-                    return RuleResult.Success(new RuleMatch(this, text.Take(1)));
+                    return new[]
+                    {
+                        new RuleMatch(this, text.Take(1))
+                    };
                 }
             }
 
-            return RuleResult.Failure(this, text);
+            return EmptyMatch;
         }
 
         public override string ToString()

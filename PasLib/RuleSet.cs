@@ -31,10 +31,8 @@ namespace PasLib
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
 
-        public RuleResult Match(string ruleName, SubString text, int? depth = null)
+        public RuleMatch Match(string ruleName, SubString text, int? depth = null)
         {
-            var actualDepth = depth ?? DEFAULT_MAX_DEPTH;
-
             if (text.IsNull)
             {
                 throw new ArgumentNullException(nameof(text));
@@ -44,37 +42,16 @@ namespace PasLib
                 throw new ArgumentOutOfRangeException(nameof(ruleName), "Unknown rule");
             }
 
+            var actualDepth = depth ?? DEFAULT_MAX_DEPTH;
             var rule = _ruleMap[ruleName];
-            var result = rule.Match(text, actualDepth);
+            var matches = rule.Match(text, actualDepth);
+            var exactLengthMatches = from m in matches
+                                     where m.Content.Length == text.Length
+                                     select m;
+            //  Take the first available match (of right length)
+            var match = exactLengthMatches.FirstOrDefault();
 
-            if (result.IsFailure || !result.Match.Content.HasContent)
-            {
-                return result;
-            }
-            else
-            {
-                //  Make sure we can match the entire text
-                var remainingText = text.Skip(result.Match.Content.Length);
-
-                if (Interleave == null)
-                {
-                    return RuleResult.Failure(rule, remainingText);
-                }
-                else
-                {
-                    var interleaveResult = _drainInterleavesRule.Match(remainingText, actualDepth);
-
-                    if (interleaveResult.IsSuccess
-                        && interleaveResult.Match.Content.Length == remainingText.Length)
-                    {
-                        return RuleResult.Success(result.Match);
-                    }
-                    else
-                    {
-                        return RuleResult.Failure(Interleave, remainingText);
-                    }
-                }
-            }
+            return match;
         }
     }
 }
