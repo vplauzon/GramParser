@@ -1,9 +1,9 @@
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\bin\Debug\netcoreapp2.0\PasLib.deps.json
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\bin\Debug\netcoreapp2.0\PasLib.dll
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\bin\Debug\netcoreapp2.0\PasLib.pdb
+C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.csprojResolveAssemblyReference.cache
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.csproj.CoreCompileInputs.cache
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.AssemblyInfoInputs.cache
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.AssemblyInfo.cs
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.dll
 C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.pdb
-C:\Users\vilauzon\Documents\git\ParserAsService\PasLib\obj\Debug\netcoreapp2.0\PasLib.csprojResolveAssemblyReference.cache

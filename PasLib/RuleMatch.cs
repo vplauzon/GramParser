@@ -6,36 +6,24 @@ namespace PasLib
 {
     internal class RuleMatch
     {
-        private RuleMatch(string ruleName, int matchLength)
+        private RuleMatch(IRule rule)
         {
-            if (ruleName == string.Empty)
-            {
-                throw new ArgumentNullException(nameof(ruleName));
-            }
-            if (matchLength < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(ruleName));
-            }
-            RuleName = ruleName;
-            MatchLength = matchLength;
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
         }
 
-        public RuleMatch(string ruleName, int matchLength, SubString content) : this(ruleName, matchLength)
+        public RuleMatch(IRule rule, SubString content) : this(rule)
         {
             Content = content;
         }
 
-        public RuleMatch(string ruleName, int matchLength, IEnumerable<RuleMatch> contents) : this(ruleName, matchLength)
+        public RuleMatch(IRule rule, SubString content, IEnumerable<RuleMatch> contents)
+            : this(rule, content)
         {
-            if (contents == null)
-            {
-                throw new ArgumentNullException(nameof(contents));
-            }
-            Contents = contents;
+            Contents = contents ?? throw new ArgumentNullException(nameof(contents));
         }
 
-        public RuleMatch(string ruleName, int matchLength, IDictionary<string, RuleMatch> fragments)
-            : this(ruleName, matchLength)
+        public RuleMatch(IRule rule, SubString content, IDictionary<string, RuleMatch> fragments)
+            : this(rule, content)
         {
             if (fragments == null || fragments.Count == 0)
             {
@@ -44,9 +32,7 @@ namespace PasLib
             Fragments = fragments;
         }
 
-        public string RuleName { get; private set; }
-
-        public int MatchLength { get; private set; }
+        public IRule Rule { get; private set; }
 
         public SubString Content { get; private set; }
 
@@ -54,45 +40,21 @@ namespace PasLib
 
         public IDictionary<string, RuleMatch> Fragments { get; private set; }
 
-        public RuleMatch ChangeName(string ruleName)
+        public RuleMatch ChangeRule(IRule rule)
         {
-            if (ruleName == string.Empty)
+            if (rule == null)
             {
-                throw new ArgumentNullException(nameof(ruleName));
+                throw new ArgumentNullException(nameof(rule));
             }
 
-            if (ruleName == RuleName)
+            if (object.ReferenceEquals(rule, Rule))
             {
                 return this;
             }
             else
             {
-                var newMatch = new RuleMatch(ruleName, MatchLength);
+                var newMatch = new RuleMatch(rule);
 
-                newMatch.Content = Content;
-                newMatch.Contents = Contents;
-                newMatch.Fragments = Fragments;
-
-                return newMatch;
-            }
-        }
-
-        public RuleMatch IncreaseMatchLength(int increase)
-        {
-            if (increase < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(increase));
-            }
-
-            if (increase == 0)
-            {
-                return this;
-            }
-            else
-            {
-                var newMatch = new RuleMatch(RuleName, MatchLength);
-
-                newMatch.MatchLength = MatchLength + increase;
                 newMatch.Content = Content;
                 newMatch.Contents = Contents;
                 newMatch.Fragments = Fragments;

@@ -33,11 +33,9 @@ namespace PasLib
             }
         }
 
-        IRule IRule.Interleave => _referencedRule.Interleave;
-
         string IRule.RuleName => _referencedRule.RuleName;
 
-        RuleResult IRule.Match(SubString text, TracePolicy tracePolicy)
-            => _referencedRule.Match(text, tracePolicy);
+        RuleResult IRule.Match(SubString text, int depth)
+            => _referencedRule.Match(text, depth);
     }
 }

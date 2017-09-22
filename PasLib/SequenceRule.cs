@@ -8,8 +8,8 @@ namespace PasLib
     {
         private readonly TaggedRule[] _rules;
 
-        public SequenceRule(string ruleName, IRule interleave, IEnumerable<TaggedRule> rules)
-            : base(ruleName, interleave)
+        public SequenceRule(string ruleName, IEnumerable<TaggedRule> rules)
+            : base(ruleName)
         {
             if (rules == null || rules.Count() == 0)
             {
@@ -19,42 +19,25 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
             var fragments = new Dictionary<string, RuleMatch>();
             var totalMatchLength = 0;
             var originalText = text;
-            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             foreach (var rule in _rules)
             {
-                var result = rule.Rule.Match(text, tracePolicy);
+                var result = rule.Rule.Match(text, depth - 1);
 
-                tracePolicy.AddTrial(trialAccumulator, result);
                 if (result.IsSuccess)
                 {
                     if (rule.Tag != null)
                     {
-                        if (rule.DoIncludeGrandChildren)
-                        {
-                            fragments[rule.Tag] = result.Match;
-                        }
-                        else
-                        {
-                            var trimmedMatch = new RuleMatch(
-                                result.Match.RuleName,
-                                result.Match.MatchLength,
-                                text.Take(result.Match.MatchLength));
-
-                            fragments[rule.Tag] = result.Match;
-                        }
+                        fragments[rule.Tag] = result.Match;
                     }
-                    text = text.Skip(result.Match.MatchLength);
+                    text = text.Skip(result.Match.Content.Length);
 
-                    var interleaves = SeekInterleaves(text, tracePolicy);
-
-                    text = text.Skip(interleaves);
-                    totalMatchLength += result.Match.MatchLength + interleaves;
+                    totalMatchLength += result.Match.Content.Length;
                 }
                 else
                 {
@@ -62,15 +45,11 @@ namespace PasLib
                 }
             }
 
+            var content = originalText.Take(totalMatchLength);
+
             return fragments.Any()
-                ? new RuleResult(
-                    this,
-                    new RuleMatch(RuleName, totalMatchLength, fragments),
-                    tracePolicy.ExtractTrials(trialAccumulator))
-                : new RuleResult(
-                    this,
-                    new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)),
-                    tracePolicy.ExtractTrials(trialAccumulator));
+                ? RuleResult.Success(new RuleMatch(this, content, fragments))
+                : RuleResult.Success(new RuleMatch(this, content));
         }
 
         public override string ToString()
@@ -78,7 +57,7 @@ namespace PasLib
             var rules = from t in _rules
                         select t.Rule.ToString();
 
-            return "<" + RuleName + "> (" + string.Join(" ", rules)+")";
+            return "<" + RuleName + "> (" + string.Join(" ", rules) + ")";
         }
     }
 }

@@ -11,6 +11,8 @@ namespace PasLib
         private readonly IDictionary<string, IRule> _ruleMap;
         private readonly IRule _drainInterleavesRule;
 
+        public static int DEFAULT_MAX_DEPTH { get => 10; }
+
         public RuleSet(IRule interleave, IEnumerable<IRule> rules)
         {
             if (rules == null)
@@ -21,7 +23,7 @@ namespace PasLib
             Interleave = interleave;
             _drainInterleavesRule = Interleave == null
                 ? MatchNoneRule.Instance
-                : new RepeatRule(null, null, Interleave, null, null, false, false);
+                : new RepeatRule(null, Interleave, null, null, false, false);
             _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
         }
 
@@ -29,8 +31,10 @@ namespace PasLib
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
 
-        public RuleResult Match(string ruleName, SubString text, TracePolicy tracePolicy)
+        public RuleResult Match(string ruleName, SubString text, int? depth = null)
         {
+            var actualDepth = depth ?? DEFAULT_MAX_DEPTH;
+
             if (text.IsNull)
             {
                 throw new ArgumentNullException(nameof(text));
@@ -41,45 +45,33 @@ namespace PasLib
             }
 
             var rule = _ruleMap[ruleName];
-            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
-            var result = rule.Match(text, tracePolicy);
+            var result = rule.Match(text, actualDepth);
 
-            tracePolicy.AddTrial(trialAccumulator, result);
-            if (result.IsFailure || result.Match.MatchLength == text.Length)
+            if (result.IsFailure || !result.Match.Content.HasContent)
             {
                 return result;
             }
             else
             {
                 //  Make sure we can match the entire text
-                var remainingText = text.Skip(result.Match.MatchLength);
+                var remainingText = text.Skip(result.Match.Content.Length);
 
                 if (Interleave == null)
-                {   //  Failure
-                    return new RuleResult(
-                        rule,
-                        remainingText,
-                        tracePolicy.ExtractTrials(trialAccumulator));
+                {
+                    return RuleResult.Failure(rule, remainingText);
                 }
                 else
                 {
-                    var interleaveResult = _drainInterleavesRule.Match(remainingText, tracePolicy);
+                    var interleaveResult = _drainInterleavesRule.Match(remainingText, actualDepth);
 
-                    tracePolicy.AddTrial(trialAccumulator, interleaveResult);
                     if (interleaveResult.IsSuccess
-                        && interleaveResult.Match.MatchLength == remainingText.Length)
+                        && interleaveResult.Match.Content.Length == remainingText.Length)
                     {
-                        return new RuleResult(
-                            rule,
-                            result.Match.IncreaseMatchLength(remainingText.Length),
-                            tracePolicy.ExtractTrials(trialAccumulator));
+                        return RuleResult.Success(result.Match);
                     }
                     else
                     {
-                        return new RuleResult(
-                            rule,
-                            remainingText,
-                            tracePolicy.ExtractTrials(trialAccumulator));
+                        return RuleResult.Failure(Interleave, remainingText);
                     }
                 }
             }

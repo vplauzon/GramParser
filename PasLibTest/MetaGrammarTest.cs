@@ -17,8 +17,8 @@ namespace PasLibTest
         public void TwoDots()
         {
             var dots = new RepeatRule(
-                null, null, new LiteralRule(null, null, "."), 2, 2, false, false);
-            var result = dots.Match("..", TracePolicy.NoTrace);
+                null, new LiteralRule(null, "."), 2, 2, false, false);
+            var result = dots.Match("..", RuleSet.DEFAULT_MAX_DEPTH);
 
             Assert.IsTrue(result.IsSuccess, "Success");
             Assert.AreEqual("..", result.Match.Content, "Content");
@@ -197,14 +197,14 @@ namespace PasLibTest
                 var isSuccess = samples[i].Item1;
                 var ruleName = samples[i].Item2;
                 var text = samples[i].Item3;
-                var ruleSet = MetaGrammar.ParseGrammar(grammar, TracePolicy.NoTrace);
-                var result = ruleSet.Match(ruleName, text, TracePolicy.NoTrace);
+                var ruleSet = MetaGrammar.ParseGrammar(grammar);
+                var result = ruleSet.Match(ruleName, text, RuleSet.DEFAULT_MAX_DEPTH);
 
                 Assert.AreEqual(isSuccess, result.IsSuccess, $"Success - {i}");
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(ruleName, result.Match.RuleName, $"Rule Name - {i}");
+                    Assert.AreEqual(ruleName, result.Match.Rule.RuleName, $"Rule Name - {i}");
                     Assert.AreEqual(text, result.Match.Content.ToString(), $"Content - {i}");
                 }
             }

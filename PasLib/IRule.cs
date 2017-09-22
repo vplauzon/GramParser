@@ -9,9 +9,6 @@ namespace PasLib
         /// <summary>Name of the rule.  Can be <c>null</c> for inline rules.</summary>
         string RuleName { get; }
 
-        /// <summary>Interleave rule.  Can be <c>null</c> if no interleave are defined for this rule.</summary>
-        IRule Interleave { get; }
-
-        RuleResult Match(SubString text, TracePolicy tracePolicy);
+        RuleResult Match(SubString text, int depth);
     }
 }

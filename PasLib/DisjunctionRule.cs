@@ -8,8 +8,8 @@ namespace PasLib
     {
         private readonly TaggedRule[] _rules;
 
-        public DisjunctionRule(string ruleName, IRule interleave, IEnumerable<TaggedRule> rules)
-            : base(ruleName, interleave)
+        public DisjunctionRule(string ruleName, IEnumerable<TaggedRule> rules)
+            : base(ruleName)
         {
             if (rules == null || rules.Count() == 0)
             {
@@ -19,41 +19,33 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
             var shortestUnmatched = new SubString();
-            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             foreach (var rule in _rules)
             {
-                var result = rule.Rule.Match(text, tracePolicy);
+                var result = rule.Rule.Match(text, depth - 1);
 
-                tracePolicy.AddTrial(trialAccumulator, result);
-                if (result.IsSuccess && result.Match.MatchLength != 0)
+                if (result.IsSuccess)
                 {
                     if (rule.Tag == null)
                     {
-                        var trimmedMatch = new RuleMatch(
-                            RuleName,
-                            result.Match.MatchLength,
-                            text.Take(result.Match.MatchLength));
-
-                        return new RuleResult(result.Rule, trimmedMatch, result.Trials);
+                        return RuleResult.Success(result.Match.ChangeRule(this));
                     }
                     else
                     {
                         var fragments = new Dictionary<string, RuleMatch>() {
                             { rule.Tag, result.Match } };
 
-                        return new RuleResult(
-                            result.Rule,
-                            new RuleMatch(RuleName, result.Match.MatchLength, fragments),
-                            result.Trials);
+                        return RuleResult.Success(
+                            new RuleMatch(this, result.Match.Content, fragments));
                     }
                 }
-                else if (result.IsFailure)
+                else
                 {
-                    if (shortestUnmatched.IsNull || result.Unmatched.Length < shortestUnmatched.Length)
+                    if (shortestUnmatched.IsNull
+                        || result.Unmatched.Length < shortestUnmatched.Length)
                     {
                         shortestUnmatched = result.Unmatched;
                     }
@@ -61,8 +53,8 @@ namespace PasLib
             }
 
             return shortestUnmatched.IsNull
-                ? new RuleResult(this, text, tracePolicy.ExtractTrials(trialAccumulator))
-                : new RuleResult(this, shortestUnmatched, tracePolicy.ExtractTrials(trialAccumulator));
+                ? RuleResult.Failure(this, text)
+                : RuleResult.Failure(this, shortestUnmatched);
         }
 
         public override string ToString()

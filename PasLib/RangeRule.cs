@@ -7,11 +7,13 @@ namespace PasLib
 {
     internal class RangeRule : RuleBase
     {
-        public RangeRule(string ruleName, IRule interleave, char first, char last) : base(ruleName, interleave)
+        public RangeRule(string ruleName, char first, char last) : base(ruleName)
         {
             if (last < first)
             {
-                throw new ArgumentOutOfRangeException(nameof(last), "Must be greater or equal to first");
+                throw new ArgumentOutOfRangeException(
+                    nameof(last),
+                    "Must be greater or equal to first");
             }
             First = first;
             Last = last;
@@ -21,7 +23,7 @@ namespace PasLib
 
         public char Last { get; private set; }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
             if (text.HasContent)
             {
@@ -29,14 +31,11 @@ namespace PasLib
 
                 if (peek >= First && peek <= Last)
                 {
-                    return new RuleResult(
-                        this,
-                        new RuleMatch(RuleName, 1, text.Take(1)),
-                        tracePolicy.EmptyTrials);
+                    return RuleResult.Success(new RuleMatch(this, text.Take(1)));
                 }
             }
 
-            return new RuleResult(this, text, tracePolicy.EmptyTrials);
+            return RuleResult.Failure(this, text);
         }
 
         public override string ToString()

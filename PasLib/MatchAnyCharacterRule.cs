@@ -6,22 +6,20 @@ namespace PasLib
 {
     internal class MatchAnyCharacterRule : RuleBase
     {
-        public MatchAnyCharacterRule(string ruleName, IRule interleave) : base(ruleName, interleave)
+        public MatchAnyCharacterRule(string ruleName) : base(ruleName)
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
             if (text.Length == 0)
             {
-                return new RuleResult(this, text, tracePolicy.EmptyTrials);
+                return RuleResult.Failure(this, text);
             }
             else
             {
-                return new RuleResult(
-                    this,
-                    new RuleMatch(RuleName, 1, text.Take(1)),
-                    tracePolicy.EmptyTrials);
+                return RuleResult.Success(
+                    new RuleMatch(this, text.Take(1)));
             }
         }
 

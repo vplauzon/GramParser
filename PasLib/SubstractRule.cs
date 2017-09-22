@@ -9,70 +9,46 @@ namespace PasLib
         private readonly TaggedRule _primary;
         private readonly IRule _excluded;
 
-        public SubstractRule(string ruleName, IRule interleave, TaggedRule primary, IRule excluded)
-            : base(ruleName, interleave)
+        public SubstractRule(string ruleName, TaggedRule primary, IRule excluded)
+            : base(ruleName)
         {
-            if (primary == null)
-            {
-                throw new ArgumentNullException(nameof(primary));
-            }
-            if (excluded == null)
-            {
-                throw new ArgumentNullException(nameof(excluded));
-            }
-
-            _primary = primary;
-            _excluded = excluded;
+            _primary = primary ?? throw new ArgumentNullException(nameof(primary));
+            _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
-            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
-            var primaryResult = _primary.Rule.Match(text, tracePolicy);
+            var primaryResult = _primary.Rule.Match(text, depth - 1);
 
-            tracePolicy.AddTrial(trialAccumulator, primaryResult);
             if (primaryResult.IsSuccess)
             {
-                var primaryText = text.Take(primaryResult.Match.MatchLength);
-                var excludedResult = _excluded.Match(primaryText, tracePolicy);
+                var primaryText = text.Take(primaryResult.Match.Content.Length);
+                var excludedResult = _excluded.Match(primaryText, depth - 1);
 
-                tracePolicy.AddTrial(trialAccumulator, excludedResult);
-                if (excludedResult.IsFailure || excludedResult.Match.MatchLength != primaryText.Length)
+                if (excludedResult.IsFailure
+                    || excludedResult.Match.Content.Length != primaryText.Length)
                 {   //  Success
                     var match = primaryResult.Match;
 
                     return _primary.HasTag
-                        ? new RuleResult(
-                            this,
-                            new RuleMatch(RuleName, match.MatchLength, CreateFragments(match, text)),
-                            tracePolicy.ExtractTrials(trialAccumulator))
-                        : new RuleResult(
-                            this,
-                            new RuleMatch(RuleName, match.MatchLength, text.Take(match.MatchLength)),
-                            tracePolicy.ExtractTrials(trialAccumulator));
+                        ? RuleResult.Success(
+                            new RuleMatch(this, match.Content, CreateFragments(match, text)))
+                        : RuleResult.Success(
+                            new RuleMatch(this, match.Content));
                 }
             }
-            //  Failure
-            return new RuleResult(this, text, tracePolicy.ExtractTrials(trialAccumulator));
+
+            return RuleResult.Failure(this, text);
         }
 
         private IDictionary<string, RuleMatch> CreateFragments(RuleMatch match, SubString text)
         {
-            if (_primary.DoIncludeGrandChildren)
-            {
-                return new Dictionary<string, RuleMatch>() { { _primary.Tag, match } };
-            }
-            else
-            {
-                var trimmedMatch = new RuleMatch(match.RuleName, match.MatchLength, text.Take(match.MatchLength));
-
-                return new Dictionary<string, RuleMatch>() { { _primary.Tag, trimmedMatch } };
-            }
+            return new Dictionary<string, RuleMatch>() { { _primary.Tag, match } };
         }
 
         public override string ToString()
         {
-            return "<" + RuleName + "> (" + _primary.ToString() + " - " + _excluded.ToString() + ")";
+            return $"<{RuleName}> ({_primary.ToString()} - {_excluded.ToString()})";
         }
     }
 }

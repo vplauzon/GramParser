@@ -9,18 +9,18 @@ namespace PasLib
 
         public static IRule Instance { get { return _instance; } }
 
-        private MatchNoneRule() : base(null, null)
+        private MatchNoneRule() : base(null)
         {
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
-            return new RuleResult(this, text, tracePolicy.EmptyTrials);
+            return RuleResult.Failure(this, text);
         }
 
         public override string ToString()
         {
-            return "<" + RuleName + "> (*Match None*)";
+            return "<>(*Match None*)";
         }
     }
 }

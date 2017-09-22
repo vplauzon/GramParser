@@ -14,18 +14,14 @@ namespace PasLib
 
         public RepeatRule(
             string ruleName,
-            IRule interleave,
             IRule rule,
             int? min,
             int? max,
             bool doIncludeChildren,
             bool doIncludeGrandChildren)
-            : base(ruleName, interleave)
+            : base(ruleName)
         {
-            if (rule == null)
-            {
-                throw new ArgumentNullException(nameof(rule));
-            }
+            _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)
             {
                 throw new ArgumentOutOfRangeException(nameof(max), "Must be larger than min");
@@ -37,70 +33,44 @@ namespace PasLib
                     "Can't include grand children if children aren't included");
             }
 
-            _rule = rule;
             _min = min;
             _max = max;
             _doIncludeChildren = doIncludeChildren;
             _doIncludeGrandChildren = doIncludeGrandChildren;
         }
 
-        protected override RuleResult OnMatch(SubString text, TracePolicy tracePolicy)
+        protected override RuleResult OnMatch(SubString text, int depth)
         {
             var children = new List<RuleMatch>();
             var originalText = text;
             int totalMatchLength = 0;
             int i = 0;
-            var trialAccumulator = tracePolicy.CreateTrialAccumulator();
 
             while (true)
             {
-                var result = _rule.Match(text, tracePolicy);
+                var result = _rule.Match(text, depth - 1);
 
-                tracePolicy.AddTrial(trialAccumulator, result);
-                if (result.IsSuccess)
+                if (result.IsSuccess && result.Match.Content.Length > 0)
                 {
                     if (_doIncludeChildren)
                     {
-                        if (_doIncludeGrandChildren)
-                        {
-                            children.Add(result.Match);
-                        }
-                        else
-                        {
-                            var trimmedMatch = new RuleMatch(
-                                result.Match.RuleName,
-                                result.Match.MatchLength,
-                                text.Take(result.Match.MatchLength));
-
-                            children.Add(trimmedMatch);
-                        }
+                        children.Add(result.Match);
                     }
                     ++i;
-                    totalMatchLength += result.Match.MatchLength;
-                    text = text.Skip(result.Match.MatchLength);
+                    totalMatchLength += result.Match.Content.Length;
+                    text = text.Skip(result.Match.Content.Length);
+                }
+                else if ((!_min.HasValue || i >= _min.Value) && (!_max.HasValue || i <= _max.Value))
+                {
+                    var content = originalText.Take(totalMatchLength);
+
+                    return _doIncludeGrandChildren
+                        ? RuleResult.Success(new RuleMatch(this, content, children))
+                        : RuleResult.Success(new RuleMatch(this, content));
                 }
                 else
                 {
-                    if ((!_min.HasValue || i >= _min.Value)
-                        && (!_max.HasValue || i <= _max.Value))
-                    {
-                        return _doIncludeGrandChildren
-                            ? new RuleResult(
-                                this,
-                                new RuleMatch(RuleName, totalMatchLength, children),
-                                tracePolicy.ExtractTrials(trialAccumulator))
-                            : new RuleResult(
-                                this,
-                                new RuleMatch(RuleName, totalMatchLength, originalText.Take(totalMatchLength)),
-                                tracePolicy.ExtractTrials(trialAccumulator));
-                    }
-                    else
-                    {
-                        return new RuleResult(
-                            this,
-                            text,
-                            tracePolicy.ExtractTrials(trialAccumulator));
-                    }
+                    return RuleResult.Failure(this, text);
                 }
             }
         }
