@@ -255,7 +255,6 @@ namespace PasLibTest
             }
         }
 
-        [Ignore]
         [TestMethod]
         public void DisjunctionWithRepeat()
         {
@@ -296,7 +295,6 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Content.Length, $"MatchLength - {i}");
-                    Assert.IsTrue(match.Content.IsNull, $"Content - {i}");
                     Assert.IsNotNull(match.Contents, $"Contents - {i}");
                 }
             }
