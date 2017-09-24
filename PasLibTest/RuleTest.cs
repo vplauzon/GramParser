@@ -463,15 +463,13 @@ namespace PasLibTest
         #endregion
 
         #region Recursion
-        //  Proove the design flaw
-        [Ignore]
         [TestMethod]
         public void PotentialInfiniteRecurse()
         {
             //  Equivalent to:
             //  rule A = "a".."z";
             //  rule B = C "," C;
-            //  rule C = B | A;
+            //  rule C = A | B;
             //  Try to match "a" with C
             var ruleA = new RangeRule("A", 'a', 'z');
             var proxyC = new RuleProxy();
@@ -481,8 +479,8 @@ namespace PasLibTest
                 new TaggedRule(proxyC)
             });
             var ruleC = new DisjunctionRule("C", new[] {
-                new TaggedRule(ruleB),
-                new TaggedRule(ruleA)
+                new TaggedRule(ruleA),
+                new TaggedRule(ruleB)
             });
 
             proxyC.ReferencedRule = ruleC;
