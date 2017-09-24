@@ -145,7 +145,7 @@ namespace PasLib
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
-            return new RuleSet(interleave, new[] { main });
+            return new RuleSet(new[] { main });
         }
 
         private static IRule GetCharacterRule()
@@ -171,7 +171,7 @@ namespace PasLib
                 ruleMap[ruleID] = rule;
             }
 
-            return new RuleSet(null, ruleMap.Values);
+            return new RuleSet(ruleMap.Values);
         }
 
         private static IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)

@@ -9,25 +9,18 @@ namespace PasLib
     internal class RuleSet
     {
         private readonly IDictionary<string, IRule> _ruleMap;
-        private readonly IRule _drainInterleavesRule;
 
         public static int DEFAULT_MAX_DEPTH { get => 10; }
 
-        public RuleSet(IRule interleave, IEnumerable<IRule> rules)
+        public RuleSet(IEnumerable<IRule> rules)
         {
-            if (rules == null)
+            if (rules == null || !rules.Any())
             {
                 throw new ArgumentNullException(nameof(rules));
             }
 
-            Interleave = interleave;
-            _drainInterleavesRule = Interleave == null
-                ? MatchNoneRule.Instance
-                : new RepeatRule(null, Interleave, null, null);
             _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
         }
-
-        public IRule Interleave { get; private set; }
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
 
