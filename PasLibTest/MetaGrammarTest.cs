@@ -17,11 +17,11 @@ namespace PasLibTest
         public void TwoDots()
         {
             var dots = new RepeatRule(
-                null, new LiteralRule(null, "."), 2, 2, false, false);
+                null, new LiteralRule(null, "."), 2, 2);
             var match = dots.Match("..", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual("..", match.Content, "Content");
+            Assert.AreEqual("..", match.Text, "Content");
         }
         #endregion
 
@@ -205,7 +205,7 @@ namespace PasLibTest
                 if (isSuccess)
                 {
                     Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
-                    Assert.AreEqual(text, match.Content.ToString(), $"Content - {i}");
+                    Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
                 }
             }
         }

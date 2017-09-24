@@ -2,43 +2,78 @@
 
 any (matches anything, one character long):
 
-	rule = .
+	rule any = .
 
 literal:
 
-	rule = "Hi" -> { "Rule" : "rule", "Content" : "Hi" }
+	rule lit = "Hi" -> { "rule" : "lit", "text" : "Hi" }
 
 range:
 
-	rule = "a".."z" -> { "Rule" : "rule", "Content" : "g" }
+	rule range = "a".."z" -> { "rule" : "range", "text" : "g" }
 
 repeat:
 
-	rule = ruleX{a,b} -> { "Rule" : "rule", "Content" : "abababab" }
-	rule = (:ruleX){a,b} -> { "Rule" : "rule", "Contents" : [{Rule":"ruleX", Content:"bob"},...] }
-	rule = (::ruleX){a,b} -> { "Rule" : "rule", "Contents" : [{Rule":"ruleX", "Fragments" : {"first" : "bo", "last":  "b"}},...] }
+	rule rep = ruleX{a,b} -> { "rule" : "rep", "text" : "tototototo" }
+	rule rep = x::ruleX{a,b} ->	{
+									"rule" : "rep",
+									"fragments" :
+									{
+										"x" : 
+										{
+											"rule" : "ruleX",
+											"text" : "tototo"
+										}
+									}
+								}
+	rule rep = x:ruleX{a,b} ->	{
+									"rule" : "rep",
+									"fragments" :
+									{
+										"x" : 
+										{
+											"rule" : "",
+											"repeats" :
+											[
+												{
+													"rule" : "ruleX",
+													"text" : "to"
+												},
+												...
+											]
+										}
+									}
+								}
 
 disjunction:
 
-	rule = ruleX | ruleY -> { "Rule" : "rule", "Content" : "Hi" }
-	rule = a:ruleX | b:ruleX -> { "Rule" : "rule", "Fragment"s: {a : {Content:"Hi"}} }
+	rule dis = ruleX | ruleY -> { "rule" : "dis", "text" : "Hi" }
+	rule dis = a:ruleX | b:ruleX -> { "rule" : "dis", "fragments": {"a" : {text:"Hi"}} }
 
 sequence:
 
-	rule = ruleX ruleY -> { "Rule" : "rule", "Content" : "Hi Bob" }
-	rule = a:ruleX b:ruleY -> { "Rule" : "rule", "Fragments": {a : {Content:"Hi"}, b: {Content:"Bob"}} }
-	                       -> { "Rule" : "rule", "Fragments": {a : {"Rule":"ruleX", "Fragments":{"h":"H", "vowel":"i"}}, b: {Content:"Bob"}} }
-	rule = a:ruleX a:ruleY -> { "Rule" : "rule", "Fragments": {a : {"Contents" : [{Content : "Hi"}, {"Content" : "Bob"}] } } }
-
+	rule seq = ruleX ruleY -> { "rule" : "seq", "text" : "Hi Bob" }
+	rule = a:ruleX b:ruleY -> { "rule" : "seq", "fragments": {"a" : {"text":"Hi"}, "b": {"text":"Bob"}} }
+	                       ->	{
+									"rule" : "seq",
+									"fragments" :
+									{
+										"a" : {"rule":"ruleX", "fragments":{"h":{...}, "vowel":{...}}},
+										"b" : {"rule":"ruleY", "text":"Bob"}
+									}
+								}
 substract:
 
-	rule = ruleX - ruleY -> { "Rule" : "rule", "Content" : "Hi Bob" }
-	rule = a:ruleX - ruleY -> { "Rule" : "rule", "Fragments": {a : {Content:"Hi Bob"}} }
+	rule sub = ruleX - ruleY -> { "rule" : "sub", "text" : "Hi Bob" }
+	rule sub = a:ruleX - ruleY ->	{
+										"rule" : "sub",
+										"fragments": {"a" : {"rule" :"ruleX", "text":"Hi Bob"}}
+									}
 
 interleave:
 
-	rule interleave = (" " | "\r" | "\n" | "\t")+
+	interleave = (" " | "\r" | "\n" | "\t")+
 
 exclude interleave:
 
-	rule(interleave = false) = rule...
+	token myToken = ...

@@ -11,16 +11,12 @@ namespace PasLib
         private readonly IRule _rule;
         private readonly int? _min;
         private readonly int? _max;
-        private readonly bool _doIncludeChildren;
-        private readonly bool _doIncludeGrandChildren;
 
         public RepeatRule(
             string ruleName,
             IRule rule,
             int? min,
-            int? max,
-            bool doIncludeChildren,
-            bool doIncludeGrandChildren)
+            int? max)
             : base(ruleName)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
@@ -28,17 +24,9 @@ namespace PasLib
             {
                 throw new ArgumentOutOfRangeException(nameof(max), "Must be larger than min");
             }
-            if (!doIncludeChildren && doIncludeGrandChildren)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(doIncludeGrandChildren),
-                    "Can't include grand children if children aren't included");
-            }
 
             _min = min;
             _max = max;
-            _doIncludeChildren = doIncludeChildren;
-            _doIncludeGrandChildren = doIncludeGrandChildren;
         }
 
         protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
@@ -70,21 +58,19 @@ namespace PasLib
         {
             var matches = _rule.Match(text, depth - 1);
             var nonEmptyMatches = from m in matches
-                                  where m.Content.Length > 0
+                                  where m.Text.Length > 0
                                   select m;
 
             if (nonEmptyMatches.Any())
             {
                 foreach (var match in nonEmptyMatches)
                 {
-                    var newReverseChildren = _doIncludeChildren
-                        ? reverseChilden.Prepend(match)
-                        : reverseChilden;
-                    var newTotalMatchLength = totalMatchLength + match.Content.Length;
+                    var newReverseChildren = reverseChilden.Prepend(match);
+                    var newTotalMatchLength = totalMatchLength + match.Text.Length;
 
                     if (!_max.HasValue || iteration + 1 < _max.Value)
                     {   //  We can still repeat
-                        var remainingText = text.Skip(match.Content.Length);
+                        var remainingText = text.Skip(match.Text.Length);
                         var downstreamMatches = RecurseMatch(
                             remainingText,
                             originalText,

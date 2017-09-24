@@ -6,9 +6,6 @@ namespace PasLib
 {
     internal class SequenceRule : RuleBase
     {
-        private static readonly KeyValuePair<string, RuleMatch>[] EMPTY_FRAGMENTS =
-            new KeyValuePair<string, RuleMatch>[0];
-
         private readonly TaggedRule[] _rules;
 
         public SequenceRule(string ruleName, IEnumerable<TaggedRule> rules)
@@ -30,7 +27,7 @@ namespace PasLib
                 text,
                 0,
                 depth,
-                EMPTY_FRAGMENTS);
+                TaggedRule.EMPTY_FRAGMENTS);
         }
 
         public override string ToString()
@@ -55,15 +52,12 @@ namespace PasLib
 
             foreach (var match in matches)
             {
-                var newTotalMatchLength = totalMatchLength + match.Content.Length;
-                var newFragments = currentRule.Tag == null
-                    ? fragments
-                    : fragments.Prepend(new KeyValuePair<string, RuleMatch>(
-                        currentRule.Tag, match));
+                var newTotalMatchLength = totalMatchLength + match.Text.Length;
+                var newFragments = currentRule.AddFragment(fragments, match);
 
                 if (remainingRules.Any())
                 {   //  Recurse
-                    var remainingText = text.Skip(match.Content.Length);
+                    var remainingText = text.Skip(match.Text.Length);
                     var downstreamMatches = RecurseMatch(
                         remainingRules,
                         originalText,
@@ -82,7 +76,7 @@ namespace PasLib
                     yield return new RuleMatch(
                         this,
                         originalText.Take(newTotalMatchLength),
-                        new Dictionary<string, RuleMatch>(newFragments));
+                        newFragments);
                 }
                 else
                 {

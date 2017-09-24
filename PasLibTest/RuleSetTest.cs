@@ -18,9 +18,7 @@ namespace PasLibTest
                 "all",
                 new LiteralRule(null, "ab"),
                 null,
-                null,
-                false,
-                false);
+                null);
             var ruleSet = new RuleSet(interleave, new[] { rule });
             var text = " ababababkebab  ";
             var match = ruleSet.Match("all", text, RuleSet.DEFAULT_MAX_DEPTH);

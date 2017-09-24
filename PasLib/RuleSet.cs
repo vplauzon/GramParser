@@ -23,7 +23,7 @@ namespace PasLib
             Interleave = interleave;
             _drainInterleavesRule = Interleave == null
                 ? MatchNoneRule.Instance
-                : new RepeatRule(null, Interleave, null, null, false, false);
+                : new RepeatRule(null, Interleave, null, null);
             _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
         }
 
@@ -46,7 +46,7 @@ namespace PasLib
             var rule = _ruleMap[ruleName];
             var matches = rule.Match(text, actualDepth);
             var exactLengthMatches = from m in matches
-                                     where m.Content.Length == text.Length
+                                     where m.Text.Length == text.Length
                                      select m;
             //  Take the first available match (of right length)
             var match = exactLengthMatches.FirstOrDefault();

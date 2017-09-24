@@ -40,9 +40,9 @@ namespace PasLib
                 new RangeRule(null, 'a', 'z'),
                 new RangeRule(null, 'A', 'Z'),
                 new RangeRule(null, '0', '9')));
-            var identifier = new RepeatRule("identifier", identifierChar, 1, null, false, false);
+            var identifier = new RepeatRule("identifier", identifierChar, 1, null);
             var number = new RepeatRule(
-                "identifier", new RangeRule(null, '0', '9'), 1, null, false, false);
+                "identifier", new RangeRule(null, '0', '9'), 1, null);
             var character = GetCharacterRule();
             var quotedCharacter = new SequenceRule("literal", new[]
             {
@@ -53,7 +53,7 @@ namespace PasLib
             var literal = new SequenceRule("literal", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
-                new TaggedRule("l", new RepeatRule(null, character, null, null, false, false)),
+                new TaggedRule("l", new RepeatRule(null, character, null, null)),
                 new TaggedRule(null, new LiteralRule(null, "\""))
             });
             var any = new LiteralRule("any", ".");
@@ -62,7 +62,7 @@ namespace PasLib
             var range = new SequenceRule("range", new[]
             {
                 new TaggedRule("lower", quotedCharacter),
-                new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2,false, false)),
+                new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2)),
                 new TaggedRule("upper", quotedCharacter)
             });
             var exactCardinality = new SequenceRule("exactCardinality", new[]
@@ -105,11 +105,9 @@ namespace PasLib
                             new TaggedRule("d", ruleBodyProxy)
                         }),
                     1,
-                    null,
-                    true,
-                    true))
+                    null))
             });
-            var sequence = new RepeatRule("sequence", ruleBodyProxy, 2, null, true, true);
+            var sequence = new RepeatRule("sequence", ruleBodyProxy, 2, null);
             var substract = new SequenceRule("substract", new[]
             {
                 new TaggedRule("primary", ruleBodyProxy),
@@ -143,7 +141,7 @@ namespace PasLib
                 new TaggedRule(null, new LiteralRule(null, ";"))
             });
             //  Main rule
-            var main = new RepeatRule("main", ruleDeclaration, 1, null, true, true);
+            var main = new RepeatRule("main", ruleDeclaration, 1, null);
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
@@ -164,9 +162,9 @@ namespace PasLib
         {
             var ruleMap = new Dictionary<string, IRule>();
 
-            foreach (var ruleMatch in match.Contents)
+            foreach (var ruleMatch in match.Repeats)
             {
-                var ruleID = ruleMatch.Fragments["id"].Content.ToString();
+                var ruleID = ruleMatch.Fragments["id"].Text.ToString();
                 var ruleBodyMatch = ruleMatch.Fragments["body"];
                 var rule = CreateRule(ruleID, ruleBodyMatch);
 
@@ -206,7 +204,7 @@ namespace PasLib
 
         private static IRule CreateLiteral(string ruleID, RuleMatch ruleBodyBody)
         {
-            var literal = ruleBodyBody.Fragments["l"].Content;
+            var literal = ruleBodyBody.Fragments["l"].Text;
             var rule = new LiteralRule(ruleID, literal.Enumerate());
 
             return rule;
@@ -219,8 +217,8 @@ namespace PasLib
 
         private static IRule CreateRange(string ruleID, RuleMatch ruleBodyBody)
         {
-            var lower = ruleBodyBody.Fragments["lower"].Fragments["l"].Content.First;
-            var upper = ruleBodyBody.Fragments["upper"].Fragments["l"].Content.First;
+            var lower = ruleBodyBody.Fragments["lower"].Fragments["l"].Text.First;
+            var upper = ruleBodyBody.Fragments["upper"].Fragments["l"].Text.First;
 
             return new RangeRule(ruleID, lower, upper);
         }
@@ -234,25 +232,25 @@ namespace PasLib
             switch (cardinality.Fragments.Keys.First())
             {
                 case "star":
-                    return new RepeatRule(ruleID, rule, null, null, false, false);
+                    return new RepeatRule(ruleID, rule, null, null);
                 case "plus":
-                    return new RepeatRule(ruleID, rule, 1, null, false, false);
+                    return new RepeatRule(ruleID, rule, 1, null);
                 case "question":
-                    return new RepeatRule(ruleID, rule, 0, 1, false, false);
+                    return new RepeatRule(ruleID, rule, 0, 1);
                 case "exact":
                     {
                         var exact = cardinality.Fragments.Values.First();
-                        var n = int.Parse(exact.Fragments["n"].Content.ToString());
+                        var n = int.Parse(exact.Fragments["n"].Text.ToString());
 
-                        return new RepeatRule(ruleID, rule, n, n, false, false);
+                        return new RepeatRule(ruleID, rule, n, n);
                     }
                 case "minMax":
                     {
                         var minMax = cardinality.Fragments.Values.First();
-                        var min = int.Parse(minMax.Fragments["min"].Content.ToString());
-                        var max = int.Parse(minMax.Fragments["max"].Content.ToString());
+                        var min = int.Parse(minMax.Fragments["min"].Text.ToString());
+                        var max = int.Parse(minMax.Fragments["max"].Text.ToString());
 
-                        return new RepeatRule(ruleID, rule, min, max, false, false);
+                        return new RepeatRule(ruleID, rule, min, max);
                     }
                 default:
                     throw new NotSupportedException();
@@ -264,7 +262,7 @@ namespace PasLib
             var head = ruleBodyBody.Fragments["head"];
             var tail = ruleBodyBody.Fragments["tail"];
             var headRule = CreateRule(null, head);
-            var tailRules = from c in tail.Contents
+            var tailRules = from c in tail.Repeats
                             select CreateRule(null, c.Fragments["d"]);
             var rules = new[] { headRule }.Concat(tailRules);
 
@@ -273,7 +271,7 @@ namespace PasLib
 
         private static IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
         {
-            var rules = from r in ruleBodyBody.Contents
+            var rules = from r in ruleBodyBody.Repeats
                         select CreateRule(null, r);
 
             return new SequenceRule(ruleID, TaggedRule.FromRules(rules));

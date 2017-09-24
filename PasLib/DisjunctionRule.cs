@@ -27,19 +27,9 @@ namespace PasLib
 
                 foreach (var m in matches)
                 {
-                    if (rule.HasTag)
-                    {
-                        var fragments = new Dictionary<string, RuleMatch>() { { rule.Tag, m } };
+                    var fragments = rule.AddFragment(TaggedRule.EMPTY_FRAGMENTS, m);
 
-                        yield return new RuleMatch(
-                            this,
-                            m.Content,
-                            fragments);
-                    }
-                    else
-                    {
-                        yield return m.ChangeRule(this);
-                    }
+                    yield return new RuleMatch(this, m.Text, fragments);
                 }
             }
         }

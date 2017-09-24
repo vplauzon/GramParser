@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace PasLib
@@ -12,32 +13,38 @@ namespace PasLib
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
         }
 
-        public RuleMatch(IRule rule, SubString content) : this(rule)
+        public RuleMatch(IRule rule, SubString text) : this(rule)
         {
-            Content = content;
+            Text = text;
         }
 
-        public RuleMatch(IRule rule, SubString content, IEnumerable<RuleMatch> contents)
-            : this(rule, content)
+        public RuleMatch(IRule rule, SubString text, IEnumerable<RuleMatch> repeats)
+            : this(rule, text)
         {
-            Contents = contents ?? throw new ArgumentNullException(nameof(contents));
+            Repeats = repeats ?? throw new ArgumentNullException(nameof(repeats));
         }
 
-        public RuleMatch(IRule rule, SubString content, IDictionary<string, RuleMatch> fragments)
-            : this(rule, content)
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
+            : this(rule, text)
         {
-            if (fragments == null || fragments.Count == 0)
+            if (fragments == null)
             {
                 throw new ArgumentNullException(nameof(fragments));
             }
-            Fragments = fragments;
+
+            Fragments = fragments.Any()
+                ? new Dictionary<string, RuleMatch>(fragments)
+                : null;
         }
 
         public IRule Rule { get; private set; }
 
-        public SubString Content { get; private set; }
+        public SubString Text { get; private set; }
 
-        public IEnumerable<RuleMatch> Contents { get; private set; } = EMPTY_CONTENTS;
+        public IEnumerable<RuleMatch> Repeats { get; private set; } = EMPTY_CONTENTS;
 
         public IDictionary<string, RuleMatch> Fragments { get; private set; }
 
@@ -56,12 +63,19 @@ namespace PasLib
             {
                 var newMatch = new RuleMatch(rule);
 
-                newMatch.Content = Content;
-                newMatch.Contents = Contents;
+                newMatch.Text = Text;
+                newMatch.Repeats = Repeats;
                 newMatch.Fragments = Fragments;
 
                 return newMatch;
             }
+        }
+
+        public RuleMatch RemoveChildren()
+        {
+            return Fragments == null && !Repeats.Any()
+                ? this
+                : new RuleMatch(Rule, Text);
         }
     }
 }

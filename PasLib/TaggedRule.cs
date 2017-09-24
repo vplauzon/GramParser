@@ -7,29 +7,24 @@ namespace PasLib
 {
     internal class TaggedRule
     {
-        public TaggedRule(IRule rule) : this(null, rule, false)
+        public TaggedRule(IRule rule) : this(null, rule, true)
         {
         }
 
-        public TaggedRule(string tag, IRule rule) : this(tag, rule, false)
-        {
-        }
-
-        public TaggedRule(string tag, IRule rule, bool doIncludeGrandChildren)
+        public TaggedRule(string tag, IRule rule, bool doIncludeChildren = true)
         {
             if (tag == string.Empty)
             {
                 throw new ArgumentNullException(nameof(tag));
             }
-            if (rule == null)
-            {
-                throw new ArgumentNullException(nameof(rule));
-            }
 
             Tag = tag;
-            Rule = rule;
-            DoIncludeGrandChildren = doIncludeGrandChildren;
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
+            DoIncludeChildren = doIncludeChildren;
         }
+
+        public static IEnumerable<KeyValuePair<string, RuleMatch>> EMPTY_FRAGMENTS { get; }
+            = new KeyValuePair<string, RuleMatch>[0];
 
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
         {
@@ -50,11 +45,25 @@ namespace PasLib
 
         public IRule Rule { get; private set; }
 
-        public bool DoIncludeGrandChildren { get; private set; }
+        public bool DoIncludeChildren { get; }
+
+        public IEnumerable<KeyValuePair<string, RuleMatch>> AddFragment(
+            IEnumerable<KeyValuePair<string, RuleMatch>> fragments,
+            RuleMatch match)
+        {
+            return Tag == null
+                ? fragments
+                : fragments.Prepend(new KeyValuePair<string, RuleMatch>(Tag, FormatMatch(match)));
+        }
 
         public override string ToString()
         {
-            return "[" + Tag + "]" + Rule.ToString(); 
+            return "[" + Tag + "]" + Rule.ToString();
+        }
+
+        private RuleMatch FormatMatch(RuleMatch match)
+        {
+            return DoIncludeChildren ? match : match.RemoveChildren();
         }
     }
 }

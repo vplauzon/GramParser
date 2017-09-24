@@ -22,10 +22,10 @@ namespace PasLib
 
             foreach (var primaryMatch in primaryMatches)
             {
-                var primaryText = primaryMatch.Content;
+                var primaryText = primaryMatch.Text;
                 var excludedMatches = _excluded.Match(primaryText, depth - 1);
                 var excludedExactLength = from ex in excludedMatches
-                                          where ex.Content.Length == primaryText.Length
+                                          where ex.Text.Length == primaryText.Length
                                           select ex;
 
                 if (!excludedExactLength.Any())
@@ -36,7 +36,7 @@ namespace PasLib
 
                         yield return new RuleMatch(
                             this,
-                            primaryMatch.Content,
+                            primaryMatch.Text,
                             fragments);
                     }
                     else

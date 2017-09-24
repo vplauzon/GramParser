@@ -1,14 +1,14 @@
 ﻿#	Comments & interleaves
-rule(interleave = false) Comment = "#" (. - ("\r" | "\n"))+;
-rule interleave = (" " | "\r" | "\n" | "\t") | Comment;
+token Comment = "#" (. - ("\r" | "\n"))+;
+interleave = (" " | "\r" | "\n" | "\t") | comments;
 
 #	tokens
-rule(interleave = false) identifier = ("a".."z" | "A".."Z" | "0".."9")+;
-rule(interleave = false) number = ("0".."9")+;
-rule(interleave = false) character = . - "\"" - "\r" - "\n";
-rule(interleave = false) quotedCharacter = "\"" c:character "\"";
-rule(interleave = false) literal = "\"" l:character* "\"";
-rule(interleave = false) any = ".";
+token identifier = ("a".."z" | "A".."Z" | "0".."9")+;
+token number = ("0".."9")+;
+token character = . - "\"" - "\r" - "\n";
+token quotedCharacter = "\"" c:character "\"";
+token literal = "\"" l:character* "\"";
+token any = ".";
 
 #	rules
 rule range = lower:quotedCharacter ".." upper:quotedCharacter;
@@ -24,4 +24,4 @@ rule ruleBody = braket | substract | sequence | disjunction | repeat:repeat | li
 rule ruleDeclaration = "rule" id:identifier "=" body:ruleBody ";";
 
 #	main rule
-rule main = ::(ruleDeclaration)*;
+rule main = m:ruleDeclaration*;
