@@ -165,13 +165,13 @@ namespace PasLib
             var ruleBody = new DisjunctionRule("ruleBody", new[]
             {
                 new TaggedRule("literal", literal),
-                new TaggedRule("any", any),
+                new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
+                new TaggedRule("any", any),
                 new TaggedRule("substract", substract),
-                new TaggedRule("sequence", sequence),
                 new TaggedRule("disjunction", disjunction),
                 new TaggedRule("repeat", repeat),
-                new TaggedRule("range", range)
+                new TaggedRule("sequence", sequence)
             });
             var interleaveDeclaration = InterleaveRule.FromSequence(new SequenceRule(
                 "interleaveDeclaration",

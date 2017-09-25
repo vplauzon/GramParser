@@ -17,10 +17,15 @@
     <RootNamespace>PasLibTest</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Meta\AnyGrammar.txt" />
     <None Remove="Meta\DisjunctionGrammar.txt" />
     <None Remove="Meta\LiteralGrammar.txt" />
+    <None Remove="Meta\OneLetterOneRuleGrammar.txt" />
     <None Remove="Meta\RangeGrammar.txt" />
     <None Remove="Meta\RepeatGrammar.txt" />
     <None Remove="Meta\SequenceGrammar.txt" />
@@ -30,8 +35,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Meta\AnyGrammar.txt" />
     <EmbeddedResource Include="Meta\DisjunctionGrammar.txt" />
-    <EmbeddedResource Include="Meta\OneLetterOneRule.txt" />
     <EmbeddedResource Include="Meta\LiteralGrammar.txt" />
+    <EmbeddedResource Include="Meta\OneLetterOneRuleGrammar.txt" />
     <EmbeddedResource Include="Meta\RangeGrammar.txt" />
     <EmbeddedResource Include="Meta\RepeatGrammar.txt" />
     <EmbeddedResource Include="Meta\SequenceGrammar.txt" />

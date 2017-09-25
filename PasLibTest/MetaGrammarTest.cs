@@ -23,7 +23,7 @@ namespace PasLibTest
                 Tuple.Create(false, "main", "z"),
             };
 
-            SimpleTest("OneLetterOneRule.txt", samples);
+            SimpleTest("OneLetterOneRuleGrammar.txt", samples);
         }
 
         [TestMethod]

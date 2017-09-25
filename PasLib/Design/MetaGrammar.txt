@@ -25,9 +25,9 @@ rule disjunction = t:tag head:ruleBody tail:("|" t:tag d:ruleBody)+;
 rule sequence = (t:tag r:ruleBody){1,};
 rule substract = t:tag primary:ruleBody "-" excluded:ruleBody;
 rule braket = "(" r:ruleBody ")";
-rule ruleBody = literal:literal | any:any | braket | substract | sequence
-	| disjunction | repeat:repeat
-	| range:range;
+rule ruleBody = literal:literal | range:range
+	| braket | any:any | substract | disjunction | repeat:repeat
+	| sequence;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
 rule boolean = true | false;
