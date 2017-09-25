@@ -10,7 +10,7 @@ namespace PasLib
     {
         private readonly IDictionary<string, IRule> _ruleMap;
 
-        public static int DEFAULT_MAX_DEPTH { get => 10; }
+        public static int DEFAULT_MAX_DEPTH { get => 40; }
 
         public RuleSet(IEnumerable<IRule> rules)
         {

@@ -7,23 +7,24 @@ using System.IO;
 
 namespace PasLibTest
 {
-    //  Let's ignore those until replatform
-    [Ignore]
     [TestClass]
     public class MetaGrammarTest
     {
-        #region Meta Grammar sub rules
+        #region Simple Tests with grammar files
         [TestMethod]
-        public void TwoDots()
+        public void OneLetterOneRule()
         {
-            var dots = new RepeatRule(
-                null, new LiteralRule(null, "."), 2, 2);
-            var match = dots.Match("..", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var samples = new[]
+            {
+                Tuple.Create(false, "main", "a"),
+                Tuple.Create(false, "main", "V"),
+                Tuple.Create(false, "main", "vvv"),
+                Tuple.Create(true, "main", "v"),
+                Tuple.Create(false, "main", "z"),
+            };
 
-            Assert.IsNotNull(match, "Success");
-            Assert.AreEqual("..", match.Text, "Content");
+            SimpleTest("OneLetterOneRule.txt", samples);
         }
-        #endregion
 
         [TestMethod]
         public void Literal()
@@ -198,9 +199,12 @@ namespace PasLibTest
                 var ruleName = samples[i].Item2;
                 var text = samples[i].Item3;
                 var ruleSet = MetaGrammar.ParseGrammar(grammar);
+
+                Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
+
                 var match = ruleSet.Match(ruleName, text, RuleSet.DEFAULT_MAX_DEPTH);
 
-                Assert.AreEqual(isSuccess, match == null, $"Success - {i}");
+                Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 
                 if (isSuccess)
                 {
@@ -223,5 +227,6 @@ namespace PasLibTest
                 return text;
             }
         }
+        #endregion
     }
 }

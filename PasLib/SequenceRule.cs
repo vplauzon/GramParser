@@ -6,8 +6,6 @@ namespace PasLib
 {
     internal class SequenceRule : RuleBase
     {
-        private readonly TaggedRule[] _rules;
-
         public SequenceRule(string ruleName, IEnumerable<TaggedRule> rules)
             : base(ruleName)
         {
@@ -16,13 +14,15 @@ namespace PasLib
                 throw new ArgumentNullException(nameof(rules));
             }
 
-            _rules = rules.ToArray();
+            Rules = rules.ToArray();
         }
+
+        public TaggedRule[] Rules { get; }
 
         protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
         {
             return RecurseMatch(
-                _rules,
+                Rules,
                 text,
                 text,
                 0,
@@ -32,7 +32,7 @@ namespace PasLib
 
         public override string ToString()
         {
-            var rules = from t in _rules
+            var rules = from t in Rules
                         select t.Rule.ToString();
 
             return "<" + RuleName + "> (" + string.Join(" ", rules) + ")";

@@ -44,7 +44,7 @@ namespace PasLib
             var number = new RepeatRule(
                 "identifier", new RangeRule(null, '0', '9'), 1, null);
             var character = GetCharacterRule();
-            var quotedCharacter = new SequenceRule("literal", new[]
+            var quotedCharacter = new SequenceRule("quotedCharacter", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
                 new TaggedRule("l", character),
@@ -58,6 +58,23 @@ namespace PasLib
             });
             var any = new LiteralRule("any", ".");
             //  Rules
+            var withChildrenTag = new SequenceRule("withChildrenTag", new[]
+            {
+                new TaggedRule("id", identifier),
+                new TaggedRule(new LiteralRule(null, ":"))
+            });
+            var noChildrenTag = new SequenceRule("noChildrenTag", new[]
+            {
+                new TaggedRule("id", identifier),
+                new TaggedRule(new LiteralRule(null, "::"))
+            });
+            var noTag = new LiteralRule("noTag", string.Empty);
+            var tag = new DisjunctionRule("tag", new[]
+            {
+                new TaggedRule("withChildrenTag", withChildrenTag),
+                new TaggedRule("noChildrenTag", noChildrenTag),
+                new TaggedRule("noTag", noTag)
+            });
             var ruleBodyProxy = new RuleProxy();
             var range = new SequenceRule("range", new[]
             {
@@ -65,20 +82,26 @@ namespace PasLib
                 new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2)),
                 new TaggedRule("upper", quotedCharacter)
             });
-            var exactCardinality = new SequenceRule("exactCardinality", new[]
-            {
-                new TaggedRule(null, new LiteralRule(null, "{")),
-                new TaggedRule("n", number),
-                new TaggedRule(null, new LiteralRule(null, "}"))
-            });
-            var minMaxCardinality = new SequenceRule("minMaxCardinality", new[]
-            {
-                new TaggedRule(null, new LiteralRule(null, "{")),
-                new TaggedRule("min", number),
-                new TaggedRule(null, new LiteralRule(null, ",")),
-                new TaggedRule("max", number),
-                new TaggedRule(null, new LiteralRule(null, "}"))
-            });
+            var exactCardinality = InterleaveRule.FromSequence(new SequenceRule(
+                "exactCardinality",
+                new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "{")),
+                    new TaggedRule("n", number),
+                    new TaggedRule(null, new LiteralRule(null, "}"))
+                }),
+                interleave);
+            var minMaxCardinality = InterleaveRule.FromSequence(new SequenceRule(
+                "minMaxCardinality",
+                new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "{")),
+                    new TaggedRule("min", number),
+                    new TaggedRule(null, new LiteralRule(null, ",")),
+                    new TaggedRule("max", number),
+                    new TaggedRule(null, new LiteralRule(null, "}"))
+                }),
+                interleave);
             var cardinality = new DisjunctionRule("cardinality", new[]
             {
                 new TaggedRule("star", new LiteralRule(null, "*")),
@@ -92,28 +115,46 @@ namespace PasLib
                 new TaggedRule("rule", ruleBodyProxy),
                 new TaggedRule("cardinality", cardinality)
             });
-            var disjunction = new SequenceRule("disjunction", new[]
-            {
-                new TaggedRule("head", ruleBodyProxy),
-                new TaggedRule("tail", new RepeatRule(
-                    null,
-                    new SequenceRule(
+            var disjunction = InterleaveRule.FromSequence(new SequenceRule(
+                "disjunction",
+                new[]
+                {
+                    new TaggedRule("t", tag),
+                    new TaggedRule("head", ruleBodyProxy),
+                    new TaggedRule("tail", new RepeatRule(
                         null,
-                        new[]
-                        {
-                            new TaggedRule(null, new LiteralRule(null, "|")),
-                            new TaggedRule("d", ruleBodyProxy)
-                        }),
-                    1,
-                    null))
-            });
-            var sequence = new RepeatRule("sequence", ruleBodyProxy, 2, null);
-            var substract = new SequenceRule("substract", new[]
-            {
-                new TaggedRule("primary", ruleBodyProxy),
-                new TaggedRule(null, new LiteralRule(null, "-")),
-                new TaggedRule("excluded", ruleBodyProxy)
-            });
+                        InterleaveRule.FromSequence(new SequenceRule(
+                            null,
+                            new[]
+                            {
+                                new TaggedRule(null, new LiteralRule(null, "|")),
+                                new TaggedRule("t", tag),
+                                new TaggedRule("d", ruleBodyProxy)
+                            }),
+                            interleave),
+                        1,
+                        null))
+                }),
+                interleave);
+            var innerSequence = InterleaveRule.FromSequence(new SequenceRule(
+                "innerSequence",
+                new[]
+                {
+                    new TaggedRule("t", tag),
+                    new TaggedRule("r", ruleBodyProxy)
+                }),
+                interleave);
+            var sequence = new RepeatRule("sequence", innerSequence, 1, null);
+            var substract = InterleaveRule.FromSequence(new SequenceRule(
+                "substract",
+                new[]
+                {
+                    new TaggedRule("t", tag),
+                    new TaggedRule("primary", ruleBodyProxy),
+                    new TaggedRule(null, new LiteralRule(null, "-")),
+                    new TaggedRule("excluded", ruleBodyProxy)
+                }),
+                interleave);
             var bracket = new SequenceRule("bracket", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "(")),
@@ -123,25 +164,82 @@ namespace PasLib
 
             var ruleBody = new DisjunctionRule("ruleBody", new[]
             {
+                new TaggedRule("literal", literal),
+                new TaggedRule("any", any),
                 new TaggedRule("bracket", bracket),
                 new TaggedRule("substract", substract),
                 new TaggedRule("sequence", sequence),
                 new TaggedRule("disjunction", disjunction),
                 new TaggedRule("repeat", repeat),
-                new TaggedRule("range", range),
-                new TaggedRule("literal", literal),
-                new TaggedRule("any", any)
+                new TaggedRule("range", range)
             });
-            var ruleDeclaration = new SequenceRule("ruleDeclaration", new[]
+            var interleaveDeclaration = InterleaveRule.FromSequence(new SequenceRule(
+                "interleaveDeclaration",
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, "interleave")),
+                    new TaggedRule(new LiteralRule(null, "=")),
+                    new TaggedRule("ruleBody", ruleBodyProxy),
+                    new TaggedRule(new LiteralRule(null, ";"))
+                }),
+                interleave);
+            var boolean = new DisjunctionRule("boolean", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "rule")),
-                new TaggedRule("id", identifier),
-                new TaggedRule(null, new LiteralRule(null, "=")),
-                new TaggedRule("body", ruleBody),
-                new TaggedRule(null, new LiteralRule(null, ";"))
+                new TaggedRule(new LiteralRule("true", "true")),
+                new TaggedRule(new LiteralRule("false", "false"))
+            });
+            var parameterAssignation = InterleaveRule.FromSequence(new SequenceRule(
+                "parameterAssignation",
+                new[]
+                {
+                    new TaggedRule("id", identifier),
+                    new TaggedRule(new LiteralRule(null, "=")),
+                    new TaggedRule("value", boolean),
+                }),
+                interleave);
+            var innerParameterAssignationList = InterleaveRule.FromSequence(
+                new SequenceRule(
+                    null,
+                    new[]
+                    {
+                        new TaggedRule(new LiteralRule(null, ",")),
+                        new TaggedRule(parameterAssignation)
+                    }),
+                    interleave);
+            var parameterAssignationList = InterleaveRule.FromSequence(new SequenceRule(
+                "parameterAssignationList",
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, "(")),
+                    new TaggedRule("head", parameterAssignation),
+                    new TaggedRule("tail", new RepeatRule(
+                        null,
+                        innerParameterAssignationList,
+                        null,
+                        null)),
+                    new TaggedRule(new LiteralRule(null, ")"))
+                }),
+                interleave);
+            var ruleDeclaration = InterleaveRule.FromSequence(new SequenceRule(
+                "ruleDeclaration",
+                new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "rule")),
+                    new TaggedRule("id", identifier),
+                    new TaggedRule(null, new LiteralRule(null, "=")),
+                    new TaggedRule("body", ruleBody),
+                    new TaggedRule(null, new LiteralRule(null, ";"))
+                }),
+                interleave);
+            var declaration = new DisjunctionRule("declaration", new[]
+            {
+                new TaggedRule("interleaveDeclaration", interleaveDeclaration),
+                new TaggedRule("ruleDeclaration", ruleDeclaration)
             });
             //  Main rule
-            var main = new RepeatRule("main", ruleDeclaration, 1, null);
+            var main = InterleaveRule.InterleaveLeftOf(
+                new RepeatRule("main", declaration, 1, null),
+                interleave);
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
@@ -164,11 +262,25 @@ namespace PasLib
 
             foreach (var ruleMatch in match.Repeats)
             {
-                var ruleID = ruleMatch.Fragments["id"].Text.ToString();
-                var ruleBodyMatch = ruleMatch.Fragments["body"];
-                var rule = CreateRule(ruleID, ruleBodyMatch);
+                var tag = ruleMatch.Fragments.Keys.First();
 
-                ruleMap[ruleID] = rule;
+                if (tag == "interleaveDeclaration")
+                {
+                    throw new NotImplementedException();
+                }
+                else if (tag == "ruleDeclaration")
+                {
+                    var subMatch = ruleMatch.Fragments.First().Value;
+                    var ruleID = subMatch.Fragments["id"].Text.ToString();
+                    var ruleBodyMatch = subMatch.Fragments["body"];
+                    var rule = CreateRule(ruleID, ruleBodyMatch);
+
+                    ruleMap[ruleID] = rule;
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
             }
 
             return new RuleSet(ruleMap.Values);

@@ -1,27 +1,43 @@
 ﻿#	Comments & interleaves
-token Comment = "#" (. - ("\r" | "\n"))+;
+rule(interleave=false) Comment = "#" (. - ("\r" | "\n"))+;
 interleave = (" " | "\r" | "\n" | "\t") | comments;
 
 #	tokens
-token identifier = ("a".."z" | "A".."Z" | "0".."9")+;
-token number = ("0".."9")+;
-token character = . - "\"" - "\r" - "\n";
-token quotedCharacter = "\"" c:character "\"";
-token literal = "\"" l:character* "\"";
-token any = ".";
+rule(interleave=false) identifier = ("a".."z" | "A".."Z" | "0".."9")+;
+rule(interleave=false) number = ("0".."9")+;
+rule(interleave=false) character = . - "\"" - "\r" - "\n";
+rule(interleave=false) quotedCharacter = "\"" c:character "\"";
+rule(interleave=false) literal = "\"" l:character* "\"";
+rule(interleave=false) any = ".";
 
 #	rules
-rule range = lower:quotedCharacter ".." upper:quotedCharacter;
+rule(interleave=false) withChildrenTag = withChildrenTag:(id:identifier ":");
+rule(interleave=false) noChildrenTag = noChildrenTag:(id:identifier "::");
+rule(interleave=false) noTag = noTag:"";
+rule(interleave=false) tag = withChildrenTag:withChildrenTag | noChildrenTag | noTag;
+rule(interleave=false) range = lower:quotedCharacter ".." upper:quotedCharacter;
 rule exactCardinality = "{" n:number "}";
 rule minMaxCardinality = "{" min:number "," max:number "}";
-rule cardinality = star:"*" | plus:"+" | question:"?" | exact:exactCardinality | minMax : minMaxCardinality;
+rule cardinality = star:"*" | plus:"+" | question:"?" | exact:exactCardinality
+	| minMax:minMaxCardinality;
 rule repeat = rule:ruleBody cardinality:cardinality;
-rule disjunction = head:ruleBody tail:("|" d:ruleBody)+;
-rule sequence = (ruleBody){2,};
-rule substract = primary:ruleBody "-" excluded:ruleBody;
+rule disjunction = t:tag head:ruleBody tail:("|" t:tag d:ruleBody)+;
+rule sequence = (t:tag r:ruleBody){1,};
+rule substract = t:tag primary:ruleBody "-" excluded:ruleBody;
 rule braket = "(" r:ruleBody ")";
-rule ruleBody = braket | substract | sequence | disjunction | repeat:repeat | literal:literal | any:any | range:range;
-rule ruleDeclaration = "rule" id:identifier "=" body:ruleBody ";";
+rule ruleBody = literal:literal | any:any | braket | substract | sequence
+	| disjunction | repeat:repeat
+	| range:range;
+
+rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
+rule boolean = true | false;
+rule parameterAssignation = id:identifier "=" value:boolean;
+rule parameterAssignationList = "(" head:parameterAssignation
+	tail:("," parameterAssignation)* ")";
+rule ruleDeclaration = "rule" params:parameterAssignationList?
+	id:identifier "=" body:ruleBody ";";
+rule declaration = interleaveDeclaration:interleaveDeclaration
+	| ruleDeclaration:ruleDeclaration;
 
 #	main rule
-rule main = m:ruleDeclaration*;
+rule main = declaration*;

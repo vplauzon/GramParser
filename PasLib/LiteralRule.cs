@@ -23,7 +23,7 @@ namespace PasLib
         public LiteralRule(string ruleName, string literal)
             : base(ruleName)
         {
-            if (string.IsNullOrEmpty(literal))
+            if (literal == null)
             {
                 throw new ArgumentNullException(nameof(literal));
             }

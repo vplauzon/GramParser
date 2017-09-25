@@ -30,6 +30,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Meta\AnyGrammar.txt" />
     <EmbeddedResource Include="Meta\DisjunctionGrammar.txt" />
+    <EmbeddedResource Include="Meta\OneLetterOneRule.txt" />
     <EmbeddedResource Include="Meta\LiteralGrammar.txt" />
     <EmbeddedResource Include="Meta\RangeGrammar.txt" />
     <EmbeddedResource Include="Meta\RepeatGrammar.txt" />
