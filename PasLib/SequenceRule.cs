@@ -19,14 +19,13 @@ namespace PasLib
 
         public TaggedRule[] Rules { get; }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             return RecurseMatch(
                 Rules,
-                text,
-                text,
+                context,
+                context.Text,
                 0,
-                depth,
                 TaggedRule.EMPTY_FRAGMENTS);
         }
 
@@ -40,15 +39,14 @@ namespace PasLib
 
         private IEnumerable<RuleMatch> RecurseMatch(
             IEnumerable<TaggedRule> rules,
+            ExplorerContext context,
             SubString originalText,
-            SubString text,
             int totalMatchLength,
-            int depth,
             IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);
-            var matches = currentRule.Rule.Match(text, depth - 1);
+            var matches = currentRule.Rule.Match(context);
 
             foreach (var match in matches)
             {
@@ -57,13 +55,12 @@ namespace PasLib
 
                 if (remainingRules.Any())
                 {   //  Recurse
-                    var remainingText = text.Skip(match.Text.Length);
+                    var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
                         remainingRules,
+                        newContext,
                         originalText,
-                        remainingText,
                         newTotalMatchLength,
-                        depth,
                         newFragments);
 
                     foreach (var m in downstreamMatches)

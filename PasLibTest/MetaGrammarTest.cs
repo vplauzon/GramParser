@@ -10,6 +10,16 @@ namespace PasLibTest
     [TestClass]
     public class MetaGrammarTest
     {
+        #region Just parsing the grammar
+        [TestMethod]
+        public void ParsingSequence()
+        {
+            var ruleSet = MetaGrammar.ParseGrammar("rule seq = \"a\" \"b\"");
+
+            Assert.IsNotNull(ruleSet);
+        }
+        #endregion
+
         #region Simple Tests with grammar files
         [TestMethod]
         public void OneLetterOneRule()
@@ -192,17 +202,15 @@ namespace PasLibTest
         private void SimpleTest(string grammarFile, Tuple<bool, string, string>[] samples)
         {
             var grammar = GetResource(grammarFile);
+            var ruleSet = MetaGrammar.ParseGrammar(grammar);
 
+            Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
             for (int i = 0; i != samples.Length; ++i)
             {
                 var isSuccess = samples[i].Item1;
                 var ruleName = samples[i].Item2;
                 var text = samples[i].Item3;
-                var ruleSet = MetaGrammar.ParseGrammar(grammar);
-
-                Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
-
-                var match = ruleSet.Match(ruleName, text, RuleSet.DEFAULT_MAX_DEPTH);
+                var match = ruleSet.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 

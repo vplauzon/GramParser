@@ -29,14 +29,13 @@ namespace PasLib
             _max = max;
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             return RecurseMatch(
-                text,
-                text,
+                context,
+                context.Text,
                 0,
                 0,
-                depth,
                 EMPTY_CHILDREN);
         }
 
@@ -49,16 +48,15 @@ namespace PasLib
         }
 
         private IEnumerable<RuleMatch> RecurseMatch(
-            SubString text,
+            ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
             int iteration,
-            int depth,
             IEnumerable<RuleMatch> reverseChilden)
         {
-            var matches = _rule.Match(text, depth - 1);
+            var matches = _rule.Match(context);
             var nonEmptyMatches = from m in matches
-                                  where m.Text.Length > 0
+                                  where m.Text.HasContent
                                   select m;
 
             if (nonEmptyMatches.Any())
@@ -70,13 +68,12 @@ namespace PasLib
 
                     if (!_max.HasValue || iteration + 1 < _max.Value)
                     {   //  We can still repeat
-                        var remainingText = text.Skip(match.Text.Length);
+                        var newContext = context.MoveForward(match);
                         var downstreamMatches = RecurseMatch(
-                            remainingText,
+                            newContext,
                             originalText,
                             newTotalMatchLength,
                             iteration + 1,
-                            depth,
                             newReverseChildren);
 
                         foreach (var m in downstreamMatches)

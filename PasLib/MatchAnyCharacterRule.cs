@@ -10,8 +10,10 @@ namespace PasLib
         {
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
+            var text = context.Text;
+
             if (text.Length == 0)
             {
                 return EmptyMatch;

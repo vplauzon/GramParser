@@ -13,7 +13,7 @@ namespace PasLib
         {
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             return EmptyMatch;
         }

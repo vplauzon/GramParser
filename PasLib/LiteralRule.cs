@@ -31,8 +31,10 @@ namespace PasLib
             _literal = literal.ToCharArray();
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
+            var text = context.Text;
+
             if (text.HasContent
                 && text.Length >= _literal.Length
                 && text.Enumerate().Take(_literal.Length).SequenceEqual(_literal))

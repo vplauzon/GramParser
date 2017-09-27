@@ -19,18 +19,13 @@ namespace PasLib
 
         public string RuleName { get; private set; }
 
-        public IEnumerable<RuleMatch> Match(SubString text, int depth)
+        public IEnumerable<RuleMatch> Match(ExplorerContext context)
         {
-            if (depth <= 0)
-            {
-                throw new InvalidOperationException("Too much recursion");
-            }
-            else
-            {
-                return OnMatch(text, depth);
-            }
+            var newContext = context.TryMoveDown(this);
+
+            return newContext == null ? EmptyMatch : OnMatch(newContext);
         }
 
-        protected abstract IEnumerable<RuleMatch> OnMatch(SubString text, int depth);
+        protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
     }
 }

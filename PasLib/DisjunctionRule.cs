@@ -19,11 +19,11 @@ namespace PasLib
             _rules = rules.ToArray();
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             foreach (var rule in _rules)
             {
-                var matches = rule.Rule.Match(text, depth - 1);
+                var matches = rule.Rule.Match(context);
 
                 foreach (var m in matches)
                 {

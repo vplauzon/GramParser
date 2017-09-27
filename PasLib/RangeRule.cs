@@ -23,8 +23,10 @@ namespace PasLib
 
         public char Last { get; }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
+            var text = context.Text;
+
             if (text.HasContent)
             {
                 var peek = text.First;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PasLib
 {
@@ -45,7 +44,7 @@ namespace PasLib
             }
 
             var repeatInterleaveRule = RepeatInterleave(interleaveRule);
-           
+
             //  Add non-tagged interleaves on the right of the rule (in a sequence)
             return new InterleaveRule(new SequenceRule(
                 rule.RuleName,
@@ -79,11 +78,11 @@ namespace PasLib
                 }));
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var matches = _proxiedRule.Match(text, depth);
+            var matches = _proxiedRule.Match(context);
 
-            foreach(var m in matches)
+            foreach (var m in matches)
             {
                 var realMatch = m.Fragments.First().Value;
 

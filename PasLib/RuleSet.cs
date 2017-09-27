@@ -10,8 +10,6 @@ namespace PasLib
     {
         private readonly IDictionary<string, IRule> _ruleMap;
 
-        public static int DEFAULT_MAX_DEPTH { get => 40; }
-
         public RuleSet(IEnumerable<IRule> rules)
         {
             if (rules == null || !rules.Any())
@@ -35,9 +33,9 @@ namespace PasLib
                 throw new ArgumentOutOfRangeException(nameof(ruleName), "Unknown rule");
             }
 
-            var actualDepth = depth ?? DEFAULT_MAX_DEPTH;
             var rule = _ruleMap[ruleName];
-            var matches = rule.Match(text, actualDepth);
+            var context = new ExplorerContext(text, depth);
+            var matches = rule.Match(context);
             var exactLengthMatches = from m in matches
                                      where m.Text.Length == text.Length
                                      select m;

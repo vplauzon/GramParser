@@ -13,7 +13,7 @@ namespace PasLibTest
         public void EmptyNone()
         {
             var rule = MatchNoneRule.Instance;
-            var match = rule.Match("", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNull(match);
         }
@@ -22,7 +22,7 @@ namespace PasLibTest
         public void EmptyAny()
         {
             var rule = new MatchAnyCharacterRule(null) as IRule;
-            var match = rule.Match("", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNull(match);
         }
@@ -44,7 +44,8 @@ namespace PasLibTest
 
             for (int i = 0; i != samples.Length; ++i)
             {
-                var match = rule.Match(samples[i], RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match =
+                    rule.Match(new ExplorerContext(samples[i])).FirstOrDefault();
 
                 Assert.IsNotNull(match, $"Success - {i}");
                 Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
@@ -59,8 +60,8 @@ namespace PasLibTest
         public void Literal()
         {
             var rule = new LiteralRule("Lit", "great") as IRule;
-            var match = rule.Match("great", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
-            var nomatch = rule.Match("h", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext("great")).FirstOrDefault();
+            var nomatch = rule.Match(new ExplorerContext("h")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
@@ -91,7 +92,8 @@ namespace PasLibTest
                 var test = samples[i].Item3;
                 var isSuccess = samples[i].Item4;
                 var rule = new RangeRule("Range", first, last) as IRule;
-                var match = rule.Match(test.ToString(), RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match =
+                    rule.Match(new ExplorerContext(test.ToString())).FirstOrDefault();
 
                 if (isSuccess)
                 {
@@ -113,7 +115,7 @@ namespace PasLibTest
         {
             var oneCharRule = new LiteralRule("oneChar", "g");
             var rule = new RepeatRule("Repeat", oneCharRule, null, null) as IRule;
-            var match = rule.Match("", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
@@ -126,7 +128,7 @@ namespace PasLibTest
         {
             var oneCharRule = new LiteralRule("oneChar", "g");
             var rule = new RepeatRule("Repeat", oneCharRule, null, null) as IRule;
-            var match = rule.Match("ggggg", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext("ggggg")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
@@ -157,7 +159,7 @@ namespace PasLibTest
                 var max = testSet[i].Item3;
                 var isSuccess = testSet[i].Item4;
                 var rule = new RepeatRule("Repeat", oneCharRule, min, max) as IRule;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -200,7 +202,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -253,7 +255,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -305,7 +307,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1;
                 var isSuccess = samples[i].Item2;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -335,7 +337,7 @@ namespace PasLibTest
                 new TaggedRule(null, new LiteralRule(null, "!"))
             });
             var text = "HiBob!";
-            var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
@@ -354,7 +356,7 @@ namespace PasLibTest
                 new TaggedRule(null, new LiteralRule(null, "!"))
             });
             var text = "HiBob!";
-            var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
@@ -373,7 +375,7 @@ namespace PasLibTest
                 new TaggedRule("b", new RepeatRule(null, new LiteralRule(null, "b"), 1, null), false)
             });
             var text = "aaaabb";
-            var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
@@ -408,7 +410,7 @@ namespace PasLibTest
             {
                 var text = samples[i].Item1.ToString();
                 var isSuccess = samples[i].Item2;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -438,13 +440,16 @@ namespace PasLibTest
             };
             var range = new RangeRule(null, 'a', 'z');
             var exclusion = new RangeRule(null, 'f', 'h');
-            var rule = new SubstractRule("Substract", new TaggedRule("mine", range), exclusion);
+            var rule = new SubstractRule(
+                "Substract",
+                new TaggedRule("mine", range),
+                exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
             {
                 var text = samples[i].Item1.ToString();
                 var isSuccess = samples[i].Item2;
-                var match = rule.Match(text, RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+                var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
                 {
@@ -485,7 +490,7 @@ namespace PasLibTest
 
             proxyC.ReferencedRule = ruleC;
 
-            var match = ruleC.Match("a", RuleSet.DEFAULT_MAX_DEPTH).FirstOrDefault();
+            var match = ruleC.Match(new ExplorerContext("a")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Should be a success");
         }

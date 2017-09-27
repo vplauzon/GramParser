@@ -16,14 +16,15 @@ namespace PasLib
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
         }
 
-        protected override IEnumerable<RuleMatch> OnMatch(SubString text, int depth)
+        protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var primaryMatches = _primary.Rule.Match(text, depth - 1);
+            var primaryMatches = _primary.Rule.Match(context);
 
             foreach (var primaryMatch in primaryMatches)
             {
                 var primaryText = primaryMatch.Text;
-                var excludedMatches = _excluded.Match(primaryText, depth - 1);
+                var excludingContext = new ExplorerContext(primaryText, context.Depth);
+                var excludedMatches = _excluded.Match(excludingContext);
                 var excludedExactLength = from ex in excludedMatches
                                           where ex.Text.Length == primaryText.Length
                                           select ex;
@@ -32,12 +33,14 @@ namespace PasLib
                 {
                     if (_primary.HasTag)
                     {
-                        var fragments = new Dictionary<string, RuleMatch>() { { _primary.Tag, primaryMatch } };
+                        var fragment = new KeyValuePair<string, RuleMatch>(
+                            _primary.Tag,
+                            primaryMatch);
 
                         yield return new RuleMatch(
                             this,
                             primaryMatch.Text,
-                            fragments);
+                            new[] { fragment });
                     }
                     else
                     {
@@ -47,7 +50,9 @@ namespace PasLib
             }
         }
 
-        private IDictionary<string, RuleMatch> CreateFragments(RuleMatch match, SubString text)
+        private IDictionary<string, RuleMatch> CreateFragments(
+            RuleMatch match,
+            SubString text)
         {
             return new Dictionary<string, RuleMatch>() { { _primary.Tag, match } };
         }
