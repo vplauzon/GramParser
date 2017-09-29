@@ -16,8 +16,9 @@ namespace PasLib
             string ruleName,
             IRule rule,
             int? min,
-            int? max)
-            : base(ruleName)
+            int? max,
+            bool? hasInterleave = null)
+            : base(ruleName, hasInterleave, rule.IsRecursive, false)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)

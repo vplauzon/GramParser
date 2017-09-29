@@ -33,6 +33,14 @@ namespace PasLib
             }
         }
 
+        #region IRuleProperties
+        public bool? HasInterleave { get => ReferencedRule.HasInterleave; }
+
+        public bool? IsRecursive { get => ReferencedRule.IsRecursive; }
+
+        public bool IsTerminalRule { get => ReferencedRule.IsTerminalRule; }
+        #endregion
+
         string IRule.RuleName => ReferencedRule.RuleName;
 
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)

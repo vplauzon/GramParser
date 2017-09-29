@@ -9,8 +9,12 @@ namespace PasLib
         private readonly TaggedRule _primary;
         private readonly IRule _excluded;
 
-        public SubstractRule(string ruleName, TaggedRule primary, IRule excluded)
-            : base(ruleName)
+        public SubstractRule(
+            string ruleName,
+            TaggedRule primary,
+            IRule excluded,
+            bool? isRecursive = null)
+            : base(ruleName, false, isRecursive, false)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));

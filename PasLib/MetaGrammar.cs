@@ -34,54 +34,59 @@ namespace PasLib
                 new LiteralRule(null, " "),
                 new LiteralRule(null, "\r"),
                 new LiteralRule(null, "\n"),
-                new LiteralRule(null, "\t")));
+                new LiteralRule(null, "\t")), false, false);
             //  Tokens
             var identifierChar = new DisjunctionRule(null, TaggedRule.FromRules(
                 new RangeRule(null, 'a', 'z'),
                 new RangeRule(null, 'A', 'Z'),
-                new RangeRule(null, '0', '9')));
-            var identifier = new RepeatRule("identifier", identifierChar, 1, null);
+                new RangeRule(null, '0', '9')), false, false);
+            var identifier = new RepeatRule(
+                "identifier",
+                identifierChar,
+                1,
+                null,
+                false);
             var number = new RepeatRule(
-                "identifier", new RangeRule(null, '0', '9'), 1, null);
+                "identifier", new RangeRule(null, '0', '9'), 1, null, false);
             var character = GetCharacterRule();
             var quotedCharacter = new SequenceRule("quotedCharacter", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
                 new TaggedRule("l", character),
                 new TaggedRule(null, new LiteralRule(null, "\""))
-            });
+            }, false, false);
             var literal = new SequenceRule("literal", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
                 new TaggedRule("l", new RepeatRule(null, character, null, null)),
                 new TaggedRule(null, new LiteralRule(null, "\""))
-            });
+            }, false, false);
             var any = new LiteralRule("any", ".");
             //  Rules
             var withChildrenTag = new SequenceRule("withChildrenTag", new[]
             {
                 new TaggedRule("id", identifier),
                 new TaggedRule(new LiteralRule(null, ":"))
-            });
+            }, false, false);
             var noChildrenTag = new SequenceRule("noChildrenTag", new[]
             {
                 new TaggedRule("id", identifier),
                 new TaggedRule(new LiteralRule(null, "::"))
-            });
+            }, false, false);
             var noTag = new LiteralRule("noTag", string.Empty);
             var tag = new DisjunctionRule("tag", new[]
             {
                 new TaggedRule("withChildrenTag", withChildrenTag),
                 new TaggedRule("noChildrenTag", noChildrenTag),
                 new TaggedRule("noTag", noTag)
-            });
+            }, false, false);
             var ruleBodyProxy = new RuleProxy();
             var range = new SequenceRule("range", new[]
             {
                 new TaggedRule("lower", quotedCharacter),
                 new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2)),
                 new TaggedRule("upper", quotedCharacter)
-            });
+            }, false, false);
             var exactCardinality = InterleaveRule.FromSequence(new SequenceRule(
                 "exactCardinality",
                 new[]
@@ -249,9 +254,21 @@ namespace PasLib
         private static IRule GetCharacterRule()
         {
             var any = new MatchAnyCharacterRule(null);
-            var noQuote = new SubstractRule(null, new TaggedRule(null, any), new LiteralRule(null, "\""));
-            var noR = new SubstractRule(null, new TaggedRule(null, noQuote), new LiteralRule(null, "\r"));
-            var noN = new SubstractRule(null, new TaggedRule(null, noR), new LiteralRule(null, "\n"));
+            var noQuote = new SubstractRule(
+                null,
+                new TaggedRule(null, any),
+                new LiteralRule(null, "\""),
+                false);
+            var noR = new SubstractRule(
+                null,
+                new TaggedRule(null, noQuote),
+                new LiteralRule(null, "\r"),
+                false);
+            var noN = new SubstractRule(
+                null,
+                new TaggedRule(null, noR),
+                new LiteralRule(null, "\n"),
+                false);
 
             return noN;
         }

@@ -6,8 +6,12 @@ namespace PasLib
 {
     internal class SequenceRule : RuleBase
     {
-        public SequenceRule(string ruleName, IEnumerable<TaggedRule> rules)
-            : base(ruleName)
+        public SequenceRule(
+            string ruleName,
+            IEnumerable<TaggedRule> rules,
+            bool? hasInterleave = null,
+            bool? isRecursive = null)
+            : base(ruleName, hasInterleave, isRecursive, false)
         {
             if (rules == null || rules.Count() == 0)
             {

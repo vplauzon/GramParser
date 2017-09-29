@@ -8,7 +8,11 @@ namespace PasLib
     {
         private readonly IRule _proxiedRule;
 
-        private InterleaveRule(IRule proxiedRule) : base(proxiedRule.RuleName)
+        private InterleaveRule(IRule proxiedRule) : base(
+            proxiedRule.RuleName,
+            proxiedRule.HasInterleave,
+            proxiedRule.IsRecursive,
+            proxiedRule.IsTerminalRule)
         {
             _proxiedRule = proxiedRule;
         }

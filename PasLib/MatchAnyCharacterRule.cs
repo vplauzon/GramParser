@@ -6,7 +6,8 @@ namespace PasLib
 {
     internal class MatchAnyCharacterRule : RuleBase
     {
-        public MatchAnyCharacterRule(string ruleName) : base(ruleName)
+        public MatchAnyCharacterRule(string ruleName)
+            : base(ruleName, false, false, true)
         {
         }
 
