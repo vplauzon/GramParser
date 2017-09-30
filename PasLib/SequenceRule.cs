@@ -36,7 +36,7 @@ namespace PasLib
         public override string ToString()
         {
             var rules = from t in Rules
-                        select t.Rule.ToString();
+                        select ToString(t.Rule);
 
             return "<" + RuleName + "> (" + string.Join(" ", rules) + ")";
         }

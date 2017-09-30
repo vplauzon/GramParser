@@ -45,7 +45,15 @@ namespace PasLib
             var min = _min.HasValue ? _min.Value.ToString() : string.Empty;
             var max = _max.HasValue ? _max.Value.ToString() : string.Empty;
 
-            return "<" + RuleName + "> (" + _rule.ToString() + ")^{" + min + "," + max + "}";
+            return "<"
+                + RuleName
+                + "> ("
+                + ToString(_rule)
+                + ")^{"
+                + min
+                + ","
+                + max
+                + "}";
         }
 
         private IEnumerable<RuleMatch> RecurseMatch(

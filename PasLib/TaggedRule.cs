@@ -58,7 +58,9 @@ namespace PasLib
 
         public override string ToString()
         {
-            return "[" + Tag + "]" + Rule.ToString();
+            var colons = DoIncludeChildren ? ":" : "::";
+
+            return $"{Tag}{colons}{Rule}";
         }
 
         private RuleMatch FormatMatch(RuleMatch match)

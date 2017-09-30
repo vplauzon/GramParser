@@ -38,5 +38,12 @@ namespace PasLib
         }
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
+
+        protected string ToString(IRule rule)
+        {
+            return string.IsNullOrWhiteSpace(rule.RuleName)
+                ? rule.ToString()
+                : rule.RuleName;
+        }
     }
 }
