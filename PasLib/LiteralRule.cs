@@ -43,7 +43,7 @@ namespace PasLib
             }
             else
             {
-                return EmptyMatch;
+                return RuleMatch.EmptyMatch;
             }
         }
 

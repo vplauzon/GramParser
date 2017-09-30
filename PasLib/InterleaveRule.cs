@@ -84,7 +84,7 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var matches = _proxiedRule.Match(context);
+            var matches = context.InvokeRule(_proxiedRule);
 
             foreach (var m in matches)
             {

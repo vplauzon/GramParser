@@ -44,7 +44,7 @@ namespace PasLib
                 }
             }
 
-            return EmptyMatch;
+            return RuleMatch.EmptyMatch;
         }
 
         public override string ToString()

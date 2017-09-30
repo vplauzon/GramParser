@@ -12,18 +12,21 @@ namespace PasLib
         private readonly SubString _text;
         private readonly int _depth;
         private readonly ImmutableHashSet<IRule> _ruleNameExcepts;
+        private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
         public ExplorerContext(SubString text, int? depth = null) : this(
             text,
             depth ?? DEFAULT_MAX_DEPTH,
-            ImmutableHashSet<IRule>.Empty)
+            ImmutableHashSet<IRule>.Empty,
+            new AmbiantRuleProperties())
         {
         }
 
         private ExplorerContext(
             SubString text,
             int depth,
-            ImmutableHashSet<IRule> ruleNameExcepts)
+            ImmutableHashSet<IRule> ruleNameExcepts,
+            AmbiantRuleProperties ambiantRuleProperties)
         {
             if (text.IsNull)
             {
@@ -36,6 +39,8 @@ namespace PasLib
             _text = text;
             _depth = depth;
             _ruleNameExcepts = ruleNameExcepts;
+            _ambiantRuleProperties = ambiantRuleProperties
+                ?? throw new ArgumentNullException(nameof(ambiantRuleProperties));
         }
 
         public SubString Text { get => _text; }
@@ -54,7 +59,8 @@ namespace PasLib
                 return new ExplorerContext(
                     _text.Skip(match.Text.Length),
                     _depth,
-                    ImmutableHashSet<IRule>.Empty);
+                    ImmutableHashSet<IRule>.Empty,
+                    _ambiantRuleProperties);
             }
             else
             {
@@ -62,36 +68,48 @@ namespace PasLib
             }
         }
 
-        public ExplorerContext TryMoveDown(IRule rule)
+        public IEnumerable<RuleMatch> InvokeRule(IRule rule)
         {
             if (rule == null)
             {
                 throw new ArgumentNullException(nameof(rule));
             }
-
-            if (!string.IsNullOrWhiteSpace(rule.RuleName))
+            if (_depth <= 1)
             {
-                if (_depth < 1)
-                {
-                    throw new InvalidOperationException("Too much recursion");
+                throw new InvalidOperationException("Too much recursion");
+            }
+
+            var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);
+
+            if (!newAmbiantRuleProperties.IsRecursive
+                && !newAmbiantRuleProperties.IsTerminalRule)
+            {
+                var newExcepts = _ruleNameExcepts.Add(rule);
+
+                if (newExcepts.Count == _ruleNameExcepts.Count)
+                {   //  Recursion into the same rule has been exhausted
+                    return RuleMatch.EmptyMatch;
                 }
                 else
                 {
-                    var newSet = _ruleNameExcepts.Add(rule);
+                    var newContext = new ExplorerContext(
+                        _text,
+                        _depth - 1,
+                        newExcepts,
+                        newAmbiantRuleProperties);
 
-                    if (newSet.Count == _ruleNameExcepts.Count)
-                    {   //  Recursion into the same rule has been exhausted
-                        return null;
-                    }
-                    else
-                    {
-                        return new ExplorerContext(_text, _depth - 1, newSet);
-                    }
+                    return rule.Match(newContext);
                 }
             }
             else
             {
-                return this;
+                var newContext = new ExplorerContext(
+                    _text,
+                    _depth - 1,
+                    _ruleNameExcepts,
+                    newAmbiantRuleProperties);
+
+                return rule.Match(newContext);
             }
         }
 

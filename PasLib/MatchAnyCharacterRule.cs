@@ -17,7 +17,7 @@ namespace PasLib
 
             if (text.Length == 0)
             {
-                return EmptyMatch;
+                return RuleMatch.EmptyMatch;
             }
             else
             {

@@ -16,7 +16,7 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            return EmptyMatch;
+            return RuleMatch.EmptyMatch;
         }
 
         public override string ToString()

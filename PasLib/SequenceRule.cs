@@ -13,7 +13,7 @@ namespace PasLib
             bool? isRecursive = null)
             : base(ruleName, hasInterleave, isRecursive, false)
         {
-            if (rules == null || rules.Count() == 0)
+            if (rules == null || !rules.Any())
             {
                 throw new ArgumentNullException(nameof(rules));
             }
@@ -50,7 +50,7 @@ namespace PasLib
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);
-            var matches = currentRule.Rule.Match(context);
+            var matches = context.InvokeRule(currentRule.Rule);
 
             foreach (var match in matches)
             {

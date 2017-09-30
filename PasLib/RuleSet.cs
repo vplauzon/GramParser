@@ -35,7 +35,7 @@ namespace PasLib
 
             var rule = _ruleMap[ruleName];
             var context = new ExplorerContext(text, depth);
-            var matches = rule.Match(context);
+            var matches = context.InvokeRule(rule);
             var exactLengthMatches = from m in matches
                                      where m.Text.Length == text.Length
                                      select m;

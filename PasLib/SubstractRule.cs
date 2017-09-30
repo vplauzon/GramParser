@@ -22,13 +22,13 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var primaryMatches = _primary.Rule.Match(context);
+            var primaryMatches = context.InvokeRule(_primary.Rule);
 
             foreach (var primaryMatch in primaryMatches)
             {
                 var primaryText = primaryMatch.Text;
                 var excludingContext = new ExplorerContext(primaryText, context.Depth);
-                var excludedMatches = _excluded.Match(excludingContext);
+                var excludedMatches = excludingContext.InvokeRule(_excluded);
                 var excludedExactLength = from ex in excludedMatches
                                           where ex.Text.Length == primaryText.Length
                                           select ex;

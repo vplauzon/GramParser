@@ -27,7 +27,7 @@ namespace PasLib
         {
             foreach (var rule in _rules)
             {
-                var matches = rule.Rule.Match(context);
+                var matches = context.InvokeRule(rule.Rule);
 
                 foreach (var m in matches)
                 {

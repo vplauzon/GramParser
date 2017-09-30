@@ -55,7 +55,7 @@ namespace PasLib
             int iteration,
             IEnumerable<RuleMatch> reverseChilden)
         {
-            var matches = _rule.Match(context);
+            var matches = context.InvokeRule(_rule);
             var nonEmptyMatches = from m in matches
                                   where m.Text.HasContent
                                   select m;

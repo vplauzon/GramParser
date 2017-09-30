@@ -40,6 +40,8 @@ namespace PasLib
                 : null;
         }
 
+        public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
+
         public IRule Rule { get; private set; }
 
         public SubString Text { get; private set; }

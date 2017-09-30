@@ -177,7 +177,8 @@ namespace PasLib
                 new TaggedRule("disjunction", disjunction),
                 new TaggedRule("repeat", repeat),
                 new TaggedRule("sequence", sequence)
-            });
+            },
+            isRecursive : true);
             var interleaveDeclaration = InterleaveRule.FromSequence(new SequenceRule(
                 "interleaveDeclaration",
                 new[]
@@ -303,6 +304,32 @@ namespace PasLib
             return new RuleSet(ruleMap.Values);
         }
 
+        private static TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
+        {
+            var fragment = tag.Fragments.First();
+
+            switch (fragment.Key)
+            {
+                case "noTag":
+                    return new TaggedRule(rule);
+                case "withChildrenTag":
+                    {
+                        var id = fragment.Value.Fragments.First().Value.Text.ToString();
+
+                        return new TaggedRule(id, rule, true);
+                    }
+                case "noChildrenTag":
+                    {
+                        var id = fragment.Value.Fragments.First().Value.Text.ToString();
+
+                        return new TaggedRule(id, rule, false);
+                    }
+                default:
+                    throw new NotSupportedException(
+                        $"Tag of type {fragment.Key} isn't supported");
+            }
+        }
+
         private static IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)
         {
             var ruleBodyTag = ruleBodyMatch.Fragments.Keys.First();
@@ -400,20 +427,24 @@ namespace PasLib
 
         private static IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
         {
-            var rules = from r in ruleBodyBody.Repeats
-                        select CreateRule(null, r);
+            var rules = from tagRule in ruleBodyBody.Repeats
+                        let t = tagRule.Fragments["t"]
+                        let r = tagRule.Fragments["r"]
+                        let rule = CreateRule(null, r)
+                        select CreateTaggedRule(t, rule);
 
-            return new SequenceRule(ruleID, TaggedRule.FromRules(rules));
+            return new SequenceRule(ruleID, rules);
         }
 
         private static IRule CreateSubstract(string ruleID, RuleMatch ruleBodyBody)
         {
             var primary = ruleBodyBody.Fragments["primary"];
             var excluded = ruleBodyBody.Fragments["excluded"];
-            var primaryRule = CreateRule(null, primary);
+            var tag = ruleBodyBody.Fragments["tag"];
+            var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
             var excludedRule = CreateRule(null, excluded);
 
-            return new SubstractRule(ruleID, new TaggedRule(null, primaryRule), excludedRule);
+            return new SubstractRule(ruleID, primaryRule, excludedRule);
         }
 
         private static IRule CreateBracket(string ruleID, RuleMatch ruleBodyBody)

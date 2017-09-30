@@ -14,7 +14,8 @@ rule(interleave=false) any = ".";
 rule(interleave=false) withChildrenTag = withChildrenTag:(id:identifier ":");
 rule(interleave=false) noChildrenTag = noChildrenTag:(id:identifier "::");
 rule(interleave=false) noTag = noTag:"";
-rule(interleave=false) tag = withChildrenTag:withChildrenTag | noChildrenTag | noTag;
+rule(interleave=false) tag = withChildrenTag:withChildrenTag
+	| noChildrenTag:noChildrenTag | noTag:noTag;
 rule(interleave=false) range = lower:quotedCharacter ".." upper:quotedCharacter;
 rule exactCardinality = "{" n:number "}";
 rule minMaxCardinality = "{" min:number "," max:number "}";

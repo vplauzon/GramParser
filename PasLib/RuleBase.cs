@@ -6,8 +6,6 @@ namespace PasLib
 {
     internal abstract class RuleBase : IRule
     {
-        protected RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
-
         protected RuleBase(
             string ruleName,
             bool? hasInterleave,
@@ -36,9 +34,7 @@ namespace PasLib
 
         public IEnumerable<RuleMatch> Match(ExplorerContext context)
         {
-            var newContext = context.TryMoveDown(this);
-
-            return newContext == null ? EmptyMatch : OnMatch(newContext);
+            return OnMatch(context);
         }
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
