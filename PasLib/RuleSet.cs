@@ -9,8 +9,9 @@ namespace PasLib
     internal class RuleSet
     {
         private readonly IDictionary<string, IRule> _ruleMap;
+        private readonly IRule _interleaveRule;
 
-        public RuleSet(IEnumerable<IRule> rules)
+        public RuleSet(IEnumerable<IRule> rules, IRule interleaveRule)
         {
             if (rules == null || !rules.Any())
             {
@@ -18,6 +19,7 @@ namespace PasLib
             }
 
             _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
+            _interleaveRule = interleaveRule;
         }
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
@@ -34,7 +36,7 @@ namespace PasLib
             }
 
             var rule = _ruleMap[ruleName];
-            var context = new ExplorerContext(text, depth);
+            var context = new ExplorerContext(text, _interleaveRule, depth);
             var matches = context.InvokeRule(rule);
             var exactLengthMatches = from m in matches
                                      where m.Text.Length == text.Length

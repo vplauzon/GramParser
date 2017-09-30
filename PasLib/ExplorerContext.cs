@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace PasLib
 {
@@ -10,20 +9,27 @@ namespace PasLib
         private const int DEFAULT_MAX_DEPTH = 40;
 
         private readonly SubString _text;
+        private readonly IRule _interleaveRule;
         private readonly int _depth;
         private readonly ImmutableHashSet<IRule> _ruleNameExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
-        public ExplorerContext(SubString text, int? depth = null) : this(
-            text,
-            depth ?? DEFAULT_MAX_DEPTH,
-            ImmutableHashSet<IRule>.Empty,
-            new AmbiantRuleProperties())
+        public ExplorerContext(
+            SubString text,
+            IRule interleaveRule = null,
+            int? depth = null)
+            : this(
+                  text,
+                  interleaveRule,
+                  depth ?? DEFAULT_MAX_DEPTH,
+                  ImmutableHashSet<IRule>.Empty,
+                  new AmbiantRuleProperties())
         {
         }
 
         private ExplorerContext(
             SubString text,
+            IRule interleaveRule,
             int depth,
             ImmutableHashSet<IRule> ruleNameExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
@@ -38,6 +44,7 @@ namespace PasLib
             }
             _text = text;
             _depth = depth;
+            _interleaveRule = interleaveRule;
             _ruleNameExcepts = ruleNameExcepts;
             _ambiantRuleProperties = ambiantRuleProperties
                 ?? throw new ArgumentNullException(nameof(ambiantRuleProperties));
@@ -58,6 +65,7 @@ namespace PasLib
             {
                 return new ExplorerContext(
                     _text.Skip(match.Text.Length),
+                    _interleaveRule,
                     _depth,
                     ImmutableHashSet<IRule>.Empty,
                     _ambiantRuleProperties);
@@ -94,6 +102,7 @@ namespace PasLib
                 {
                     var newContext = new ExplorerContext(
                         _text,
+                        _interleaveRule,
                         _depth - 1,
                         newExcepts,
                         newAmbiantRuleProperties);
@@ -105,12 +114,28 @@ namespace PasLib
             {
                 var newContext = new ExplorerContext(
                     _text,
+                    _interleaveRule,
                     _depth - 1,
                     _ruleNameExcepts,
                     newAmbiantRuleProperties);
 
                 return rule.Match(newContext);
             }
+        }
+
+        public ExplorerContext SubContext(int length)
+        {
+            if (length > _text.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(length));
+            }
+
+            return new ExplorerContext(
+                _text.Take(length),
+                _interleaveRule,
+                _depth,
+                ImmutableHashSet<IRule>.Empty,
+                _ambiantRuleProperties);
         }
 
         #region object methods

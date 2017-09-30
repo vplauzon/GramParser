@@ -27,7 +27,7 @@ namespace PasLib
             foreach (var primaryMatch in primaryMatches)
             {
                 var primaryText = primaryMatch.Text;
-                var excludingContext = new ExplorerContext(primaryText, context.Depth);
+                var excludingContext = context.SubContext(primaryText.Length);
                 var excludedMatches = excludingContext.InvokeRule(_excluded);
                 var excludedExactLength = from ex in excludedMatches
                                           where ex.Text.Length == primaryText.Length

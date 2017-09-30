@@ -249,7 +249,7 @@ namespace PasLib
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
-            return new RuleSet(new[] { main });
+            return new RuleSet(new[] { main }, interleave);
         }
 
         private static IRule GetCharacterRule()
@@ -277,6 +277,7 @@ namespace PasLib
         private static RuleSet CreateGrammar(RuleMatch match)
         {
             var ruleMap = new Dictionary<string, IRule>();
+            IRule interleave = null;
 
             foreach (var ruleMatch in match.Repeats)
             {
@@ -301,7 +302,7 @@ namespace PasLib
                 }
             }
 
-            return new RuleSet(ruleMap.Values);
+            return new RuleSet(ruleMap.Values, interleave);
         }
 
         private static TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
