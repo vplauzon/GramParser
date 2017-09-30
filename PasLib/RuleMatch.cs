@@ -79,5 +79,12 @@ namespace PasLib
                 ? this
                 : new RuleMatch(Rule, Text);
         }
+
+        public RuleMatch ChangeText(SubString text)
+        {
+            return Fragments == null
+                ? new RuleMatch(Rule, text, Repeats)
+                : new RuleMatch(Rule, text, Fragments);
+        }
     }
 }

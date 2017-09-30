@@ -37,7 +37,7 @@ namespace PasLib
 
             var rule = _ruleMap[ruleName];
             var context = new ExplorerContext(text, _interleaveRule, depth);
-            var matches = context.InvokeRule(rule);
+            var matches = GetMatches(rule, context);
             var exactLengthMatches = from m in matches
                                      where m.Text.Length == text.Length
                                      select m;
@@ -45,6 +45,20 @@ namespace PasLib
             var match = exactLengthMatches.FirstOrDefault();
 
             return match;
+        }
+
+        private static IEnumerable<RuleMatch> GetMatches(
+            IRule rule,
+            ExplorerContext context)
+        {
+            var leftMatches = context.InvokeRule(rule);
+
+            foreach (var m in leftMatches)
+            {
+                var fullMatch = context.MoveInterleaveRight(m);
+
+                yield return fullMatch;
+            }
         }
     }
 }

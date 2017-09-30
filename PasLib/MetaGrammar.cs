@@ -87,16 +87,15 @@ namespace PasLib
                 new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2)),
                 new TaggedRule("upper", quotedCharacter)
             }, false, false);
-            var exactCardinality = InterleaveRule.FromSequence(new SequenceRule(
+            var exactCardinality = new SequenceRule(
                 "exactCardinality",
                 new[]
                 {
                     new TaggedRule(null, new LiteralRule(null, "{")),
                     new TaggedRule("n", number),
                     new TaggedRule(null, new LiteralRule(null, "}"))
-                }),
-                interleave);
-            var minMaxCardinality = InterleaveRule.FromSequence(new SequenceRule(
+                });
+            var minMaxCardinality = new SequenceRule(
                 "minMaxCardinality",
                 new[]
                 {
@@ -105,8 +104,7 @@ namespace PasLib
                     new TaggedRule(null, new LiteralRule(null, ",")),
                     new TaggedRule("max", number),
                     new TaggedRule(null, new LiteralRule(null, "}"))
-                }),
-                interleave);
+                });
             var cardinality = new DisjunctionRule("cardinality", new[]
             {
                 new TaggedRule("star", new LiteralRule(null, "*")),
@@ -120,7 +118,7 @@ namespace PasLib
                 new TaggedRule("rule", ruleBodyProxy),
                 new TaggedRule("cardinality", cardinality)
             });
-            var disjunction = InterleaveRule.FromSequence(new SequenceRule(
+            var disjunction = new SequenceRule(
                 "disjunction",
                 new[]
                 {
@@ -128,7 +126,7 @@ namespace PasLib
                     new TaggedRule("head", ruleBodyProxy),
                     new TaggedRule("tail", new RepeatRule(
                         null,
-                        InterleaveRule.FromSequence(new SequenceRule(
+                        new SequenceRule(
                             null,
                             new[]
                             {
@@ -136,21 +134,18 @@ namespace PasLib
                                 new TaggedRule("t", tag),
                                 new TaggedRule("d", ruleBodyProxy)
                             }),
-                            interleave),
                         1,
                         null))
-                }),
-                interleave);
-            var innerSequence = InterleaveRule.FromSequence(new SequenceRule(
+                });
+            var innerSequence = new SequenceRule(
                 "innerSequence",
                 new[]
                 {
                     new TaggedRule("t", tag),
                     new TaggedRule("r", ruleBodyProxy)
-                }),
-                interleave);
+                });
             var sequence = new RepeatRule("sequence", innerSequence, 1, null);
-            var substract = InterleaveRule.FromSequence(new SequenceRule(
+            var substract = new SequenceRule(
                 "substract",
                 new[]
                 {
@@ -158,8 +153,7 @@ namespace PasLib
                     new TaggedRule("primary", ruleBodyProxy),
                     new TaggedRule(null, new LiteralRule(null, "-")),
                     new TaggedRule("excluded", ruleBodyProxy)
-                }),
-                interleave);
+                });
             var bracket = new SequenceRule("bracket", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "(")),
@@ -179,7 +173,7 @@ namespace PasLib
                 new TaggedRule("sequence", sequence)
             },
             isRecursive : true);
-            var interleaveDeclaration = InterleaveRule.FromSequence(new SequenceRule(
+            var interleaveDeclaration = new SequenceRule(
                 "interleaveDeclaration",
                 new[]
                 {
@@ -187,32 +181,28 @@ namespace PasLib
                     new TaggedRule(new LiteralRule(null, "=")),
                     new TaggedRule("ruleBody", ruleBodyProxy),
                     new TaggedRule(new LiteralRule(null, ";"))
-                }),
-                interleave);
+                });
             var boolean = new DisjunctionRule("boolean", new[]
             {
                 new TaggedRule(new LiteralRule("true", "true")),
                 new TaggedRule(new LiteralRule("false", "false"))
             });
-            var parameterAssignation = InterleaveRule.FromSequence(new SequenceRule(
+            var parameterAssignation = new SequenceRule(
                 "parameterAssignation",
                 new[]
                 {
                     new TaggedRule("id", identifier),
                     new TaggedRule(new LiteralRule(null, "=")),
                     new TaggedRule("value", boolean),
-                }),
-                interleave);
-            var innerParameterAssignationList = InterleaveRule.FromSequence(
-                new SequenceRule(
-                    null,
-                    new[]
-                    {
-                        new TaggedRule(new LiteralRule(null, ",")),
-                        new TaggedRule(parameterAssignation)
-                    }),
-                    interleave);
-            var parameterAssignationList = InterleaveRule.FromSequence(new SequenceRule(
+                });
+            var innerParameterAssignationList = new SequenceRule(
+                null,
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, ",")),
+                    new TaggedRule(parameterAssignation)
+                });
+            var parameterAssignationList = new SequenceRule(
                 "parameterAssignationList",
                 new[]
                 {
@@ -224,9 +214,8 @@ namespace PasLib
                         null,
                         null)),
                     new TaggedRule(new LiteralRule(null, ")"))
-                }),
-                interleave);
-            var ruleDeclaration = InterleaveRule.FromSequence(new SequenceRule(
+                });
+            var ruleDeclaration = new SequenceRule(
                 "ruleDeclaration",
                 new[]
                 {
@@ -235,17 +224,14 @@ namespace PasLib
                     new TaggedRule(null, new LiteralRule(null, "=")),
                     new TaggedRule("body", ruleBody),
                     new TaggedRule(null, new LiteralRule(null, ";"))
-                }),
-                interleave);
+                });
             var declaration = new DisjunctionRule("declaration", new[]
             {
                 new TaggedRule("interleaveDeclaration", interleaveDeclaration),
                 new TaggedRule("ruleDeclaration", ruleDeclaration)
             });
             //  Main rule
-            var main = InterleaveRule.InterleaveLeftOf(
-                new RepeatRule("main", declaration, 1, null),
-                interleave);
+            var main = new RepeatRule("main", declaration, 1, null);
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 

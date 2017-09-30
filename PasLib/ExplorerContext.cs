@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace PasLib
 {
@@ -87,39 +88,24 @@ namespace PasLib
                 throw new InvalidOperationException("Too much recursion");
             }
 
+            var interleaveMatch = UseInterleave()
+                ? _interleaveRule.Match(ForInterleave()).FirstOrDefault()
+                : null;
             var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);
+            var ruleMatches = InvokeRuleIfRecursionValid(rule, newAmbiantRuleProperties);
 
-            if (!newAmbiantRuleProperties.IsRecursive
-                && !newAmbiantRuleProperties.IsTerminalRule)
+            foreach (var m in ruleMatches)
             {
-                var newExcepts = _ruleNameExcepts.Add(rule);
-
-                if (newExcepts.Count == _ruleNameExcepts.Count)
-                {   //  Recursion into the same rule has been exhausted
-                    return RuleMatch.EmptyMatch;
+                if (interleaveMatch != null)
+                {
+                    yield return m.ChangeText(_text.Take(
+                        interleaveMatch.Text.Length
+                        + m.Text.Length));
                 }
                 else
                 {
-                    var newContext = new ExplorerContext(
-                        _text,
-                        _interleaveRule,
-                        _depth - 1,
-                        newExcepts,
-                        newAmbiantRuleProperties);
-
-                    return rule.Match(newContext);
+                    yield return m;
                 }
-            }
-            else
-            {
-                var newContext = new ExplorerContext(
-                    _text,
-                    _interleaveRule,
-                    _depth - 1,
-                    _ruleNameExcepts,
-                    newAmbiantRuleProperties);
-
-                return rule.Match(newContext);
             }
         }
 
@@ -138,11 +124,81 @@ namespace PasLib
                 _ambiantRuleProperties);
         }
 
+        public RuleMatch MoveInterleaveRight(RuleMatch match)
+        {
+            if (UseInterleave())
+            {
+                var newContext = MoveForward(match).ForInterleave();
+                var interleaveMatch = _interleaveRule.Match(newContext).FirstOrDefault();
+
+                return match.ChangeText(
+                    _text.Take(match.Text.Length + interleaveMatch.Text.Length));
+            }
+            else
+            {
+                return match;
+            }
+        }
+
         #region object methods
         public override string ToString()
         {
             return $"[{_depth}]{_text}";
         }
         #endregion
+
+        private bool UseInterleave()
+        {
+            return _interleaveRule != null && _ambiantRuleProperties.HasInterleave;
+        }
+
+        private ExplorerContext ForInterleave()
+        {
+            return new ExplorerContext(
+                _text,
+                null,
+                _depth,
+                _ruleNameExcepts,
+                _ambiantRuleProperties);
+        }
+
+        private IEnumerable<RuleMatch> InvokeRuleIfRecursionValid(
+            IRule rule,
+            AmbiantRuleProperties newAmbiantRuleProperties)
+        {
+            if (!newAmbiantRuleProperties.IsRecursive
+                && !newAmbiantRuleProperties.IsTerminalRule)
+            {
+                var newExcepts = _ruleNameExcepts.Add(rule);
+
+                if (newExcepts.Count == _ruleNameExcepts.Count)
+                {   //  Recursion into the same rule has been exhausted
+                    return RuleMatch.EmptyMatch;
+                }
+                else
+                {
+                    return InvokeRuleOnly(rule, newAmbiantRuleProperties, newExcepts);
+                }
+            }
+            else
+            {
+                return InvokeRuleOnly(rule, newAmbiantRuleProperties, _ruleNameExcepts);
+            }
+        }
+
+        private IEnumerable<RuleMatch> InvokeRuleOnly(
+            IRule rule,
+            AmbiantRuleProperties newAmbiantRuleProperties,
+            ImmutableHashSet<IRule> newExcepts)
+        {
+            var newContext = new ExplorerContext(
+                _text,
+                _interleaveRule,
+                _depth - 1,
+                newExcepts,
+                newAmbiantRuleProperties);
+
+            return rule.Match(newContext);
+        }
     }
 }
