@@ -21,7 +21,7 @@ namespace PasLib
 
         public override string ToString()
         {
-            return "<>(*Match None*)";
+            return "(*Match None*)";
         }
     }
 }

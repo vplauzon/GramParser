@@ -59,8 +59,11 @@ namespace PasLib
         public override string ToString()
         {
             var colons = DoIncludeChildren ? ":" : "::";
+            var rule = string.IsNullOrWhiteSpace(Rule.RuleName)
+                    ? Rule.ToString()
+                    : Rule.RuleName;
 
-            return $"{Tag}{colons}{Rule}";
+            return $"{Tag}{colons}({rule})";
         }
 
         private RuleMatch FormatMatch(RuleMatch match)

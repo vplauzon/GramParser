@@ -45,5 +45,10 @@ namespace PasLib
                 ? rule.ToString()
                 : rule.RuleName;
         }
+
+        protected string ToStringRuleName()
+        {
+            return (string.IsNullOrWhiteSpace(RuleName) ? "" : $"<{RuleName}>");
+        }
     }
 }

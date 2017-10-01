@@ -63,7 +63,8 @@ namespace PasLib
 
         public override string ToString()
         {
-            return $"<{RuleName}> ({ToString(_primary.Rule)} - {ToString(_excluded)})";
+            return ToStringRuleName()
+                + $"({_primary} - {ToString(_excluded)})";
         }
     }
 }

@@ -49,7 +49,7 @@ namespace PasLib
 
         public override string ToString()
         {
-            return "<" + RuleName + "> (\"" + First + "\"..\"" + Last + "\")";
+            return ToStringRuleName() + $" (\"{First}\"..\"{Last}\")";
         }
     }
 }

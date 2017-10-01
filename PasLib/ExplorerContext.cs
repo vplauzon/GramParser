@@ -92,7 +92,10 @@ namespace PasLib
                 ? _interleaveRule.Match(ForInterleave()).FirstOrDefault()
                 : null;
             var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);
-            var ruleMatches = InvokeRuleIfRecursionValid(rule, newAmbiantRuleProperties);
+            var ruleMatches = InvokeRuleIfRecursionValid(
+                rule,
+                interleaveMatch,
+                newAmbiantRuleProperties);
 
             foreach (var m in ruleMatches)
             {
@@ -164,6 +167,7 @@ namespace PasLib
 
         private IEnumerable<RuleMatch> InvokeRuleIfRecursionValid(
             IRule rule,
+            RuleMatch interleaveMatch,
             AmbiantRuleProperties newAmbiantRuleProperties)
         {
             if (!newAmbiantRuleProperties.IsRecursive
@@ -177,22 +181,34 @@ namespace PasLib
                 }
                 else
                 {
-                    return InvokeRuleOnly(rule, newAmbiantRuleProperties, newExcepts);
+                    return InvokeRuleOnly(
+                        rule,
+                        interleaveMatch,
+                        newAmbiantRuleProperties,
+                        newExcepts);
                 }
             }
             else
             {
-                return InvokeRuleOnly(rule, newAmbiantRuleProperties, _ruleNameExcepts);
+                return InvokeRuleOnly(
+                    rule,
+                    interleaveMatch,
+                    newAmbiantRuleProperties,
+                    _ruleNameExcepts);
             }
         }
 
         private IEnumerable<RuleMatch> InvokeRuleOnly(
             IRule rule,
+            RuleMatch interleaveMatch,
             AmbiantRuleProperties newAmbiantRuleProperties,
             ImmutableHashSet<IRule> newExcepts)
         {
+            var newText = interleaveMatch == null
+                ? _text
+                : _text.Skip(interleaveMatch.Text.Length);
             var newContext = new ExplorerContext(
-                _text,
+                newText,
                 _interleaveRule,
                 _depth - 1,
                 newExcepts,

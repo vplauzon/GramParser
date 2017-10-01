@@ -9,7 +9,7 @@ namespace PasLib
         /// <summary>Initialize to default values.</summary>
         public AmbiantRuleProperties()
         {
-            HasInterleave = false;
+            HasInterleave = true;
             IsRecursive = false;
             IsTerminalRule = false;
         }

@@ -49,7 +49,9 @@ namespace PasLib
 
         public override string ToString()
         {
-            return "<" + RuleName + "> (\"" + new string(_literal).Replace("\"", "\\\"") + "\")";
+            var literal = new string(_literal).Replace("\"", "\\\"");
+
+            return ToStringRuleName() + $" (\"{literal}\")";
         }
     }
 }

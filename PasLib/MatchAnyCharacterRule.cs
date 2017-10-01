@@ -30,7 +30,7 @@ namespace PasLib
 
         public override string ToString()
         {
-            return "<" + RuleName + "> (.)";
+            return ToStringRuleName() + " .";
         }
     }
 }

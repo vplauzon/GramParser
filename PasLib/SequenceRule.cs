@@ -36,9 +36,10 @@ namespace PasLib
         public override string ToString()
         {
             var rules = from t in Rules
-                        select ToString(t.Rule);
+                        select t.ToString();
 
-            return "<" + RuleName + "> (" + string.Join(" ", rules) + ")";
+            return ToStringRuleName()
+                + $"({string.Join(" ", rules)})";
         }
 
         private IEnumerable<RuleMatch> RecurseMatch(
