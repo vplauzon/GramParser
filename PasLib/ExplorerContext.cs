@@ -12,7 +12,7 @@ namespace PasLib
         private readonly SubString _text;
         private readonly IRule _interleaveRule;
         private readonly int _depth;
-        private readonly ImmutableHashSet<IRule> _ruleNameExcepts;
+        private readonly ImmutableHashSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
         public ExplorerContext(
@@ -46,7 +46,7 @@ namespace PasLib
             _text = text;
             _depth = depth;
             _interleaveRule = interleaveRule;
-            _ruleNameExcepts = ruleNameExcepts;
+            _ruleExcepts = ruleNameExcepts;
             _ambiantRuleProperties = ambiantRuleProperties
                 ?? throw new ArgumentNullException(nameof(ambiantRuleProperties));
         }
@@ -88,26 +88,25 @@ namespace PasLib
                 throw new InvalidOperationException("Too much recursion");
             }
 
-            var interleaveMatch = UseInterleave()
-                ? _interleaveRule.Match(ForInterleave()).FirstOrDefault()
-                : null;
             var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);
-            var ruleMatches = InvokeRuleIfRecursionValid(
-                rule,
-                interleaveMatch,
-                newAmbiantRuleProperties);
+            var newExcepts = GetNewRuleExceptions(newAmbiantRuleProperties, rule);
 
-            foreach (var m in ruleMatches)
+            if (newExcepts != null)
             {
-                if (interleaveMatch != null)
+                var interleaveLength = MatchInterleave();
+                var newText = _text.Skip(interleaveLength);
+                var newContext = new ExplorerContext(
+                    newText,
+                    _interleaveRule,
+                    _depth - 1,
+                    newExcepts,
+                    newAmbiantRuleProperties);
+                var ruleMatches = rule.Match(newContext);
+
+                foreach (var m in ruleMatches)
                 {
-                    yield return m.ChangeText(_text.Take(
-                        interleaveMatch.Text.Length
-                        + m.Text.Length));
-                }
-                else
-                {
-                    yield return m;
+                    yield return
+                        m.ChangeLengthWithInterleaves(interleaveLength + m.Text.Length);
                 }
             }
         }
@@ -127,21 +126,18 @@ namespace PasLib
                 _ambiantRuleProperties);
         }
 
-        public RuleMatch MoveInterleaveRight(RuleMatch match)
+        public int MatchInterleave()
         {
             if (UseInterleave())
             {
-                var newContext = MoveForward(match).ForInterleave();
-                var interleaveMatch = _interleaveRule.Match(newContext).FirstOrDefault();
+                var interleaveMatch =
+                    _interleaveRule.Match(ForInterleave()).FirstOrDefault();
 
-                return interleaveMatch == null
-                    ? match
-                    : match.ChangeText(
-                        _text.Take(match.Text.Length + interleaveMatch.Text.Length));
+                return interleaveMatch == null ? 0 : interleaveMatch.Text.Length;
             }
             else
             {
-                return match;
+                return 0;
             }
         }
 
@@ -163,60 +159,30 @@ namespace PasLib
                 _text,
                 null,
                 _depth,
-                _ruleNameExcepts,
+                _ruleExcepts,
                 _ambiantRuleProperties);
         }
 
-        private IEnumerable<RuleMatch> InvokeRuleIfRecursionValid(
-            IRule rule,
-            RuleMatch interleaveMatch,
-            AmbiantRuleProperties newAmbiantRuleProperties)
+        private ImmutableHashSet<IRule> GetNewRuleExceptions(
+            AmbiantRuleProperties newAmbiantRuleProperties,
+            IRule rule)
         {
             if (!newAmbiantRuleProperties.IsRecursive
                 && !newAmbiantRuleProperties.IsTerminalRule)
             {
-                var newExcepts = _ruleNameExcepts.Add(rule);
-
-                if (newExcepts.Count == _ruleNameExcepts.Count)
+                if (_ruleExcepts.Contains(rule))
                 {   //  Recursion into the same rule has been exhausted
-                    return RuleMatch.EmptyMatch;
+                    return null;
                 }
                 else
                 {
-                    return InvokeRuleOnly(
-                        rule,
-                        interleaveMatch,
-                        newAmbiantRuleProperties,
-                        newExcepts);
+                    return _ruleExcepts.Add(rule);
                 }
             }
             else
             {
-                return InvokeRuleOnly(
-                    rule,
-                    interleaveMatch,
-                    newAmbiantRuleProperties,
-                    _ruleNameExcepts);
+                return _ruleExcepts;
             }
-        }
-
-        private IEnumerable<RuleMatch> InvokeRuleOnly(
-            IRule rule,
-            RuleMatch interleaveMatch,
-            AmbiantRuleProperties newAmbiantRuleProperties,
-            ImmutableHashSet<IRule> newExcepts)
-        {
-            var newText = interleaveMatch == null
-                ? _text
-                : _text.Skip(interleaveMatch.Text.Length);
-            var newContext = new ExplorerContext(
-                newText,
-                _interleaveRule,
-                _depth - 1,
-                newExcepts,
-                newAmbiantRuleProperties);
-
-            return rule.Match(newContext);
         }
     }
 }

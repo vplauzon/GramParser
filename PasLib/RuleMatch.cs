@@ -8,18 +8,29 @@ namespace PasLib
     {
         private static readonly RuleMatch[] EMPTY_CONTENTS = new RuleMatch[0];
 
-        private RuleMatch(IRule rule)
+        public RuleMatch(IRule rule, SubString text, int lengthWithInterleaves)
         {
+            if (lengthWithInterleaves < text.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lengthWithInterleaves));
+            }
+
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
-        }
-
-        public RuleMatch(IRule rule, SubString text) : this(rule)
-        {
             Text = text;
+            LengthWithInterleaves = lengthWithInterleaves;
         }
 
-        public RuleMatch(IRule rule, SubString text, IEnumerable<RuleMatch> repeats)
-            : this(rule, text)
+        public RuleMatch(IRule rule, SubString text)
+            :this(rule, text, text.Length)
+        {
+        }
+
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            int lengthWithInterleaves,
+            IEnumerable<RuleMatch> repeats)
+            : this(rule, text, lengthWithInterleaves)
         {
             Repeats = repeats ?? throw new ArgumentNullException(nameof(repeats));
         }
@@ -27,8 +38,17 @@ namespace PasLib
         public RuleMatch(
             IRule rule,
             SubString text,
+            IEnumerable<RuleMatch> repeats)
+            : this(rule, text, text.Length, repeats)
+        {
+        }
+
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            int lengthWithInterleaves,
             IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
-            : this(rule, text)
+            : this(rule, text, lengthWithInterleaves)
         {
             if (fragments == null)
             {
@@ -40,15 +60,25 @@ namespace PasLib
                 : null;
         }
 
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
+            : this (rule, text, text.Length, fragments)
+        {
+        }
+
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
 
-        public IRule Rule { get; private set; }
+        public IRule Rule { get; }
 
-        public SubString Text { get; private set; }
+        public SubString Text { get; }
 
-        public IEnumerable<RuleMatch> Repeats { get; private set; } = EMPTY_CONTENTS;
+        public int LengthWithInterleaves { get; }
 
-        public IDictionary<string, RuleMatch> Fragments { get; private set; }
+        public IEnumerable<RuleMatch> Repeats { get; } = EMPTY_CONTENTS;
+
+        public IDictionary<string, RuleMatch> Fragments { get; }
 
         public RuleMatch ChangeRule(IRule rule)
         {
@@ -63,13 +93,28 @@ namespace PasLib
             }
             else
             {
-                var newMatch = new RuleMatch(rule);
+                return Fragments == null
+                    ? new RuleMatch(rule, Text, LengthWithInterleaves, Repeats)
+                    : new RuleMatch(rule, Text, LengthWithInterleaves, Fragments);
+            }
+        }
 
-                newMatch.Text = Text;
-                newMatch.Repeats = Repeats;
-                newMatch.Fragments = Fragments;
+        public RuleMatch ChangeLengthWithInterleaves(int lengthWithInterleaves)
+        {
+            if (lengthWithInterleaves < Text.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lengthWithInterleaves));
+            }
 
-                return newMatch;
+            if (lengthWithInterleaves == LengthWithInterleaves)
+            {
+                return this;
+            }
+            else
+            {
+                return Fragments == null
+                    ? new RuleMatch(Rule, Text, lengthWithInterleaves, Repeats)
+                    : new RuleMatch(Rule, Text, lengthWithInterleaves, Fragments);
             }
         }
 
@@ -77,14 +122,7 @@ namespace PasLib
         {
             return Fragments == null && !Repeats.Any()
                 ? this
-                : new RuleMatch(Rule, Text);
-        }
-
-        public RuleMatch ChangeText(SubString text)
-        {
-            return Fragments == null
-                ? new RuleMatch(Rule, text, Repeats)
-                : new RuleMatch(Rule, text, Fragments);
+                : new RuleMatch(Rule, Text, LengthWithInterleaves);
         }
     }
 }

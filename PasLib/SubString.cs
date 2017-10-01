@@ -74,12 +74,14 @@ namespace PasLib
 
         public SubString Skip(int offset)
         {
-            if (offset > Length)
+            if (offset > Length || offset < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(offset), "Must be smaller than the sub list length");
             }
 
-            return new SubString(_master, _offset + offset, _length - offset);
+            return offset == 0
+                ? this
+                : new SubString(_master, _offset + offset, _length - offset);
         }
 
         public IEnumerable<char> Enumerate()

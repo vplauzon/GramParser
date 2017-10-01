@@ -55,7 +55,10 @@ namespace PasLib
 
             foreach (var m in leftMatches)
             {
-                var fullMatch = context.MoveInterleaveRight(m);
+                var newContext = context.MoveForward(m);
+                var interleaveLength = newContext.MatchInterleave();
+                var fullMatch = m.ChangeLengthWithInterleaves(
+                    m.LengthWithInterleaves + interleaveLength);
 
                 yield return fullMatch;
             }
