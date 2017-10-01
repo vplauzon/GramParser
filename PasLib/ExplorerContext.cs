@@ -134,8 +134,10 @@ namespace PasLib
                 var newContext = MoveForward(match).ForInterleave();
                 var interleaveMatch = _interleaveRule.Match(newContext).FirstOrDefault();
 
-                return match.ChangeText(
-                    _text.Take(match.Text.Length + interleaveMatch.Text.Length));
+                return interleaveMatch == null
+                    ? match
+                    : match.ChangeText(
+                        _text.Take(match.Text.Length + interleaveMatch.Text.Length));
             }
             else
             {
