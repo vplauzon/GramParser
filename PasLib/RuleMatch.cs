@@ -124,5 +124,14 @@ namespace PasLib
                 ? this
                 : new RuleMatch(Rule, Text, LengthWithInterleaves);
         }
+
+        #region object methods
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(Rule.RuleName)
+                ? Text.ToString()
+                : $"<{Rule.RuleName}>{Text}";
+        }
+        #endregion
     }
 }
