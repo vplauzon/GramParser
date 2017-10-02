@@ -19,7 +19,9 @@ namespace PasLib
             }
 
             _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
-            _interleaveRule = interleaveRule;
+            _interleaveRule = interleaveRule == null
+                ? null
+                : new RepeatRule(null, interleaveRule, null, null, false, false);
         }
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
