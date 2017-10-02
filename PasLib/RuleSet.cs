@@ -39,7 +39,7 @@ namespace PasLib
             var context = new ExplorerContext(text, _interleaveRule, depth);
             var matches = GetMatches(rule, context);
             var exactLengthMatches = from m in matches
-                                     where m.Text.Length == text.Length
+                                     where m.LengthWithInterleaves == text.Length
                                      select m;
             //  Take the first available match (of right length)
             var match = exactLengthMatches.FirstOrDefault();
