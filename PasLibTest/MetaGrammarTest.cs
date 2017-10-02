@@ -14,7 +14,7 @@ namespace PasLibTest
         [TestMethod]
         public void ParsingSequence()
         {
-            var ruleSet = MetaGrammar.ParseGrammar("rule seq = \"a\" \"b\"");
+            var ruleSet = MetaGrammar.ParseGrammar("rule seq = \"a\" \"b\";");
 
             Assert.IsNotNull(ruleSet);
         }

@@ -55,7 +55,7 @@ namespace PasLib
 
             foreach (var match in matches)
             {
-                var newTotalMatchLength = totalMatchLength + match.Text.Length;
+                var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
                 var newFragments = currentRule.AddFragment(fragments, match);
 
                 if (remainingRules.Any())
