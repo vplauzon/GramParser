@@ -146,7 +146,7 @@ namespace PasLib
             var sequence = new RepeatRule(
                 "sequence",
                 innerSequence,
-                1,
+                2,
                 null,
                 isRecursive: false);
             var substract = new SequenceRule("substract", new[]
