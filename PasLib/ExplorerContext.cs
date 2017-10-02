@@ -105,9 +105,11 @@ namespace PasLib
 
                 foreach (var m in ruleMatches)
                 {
-                    yield return
-                        m.ChangeLengthWithInterleaves(interleaveLength + m.Text.Length);
+                    yield return m.AddInterleaveLength(interleaveLength);
                 }
+            }
+            else
+            {   //  Just for breakpoints, to detect recursion breaks
             }
         }
 

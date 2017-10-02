@@ -25,12 +25,14 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            return RecurseMatch(
+            var matches = RecurseMatch(
                 Rules,
                 context,
                 context.Text,
                 0,
                 TaggedRule.EMPTY_FRAGMENTS);
+
+            return matches;
         }
 
         public override string ToString()

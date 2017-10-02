@@ -21,7 +21,7 @@ namespace PasLib
         }
 
         public RuleMatch(IRule rule, SubString text)
-            :this(rule, text, text.Length)
+            : this(rule, text, text.Length)
         {
         }
 
@@ -64,7 +64,7 @@ namespace PasLib
             IRule rule,
             SubString text,
             IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
-            : this (rule, text, text.Length, fragments)
+            : this(rule, text, text.Length, fragments)
         {
         }
 
@@ -99,22 +99,22 @@ namespace PasLib
             }
         }
 
-        public RuleMatch ChangeLengthWithInterleaves(int lengthWithInterleaves)
+        public RuleMatch AddInterleaveLength(int length)
         {
-            if (lengthWithInterleaves < Text.Length)
+            if (length < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(lengthWithInterleaves));
+                throw new ArgumentOutOfRangeException(nameof(length));
             }
 
-            if (lengthWithInterleaves == LengthWithInterleaves)
+            if (length == 0)
             {
                 return this;
             }
             else
             {
                 return Fragments == null
-                    ? new RuleMatch(Rule, Text, lengthWithInterleaves, Repeats)
-                    : new RuleMatch(Rule, Text, lengthWithInterleaves, Fragments);
+                    ? new RuleMatch(Rule, Text, LengthWithInterleaves + length, Repeats)
+                    : new RuleMatch(Rule, Text, LengthWithInterleaves + length, Fragments);
             }
         }
 
