@@ -65,7 +65,7 @@ namespace PasLib
             if (match.Text.HasContent)
             {
                 return new ExplorerContext(
-                    _text.Skip(match.Text.Length),
+                    _text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
                     _depth,
                     ImmutableHashSet<IRule>.Empty,
@@ -167,7 +167,8 @@ namespace PasLib
             AmbiantRuleProperties newAmbiantRuleProperties,
             IRule rule)
         {
-            if (!newAmbiantRuleProperties.IsRecursive
+            if (!string.IsNullOrWhiteSpace(rule.RuleName)
+                && !newAmbiantRuleProperties.IsRecursive
                 && !newAmbiantRuleProperties.IsTerminalRule)
             {
                 if (_ruleExcepts.Contains(rule))

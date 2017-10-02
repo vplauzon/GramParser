@@ -82,7 +82,8 @@ namespace PasLib
                 }
                 else
                 {
-                    yield return new RuleMatch(this, originalText.Take(newTotalMatchLength));
+                    yield return
+                        new RuleMatch(this, originalText.Take(newTotalMatchLength));
                 }
             }
         }
