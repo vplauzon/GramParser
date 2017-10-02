@@ -60,46 +60,46 @@ namespace PasLib
             var nonEmptyMatches = from m in matches
                                   where m.Text.HasContent
                                   select m;
+            var hasOneMatchSentinel = false;
 
-            if (nonEmptyMatches.Any())
+            foreach (var match in nonEmptyMatches)
             {
-                foreach (var match in nonEmptyMatches)
-                {
-                    var newReverseChildren = reverseChilden.Prepend(match);
-                    var newTotalMatchLength = totalMatchLength
-                        + match.LengthWithInterleaves;
+                var newReverseChildren = reverseChilden.Prepend(match);
+                var newTotalMatchLength = totalMatchLength
+                    + match.LengthWithInterleaves;
 
-                    if (!_max.HasValue || iteration + 1 < _max.Value)
-                    {   //  We can still repeat
-                        var newContext = context.MoveForward(match);
-                        var downstreamMatches = RecurseMatch(
-                            newContext,
-                            originalText,
-                            newTotalMatchLength,
-                            iteration + 1,
-                            newReverseChildren);
+                hasOneMatchSentinel = true;
+                if (!_max.HasValue || iteration + 1 < _max.Value)
+                {   //  We can still repeat
+                    var newContext = context.MoveForward(match);
+                    var downstreamMatches = RecurseMatch(
+                        newContext,
+                        originalText,
+                        newTotalMatchLength,
+                        iteration + 1,
+                        newReverseChildren);
 
-                        foreach (var m in downstreamMatches)
-                        {
-                            yield return m;
-                        }
-                    }
-                    //  We have reached our max:  end recursion
-                    //  Have we reached our min?
-                    else if ((!_min.HasValue || iteration + 1 >= _min.Value))
+                    foreach (var m in downstreamMatches)
                     {
-                        var content = originalText.Take(newTotalMatchLength);
-
-                        yield return new RuleMatch(
-                            this,
-                            content,
-                            newReverseChildren.Reverse().ToArray());
+                        yield return m;
                     }
+                }
+                //  We have reached our max:  end recursion
+                //  Have we reached our min?
+                else if ((!_min.HasValue || iteration + 1 >= _min.Value))
+                {
+                    var content = originalText.Take(newTotalMatchLength);
+
+                    yield return new RuleMatch(
+                        this,
+                        content,
+                        newReverseChildren.Reverse().ToArray());
                 }
             }
             //  Repeat didn't work, but if we already reached our min, we're good
             //  (even if no content)
-            else if ((!_min.HasValue || iteration >= _min.Value))
+            if (!hasOneMatchSentinel
+                && (!_min.HasValue || iteration >= _min.Value))
             {
                 var content = originalText.Take(totalMatchLength);
 
