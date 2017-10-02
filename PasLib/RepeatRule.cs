@@ -66,7 +66,8 @@ namespace PasLib
                 foreach (var match in nonEmptyMatches)
                 {
                     var newReverseChildren = reverseChilden.Prepend(match);
-                    var newTotalMatchLength = totalMatchLength + match.Text.Length;
+                    var newTotalMatchLength = totalMatchLength
+                        + match.LengthWithInterleaves;
 
                     if (!_max.HasValue || iteration + 1 < _max.Value)
                     {   //  We can still repeat
