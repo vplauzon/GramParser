@@ -5,7 +5,7 @@ using PasLib;
 
 namespace PasLibTest
 {
-    [TestClass] 
+    [TestClass]
     public class RuleTest
     {
         #region Trivial
