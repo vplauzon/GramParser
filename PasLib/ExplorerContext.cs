@@ -49,11 +49,20 @@ namespace PasLib
             _ruleExcepts = ruleNameExcepts;
             _ambiantRuleProperties = ambiantRuleProperties
                 ?? throw new ArgumentNullException(nameof(ambiantRuleProperties));
+            ContextID = Guid.NewGuid().GetHashCode();
         }
 
         public SubString Text { get => _text; }
 
         public int Depth { get => _depth; }
+
+        /// <summary>For debug purposes only.</summary>
+        /// <remarks>
+        /// Ease the use of conditional breakpoints in the highly recursive rule resolution.
+        /// </remarks>
+        public int ContextID { get; }
+
+        public IEnumerable<IRule> RuleExcepts { get { return _ruleExcepts; } }
 
         public ExplorerContext MoveForward(RuleMatch match)
         {
