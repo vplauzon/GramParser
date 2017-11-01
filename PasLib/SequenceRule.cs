@@ -35,6 +35,7 @@ namespace PasLib
             return matches;
         }
 
+        #region object methods
         public override string ToString()
         {
             var rules = from t in Rules
@@ -43,6 +44,7 @@ namespace PasLib
             return ToStringRuleName()
                 + $"({string.Join(" ", rules)})";
         }
+        #endregion
 
         private IEnumerable<RuleMatch> RecurseMatch(
             IEnumerable<TaggedRule> rules,
