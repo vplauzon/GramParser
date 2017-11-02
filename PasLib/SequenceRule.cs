@@ -27,6 +27,7 @@ namespace PasLib
         {
             var matches = RecurseMatch(
                 Rules,
+                context.ContextID,
                 context,
                 context.Text,
                 0,
@@ -48,6 +49,8 @@ namespace PasLib
 
         private IEnumerable<RuleMatch> RecurseMatch(
             IEnumerable<TaggedRule> rules,
+            //  Used only for debugging purposes, to hook on the context ID of the entire sequence
+            int masterContextID,
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
@@ -67,6 +70,7 @@ namespace PasLib
                     var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
                         remainingRules,
+                        masterContextID,
                         newContext,
                         originalText,
                         newTotalMatchLength,

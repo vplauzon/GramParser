@@ -34,6 +34,7 @@ namespace PasLib
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             return RecurseMatch(
+                context.ContextID,
                 context,
                 context.Text,
                 0,
@@ -50,6 +51,8 @@ namespace PasLib
         }
 
         private IEnumerable<RuleMatch> RecurseMatch(
+            //  Used only for debugging purposes, to hook on the context ID of the entire sequence
+            int masterContextID,
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
@@ -73,6 +76,7 @@ namespace PasLib
                 {   //  We can still repeat
                     var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
+                        masterContextID,
                         newContext,
                         originalText,
                         newTotalMatchLength,
