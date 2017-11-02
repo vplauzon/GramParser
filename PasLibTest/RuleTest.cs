@@ -177,6 +177,25 @@ namespace PasLibTest
                 }
             }
         }
+
+        [TestMethod]
+        public void RepeatWithSequenceAndInterleave()
+        {
+            var interleave = new RepeatRule("interleave", new LiteralRule(null, " "), 0, null);
+            var seq = new SequenceRule("seq", new[]
+            {
+                new TaggedRule(null, new LiteralRule(null, "|")),
+                new TaggedRule("t", new LiteralRule(null, "a"))
+            });
+            var rule = new RepeatRule("rep", seq, 1, null);
+            var text = "  |a  |a   |a;";
+            var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
+
+            Assert.IsNotNull(match, "Success");
+            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
+            Assert.AreEqual(text.Length-1, match.Text.Length, "MatchLength");
+            Assert.AreEqual(3, match.Repeats.Count(), "Contents");
+        }
         #endregion
 
         #region Disjunction
