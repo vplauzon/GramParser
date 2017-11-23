@@ -71,7 +71,7 @@ namespace PasLib
                 throw new ArgumentNullException(nameof(match));
             }
 
-            if (match.Text.HasContent)
+            if (match.LengthWithInterleaves > 0)
             {
                 return new ExplorerContext(
                     _text.Skip(match.LengthWithInterleaves),
