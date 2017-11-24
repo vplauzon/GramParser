@@ -181,14 +181,12 @@ namespace PasLib
                 2,
                 null,
                 isRecursive: false);
-            var substractProxy = new RuleProxy();
             var substractable = new DisjunctionRule("substractable", new[]
             {
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
                 new TaggedRule("any", any),
-                new TaggedRule("substract", substractProxy),
                 new TaggedRule("repeat", repeat)
             },
             isRecursive: false);
@@ -277,7 +275,6 @@ namespace PasLib
             //  Main rule
             var main = new RepeatRule("main", declaration, 1, null, isRecursive: false);
 
-            substractProxy.ReferencedRule = substract;
             ruleBodyProxy.ReferencedRule = ruleBody;
 
             return new RuleSet(new[] { main }, interleave);
@@ -472,7 +469,7 @@ namespace PasLib
         {
             var primary = ruleBodyBody.Fragments["primary"];
             var excluded = ruleBodyBody.Fragments["excluded"];
-            var tag = ruleBodyBody.Fragments["tag"];
+            var tag = ruleBodyBody.Fragments["t"];
             var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
             var excludedRule = CreateRule(null, excluded);
 

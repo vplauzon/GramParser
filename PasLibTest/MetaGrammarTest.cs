@@ -208,8 +208,11 @@ namespace PasLibTest
                 Tuple.Create(true, "a", "a"),
                 Tuple.Create(false, "a", "aa"),
                 Tuple.Create(true, "a", "aaa"),
-                Tuple.Create(true, "hiBang", "Hi!"),
-                Tuple.Create(false, "hiBang", "HiBob!"),
+                Tuple.Create(true, "hiBang", "Hi"),
+                Tuple.Create(true, "hiBang", "!"),
+                Tuple.Create(false, "hiBang", "Bob"),
+                Tuple.Create(false, "hiBang", "Hi!"),
+                Tuple.Create(false, "hiBang", "HiBob!")
             };
 
             SimpleTest("SubstractGrammar.txt", samples);

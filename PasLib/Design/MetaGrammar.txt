@@ -29,7 +29,7 @@ rule disjunction = t:tag head:disjunctionable tail:("|" t:tag d:disjunctionable)
 rule sequenceable = literal:literal | range:range | bracket | any:any | repeat:repeat;
 rule sequence = (t:tag r:sequenceable){2,};
 rule substractable = literal:literal | range:range
-	| bracket | any:any | substract | repeat:repeat;
+	| bracket | any:any | repeat:repeat;
 rule substracted = literal:literal | range:range | bracket | repeat:repeat;
 rule substract = t:tag primary:substractable "-" excluded:substracted;
 rule(recursive=true) ruleBody = literal:literal | range:range
