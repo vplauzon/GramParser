@@ -113,16 +113,39 @@ namespace PasLib
                 new TaggedRule("minMax", minMaxCardinality)
             },
             isRecursive: false);
+            var bracket = new SequenceRule("bracket", new[]
+            {
+                new TaggedRule(null, new LiteralRule(null, "(")),
+                new TaggedRule("r", ruleBodyProxy),
+                new TaggedRule(null, new LiteralRule(null, ")"))
+            },
+            isRecursive: false);
+            var repeatable = new DisjunctionRule("repeatable", new[]
+            {
+                new TaggedRule("literal", literal),
+                new TaggedRule("bracket", bracket),
+                new TaggedRule("any", any)
+            },
+            isRecursive: false);
             var repeat = new SequenceRule("repeat", new[]
             {
-                new TaggedRule("rule", ruleBodyProxy),
+                new TaggedRule("rule", repeatable),
                 new TaggedRule("cardinality", cardinality)
+            },
+            isRecursive: false);
+            var disjunctionable = new DisjunctionRule("disjunctionable", new[]
+            {
+                new TaggedRule("literal", literal),
+                new TaggedRule("range", range),
+                new TaggedRule("bracket", bracket),
+                new TaggedRule("any", any),
+                new TaggedRule("repeat", repeat)
             },
             isRecursive: false);
             var disjunction = new SequenceRule("disjunction", new[]
             {
                 new TaggedRule("t", tag),
-                new TaggedRule("head", ruleBodyProxy),
+                new TaggedRule("head", disjunctionable),
                 new TaggedRule("tail", new RepeatRule(
                     null,
                     new SequenceRule(
@@ -131,16 +154,25 @@ namespace PasLib
                         {
                             new TaggedRule(null, new LiteralRule(null, "|")),
                             new TaggedRule("t", tag),
-                            new TaggedRule("d", ruleBodyProxy)
+                            new TaggedRule("d", disjunctionable)
                         }),
                     1,
                     null))
             },
             isRecursive: false);
+            var sequenceable = new DisjunctionRule("sequenceable", new[]
+            {
+                new TaggedRule("literal", literal),
+                new TaggedRule("range", range),
+                new TaggedRule("bracket", bracket),
+                new TaggedRule("any", any),
+                new TaggedRule("repeat", repeat)
+            },
+            isRecursive: false);
             var innerSequence = new SequenceRule("innerSequence", new[]
             {
                 new TaggedRule("t", tag),
-                new TaggedRule("r", ruleBodyProxy)
+                new TaggedRule("r", sequenceable)
             },
             isRecursive: false);
             var sequence = new RepeatRule(
@@ -149,19 +181,31 @@ namespace PasLib
                 2,
                 null,
                 isRecursive: false);
+            var substractProxy = new RuleProxy();
+            var substractable = new DisjunctionRule("substractable", new[]
+            {
+                new TaggedRule("literal", literal),
+                new TaggedRule("range", range),
+                new TaggedRule("bracket", bracket),
+                new TaggedRule("any", any),
+                new TaggedRule("substract", substractProxy),
+                new TaggedRule("repeat", repeat)
+            },
+            isRecursive: false);
+            var substracted = new DisjunctionRule("substracted", new[]
+            {
+                new TaggedRule("literal", literal),
+                new TaggedRule("range", range),
+                new TaggedRule("bracket", bracket),
+                new TaggedRule("repeat", repeat)
+            },
+            isRecursive: false);
             var substract = new SequenceRule("substract", new[]
             {
                 new TaggedRule("t", tag),
-                new TaggedRule("primary", ruleBodyProxy),
+                new TaggedRule("primary", substractable),
                 new TaggedRule(null, new LiteralRule(null, "-")),
-                new TaggedRule("excluded", ruleBodyProxy)
-            },
-            isRecursive: false);
-            var bracket = new SequenceRule("bracket", new[]
-            {
-                new TaggedRule(null, new LiteralRule(null, "(")),
-                new TaggedRule("r", ruleBodyProxy),
-                new TaggedRule(null, new LiteralRule(null, ")"))
+                new TaggedRule("excluded", substracted)
             },
             isRecursive: false);
 
@@ -233,6 +277,7 @@ namespace PasLib
             //  Main rule
             var main = new RepeatRule("main", declaration, 1, null, isRecursive: false);
 
+            substractProxy.ReferencedRule = substract;
             ruleBodyProxy.ReferencedRule = ruleBody;
 
             return new RuleSet(new[] { main }, interleave);

@@ -21,13 +21,19 @@ rule exactCardinality = "{" n:number "}";
 rule minMaxCardinality = "{" min:number "," max:number "}";
 rule cardinality = star:"*" | plus:"+" | question:"?" | exact:exactCardinality
 	| minMax:minMaxCardinality;
-rule repeat = rule:ruleBody cardinality:cardinality;
-rule disjunction = t:tag head:ruleBody tail:("|" t:tag d:ruleBody)+;
-rule sequence = (t:tag r:ruleBody){2,};
-rule substract = t:tag primary:ruleBody "-" excluded:ruleBody;
-rule braket = "(" r:ruleBody ")";
+rule bracket = "(" r:ruleBody ")";
+rule repeatable = literal:literal | bracket | any:any;
+rule repeat = rule:repeatable cardinality:cardinality;
+rule disjunctionable = literal:literal | range:range | bracket | any:any | repeat:repeat;
+rule disjunction = t:tag head:disjunctionable tail:("|" t:tag d:disjunctionable)+;
+rule sequenceable = literal:literal | range:range | bracket | any:any | repeat:repeat;
+rule sequence = (t:tag r:sequenceable){2,};
+rule substractable = literal:literal | range:range
+	| bracket | any:any | substract | repeat:repeat;
+rule substracted = literal:literal | range:range | bracket | repeat:repeat;
+rule substract = t:tag primary:substractable "-" excluded:substracted;
 rule(recursive=true) ruleBody = literal:literal | range:range
-	| braket | any:any | substract | disjunction | repeat:repeat
+	| bracket | any:any | substract | disjunction | repeat:repeat
 	| sequence;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
