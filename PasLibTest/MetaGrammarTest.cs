@@ -142,6 +142,22 @@ namespace PasLibTest
         }
 
         [TestMethod]
+        public void Disjunction3Terms()
+        {
+            var samples = new[]
+            {
+                Tuple.Create(true, "myrule", "a"),
+                Tuple.Create(true, "myrule", "b"),
+                Tuple.Create(true, "myrule", "c"),
+                Tuple.Create(false, "myrule", "d"),
+                Tuple.Create(false, "myrule", "aa"),
+                Tuple.Create(false, "myrule", "B")
+            };
+
+            SimpleTest("Disjunction3TermsGrammar.txt", samples);
+        }
+
+        [TestMethod]
         public void Disjunction()
         {
             var samples = new[]

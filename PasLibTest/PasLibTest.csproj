@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Meta\AnyGrammar.txt" />
+    <EmbeddedResource Include="Meta\Disjunction3TermsGrammar.txt" />
     <EmbeddedResource Include="Meta\DisjunctionGrammar.txt" />
     <EmbeddedResource Include="Meta\LiteralGrammar.txt" />
     <EmbeddedResource Include="Meta\OneLetterOneRuleGrammar.txt" />
