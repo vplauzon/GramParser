@@ -4,8 +4,26 @@
   "parameters": {
   },
   "variables": {
+    "Plan Name": "PasConsumptionPlan"
   },
   "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "size": "Y1",
+        "family": "Y",
+        "capacity": 0
+      },
+      "kind": "functionapp",
+      "name": "[variables('Plan Name')]",
+      "apiVersion": "2016-09-01",
+      "location": "[resourceGroup().location]",
+      "scale": null,
+      "properties": {},
+      "dependsOn": []
+    }
   ],
   "outputs": {}
 }
