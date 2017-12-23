@@ -12,7 +12,8 @@ namespace PasFunction
     {
         [FunctionName("GrammarFunction")]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]HttpRequest req, TraceWriter log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]HttpRequest req,
+            TraceWriter log)
         {
             log.Info("Begin request.");
 

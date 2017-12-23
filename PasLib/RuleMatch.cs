@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace PasLib
 {
     internal class RuleMatch
     {
-        private static readonly RuleMatch[] EMPTY_CONTENTS = new RuleMatch[0];
-
-        public RuleMatch(IRule rule, SubString text, int lengthWithInterleaves)
+        private RuleMatch(IRule rule, SubString text, int lengthWithInterleaves)
         {
             if (lengthWithInterleaves < text.Length)
             {
@@ -25,14 +24,19 @@ namespace PasLib
         {
         }
 
-        public RuleMatch(
+        private RuleMatch(
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
             IEnumerable<RuleMatch> repeats)
             : this(rule, text, lengthWithInterleaves)
         {
-            Repeats = repeats ?? throw new ArgumentNullException(nameof(repeats));
+            if (repeats == null)
+            {
+                throw new ArgumentNullException(nameof(repeats));
+            }
+
+            Repeats = ImmutableList<RuleMatch>.Empty.AddRange(repeats);
         }
 
         public RuleMatch(
@@ -43,7 +47,7 @@ namespace PasLib
         {
         }
 
-        public RuleMatch(
+        private RuleMatch(
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
@@ -56,7 +60,7 @@ namespace PasLib
             }
 
             Fragments = fragments.Any()
-                ? new Dictionary<string, RuleMatch>(fragments)
+                ? ImmutableDictionary<string, RuleMatch>.Empty.AddRange(fragments)
                 : null;
         }
 
@@ -76,9 +80,9 @@ namespace PasLib
 
         public int LengthWithInterleaves { get; }
 
-        public IEnumerable<RuleMatch> Repeats { get; } = EMPTY_CONTENTS;
+        public IImmutableList<RuleMatch> Repeats { get; } = ImmutableList<RuleMatch>.Empty;
 
-        public IDictionary<string, RuleMatch> Fragments { get; }
+        public IImmutableDictionary<string, RuleMatch> Fragments { get; }
 
         public RuleMatch ChangeRule(IRule rule)
         {

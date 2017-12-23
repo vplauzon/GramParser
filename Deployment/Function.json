@@ -3,14 +3,17 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Storage Account Name": {
-      "type": "String"
+      "type": "string"
+    },
+    "Plan Name": {
+      "type": "string",
+      "defaultValue": "PasConsumptionPlan"
     },
     "Function App Name": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
-    "Plan Name": "PasConsumptionPlan",
     "Storage Account Id": "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]"
   },
   "resources": [
@@ -35,7 +38,7 @@
       "apiVersion": "2016-09-01",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
-      "name": "[variables('Plan Name')]",
+      "name": "[parameters('Plan Name')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
@@ -55,11 +58,11 @@
       "name": "[parameters('Function App Name')]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('Plan Name'))]",
+        "[resourceId('Microsoft.Web/serverfarms', parameters('Plan Name'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('Plan Name'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('Plan Name'))]",
         "siteConfig": {
           "appSettings": [
             {
