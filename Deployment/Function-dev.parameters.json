@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Storage Account Name": {
-      "value": "pasapisto"
+      "value": "pasapidevsto"
     },
     "Function App Name": {
       "value": "pas-api-dev"
