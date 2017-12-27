@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PasLib
 {
-    internal interface IRuleProperties
+    public interface IRuleProperties
     {
         bool? HasInterleave { get; }
 

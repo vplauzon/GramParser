@@ -6,12 +6,12 @@ using System.Text;
 
 namespace PasLib
 {
-    internal class Grammar
+    public class Grammar
     {
         private readonly IDictionary<string, IRule> _ruleMap;
         private readonly IRule _interleaveRule;
 
-        public Grammar(IEnumerable<IRule> rules, IRule interleaveRule)
+        internal Grammar(IEnumerable<IRule> rules, IRule interleaveRule)
         {
             if (rules == null || !rules.Any())
             {

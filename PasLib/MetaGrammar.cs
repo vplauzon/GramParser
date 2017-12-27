@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PasLib
 {
-    internal static class MetaGrammar
+    public static class MetaGrammar
     {
         private const string MAIN_RULE = "main";
 

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace PasLib
 {
-    internal class ExplorerContext
+    public class ExplorerContext
     {
         private const int DEFAULT_MAX_DEPTH = 40;
 

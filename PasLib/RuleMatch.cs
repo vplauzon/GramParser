@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace PasLib
 {
-    internal class RuleMatch
+    public class RuleMatch
     {
         private RuleMatch(IRule rule, SubString text, int lengthWithInterleaves)
         {

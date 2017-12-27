@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PasLib
 {
-    internal struct SubString
+    public struct SubString
     {
         private readonly string _master;
         private readonly int _offset;
