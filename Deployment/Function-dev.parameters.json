@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Storage Account Name": {
-      "value": "vplfunksto3"
+      "value": "vplpasapisto"
     },
     "Function App Name": {
-      "value": "vplfunkapp3"
+      "value": "vpl-pas-api-dev"
     },
     "Plan Name": {
-      "value": "PasConsumptionPlan3"
+      "value": "PasConsumptionPlan"
     }
   }
 }
