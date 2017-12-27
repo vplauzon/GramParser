@@ -8,6 +8,7 @@ namespace PasLib
 {
     public class Grammar
     {
+        private const string DEFAULT_RULE_NAME = "main";
         private readonly IDictionary<string, IRule> _ruleMap;
         private readonly IRule _interleaveRule;
 
@@ -31,6 +32,10 @@ namespace PasLib
             if (text.IsNull)
             {
                 throw new ArgumentNullException(nameof(text));
+            }
+            if(string.IsNullOrWhiteSpace(ruleName))
+            {
+                ruleName = DEFAULT_RULE_NAME;
             }
             if (!_ruleMap.ContainsKey(ruleName))
             {
