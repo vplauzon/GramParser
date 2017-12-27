@@ -52,7 +52,7 @@
       "dependsOn": []
     },
     {
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2016-08-01",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "name": "[parameters('Function App Name')]",
