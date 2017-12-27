@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 
-namespace PasFunction
+namespace PasFunction.Functions
 {
     public static class GrammarFunction
     {

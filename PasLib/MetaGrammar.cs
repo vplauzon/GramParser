@@ -9,9 +9,9 @@ namespace PasLib
     {
         private const string MAIN_RULE = "main";
 
-        private static readonly RuleSet _metaSet = CreateMetaGrammar();
+        private static readonly Grammar _metaSet = CreateMetaGrammar();
 
-        public static RuleSet ParseGrammar(SubString text)
+        public static Grammar ParseGrammar(SubString text)
         {
             var match = _metaSet.Match(MAIN_RULE, text);
 
@@ -27,7 +27,7 @@ namespace PasLib
             }
         }
 
-        private static RuleSet CreateMetaGrammar()
+        private static Grammar CreateMetaGrammar()
         {
             //  Comments & interleaves
             var interleave = new DisjunctionRule("$interleave$", TaggedRule.FromRules(
@@ -277,7 +277,7 @@ namespace PasLib
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
-            return new RuleSet(new[] { main }, interleave);
+            return new Grammar(new[] { main }, interleave);
         }
 
         private static IRule GetCharacterRule()
@@ -302,7 +302,7 @@ namespace PasLib
             return noN;
         }
 
-        private static RuleSet CreateGrammar(RuleMatch match)
+        private static Grammar CreateGrammar(RuleMatch match)
         {
             var ruleMap = new Dictionary<string, IRule>();
             IRule interleave = null;
@@ -330,7 +330,7 @@ namespace PasLib
                 }
             }
 
-            return new RuleSet(ruleMap.Values, interleave);
+            return new Grammar(ruleMap.Values, interleave);
         }
 
         private static TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
