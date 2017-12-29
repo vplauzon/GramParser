@@ -8,8 +8,14 @@ namespace PasFunction
 {
     /// <summary>Caches the compute of a grammar.</summary>
     /// <remarks>
+    /// <para>
     /// Although functions are stateless, they are kept in memory for a while and can
     /// therefore beneficiate from caching.
+    /// </para>
+    /// <para>
+    /// Preliminary measures (in Azure) half the processing time for a simple grammar
+    /// with caching.
+    /// </para>
     /// </remarks>
     internal static class GrammarCache
     {
