@@ -29,6 +29,11 @@ namespace PasLib
                 {
                     throw new InvalidOperationException("Can't set the referenced rule to null");
                 }
+                if (!HasNoRecursion(value))
+                {
+                    throw new ParsingException("Circular rule reference");
+                }
+
                 _referencedRule = value;
             }
         }
@@ -45,5 +50,21 @@ namespace PasLib
 
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);
+
+        private bool HasNoRecursion(IRule value)
+        {
+            if (ReferenceEquals(this, value))
+            {
+                return false;
+            }
+            else
+            {
+                var proxy = value as RuleProxy;
+
+                return proxy == null
+                    || proxy._referencedRule == null
+                    || HasNoRecursion(proxy._referencedRule);
+            }
+        }
     }
 }
