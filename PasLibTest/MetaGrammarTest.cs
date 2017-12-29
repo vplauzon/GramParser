@@ -220,7 +220,7 @@ namespace PasLibTest
 
         private void SimpleTest(string grammarFile, Tuple<bool, string, string>[] samples)
         {
-            var grammar = GetResource(grammarFile);
+            var grammar = GetResource("Simple." + grammarFile);
             var ruleSet = MetaGrammar.ParseGrammar(grammar);
 
             Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
@@ -240,6 +240,27 @@ namespace PasLibTest
                 }
             }
         }
+        #endregion
+
+        #region Ad hoc tests with files
+        [TestMethod]
+        public void TwoRules()
+        {
+            AdHocTest("TwoRules.txt", "main", "aaaaaaabbbb");
+        }
+
+        private void AdHocTest(string grammarFile, string ruleName, string sample)
+        {
+            var grammarText = GetResource("AdHoc." + grammarFile);
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
+
+            Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
+
+            var match = grammar.Match(ruleName, sample);
+
+            Assert.IsNotNull(match != null, $"Success");
+        }
+        #endregion
 
         private string GetResource(string resourceName)
         {
@@ -254,6 +275,5 @@ namespace PasLibTest
                 return text;
             }
         }
-        #endregion
     }
 }

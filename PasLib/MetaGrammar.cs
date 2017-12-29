@@ -7,6 +7,253 @@ namespace PasLib
 {
     public static class MetaGrammar
     {
+        #region Inner Types
+        private class GrammarCreator
+        {
+            private readonly Dictionary<string, IRule> _ruleMap =
+                new Dictionary<string, IRule>();
+            private readonly Dictionary<string, List<RuleProxy>> _proxies =
+                new Dictionary<string, List<RuleProxy>>();
+
+            public GrammarCreator(RuleMatch match)
+            {
+                IRule interleave = null;
+
+                foreach (var ruleMatch in match.Repeats)
+                {
+                    var tag = ruleMatch.Fragments.Keys.First();
+
+                    if (tag == "interleaveDeclaration")
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (tag == "ruleDeclaration")
+                    {
+                        var subMatch = ruleMatch.Fragments.First().Value;
+                        var ruleID = subMatch.Fragments["id"].Text.ToString();
+                        var ruleBodyMatch = subMatch.Fragments["body"];
+                        var rule = CreateRule(ruleID, ruleBodyMatch);
+
+                        _ruleMap[ruleID] = rule;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
+
+                ResolveProxies();
+                CreatedGrammar = new Grammar(_ruleMap.Values, interleave);
+            }
+
+            private void ResolveProxies()
+            {
+                foreach(var pair in _proxies)
+                {
+                    var ruleName = pair.Key;
+                    var referenceList = pair.Value;
+
+                    if(!_ruleMap.ContainsKey(ruleName))
+                    {
+                        throw new ArgumentOutOfRangeException("TODO");
+                    }
+
+                    var rule = _ruleMap[ruleName];
+
+                    foreach(var proxy in referenceList)
+                    {
+                        proxy.ReferencedRule = rule;
+                    }
+                }
+            }
+
+            public Grammar CreatedGrammar { get; }
+
+            private TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
+            {
+                var fragment = tag.Fragments.First();
+
+                switch (fragment.Key)
+                {
+                    case "noTag":
+                        return new TaggedRule(rule);
+                    case "withChildrenTag":
+                        {
+                            var id = fragment.Value.Fragments.First().Value.Text.ToString();
+
+                            return new TaggedRule(id, rule, true);
+                        }
+                    case "noChildrenTag":
+                        {
+                            var id = fragment.Value.Fragments.First().Value.Text.ToString();
+
+                            return new TaggedRule(id, rule, false);
+                        }
+                    default:
+                        throw new NotSupportedException(
+                            $"Tag of type {fragment.Key} isn't supported");
+                }
+            }
+
+            private IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)
+            {
+                var ruleBodyTag = ruleBodyMatch.Fragments.Keys.First();
+                var ruleBodyBody = ruleBodyMatch.Fragments.Values.First();
+
+                switch (ruleBodyTag)
+                {
+                    case "ruleRef":
+                        return CreateRuleReference(ruleID, ruleBodyBody);
+                    case "literal":
+                        return CreateLiteral(ruleID, ruleBodyBody);
+                    case "any":
+                        return CreateAnyCharacter(ruleID, ruleBodyBody);
+                    case "range":
+                        return CreateRange(ruleID, ruleBodyBody);
+                    case "repeat":
+                        return CreateRepeat(ruleID, ruleBodyBody);
+                    case "disjunction":
+                        return CreateDisjunction(ruleID, ruleBodyBody);
+                    case "sequence":
+                        return CreateSequence(ruleID, ruleBodyBody);
+                    case "substract":
+                        return CreateSubstract(ruleID, ruleBodyBody);
+                    case "bracket":
+                        return CreateBracket(ruleID, ruleBodyBody);
+                    default:
+                        throw new NotSupportedException(ruleBodyTag);
+                }
+            }
+
+            private IRule CreateRuleReference(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var identifier = ruleBodyBody.Text.ToString();
+
+                //  If the referenced rule has already been parsed we insert it
+                //  Otherwise, we put a proxy
+                if (_ruleMap.ContainsKey(identifier))
+                {
+                    var rule = _ruleMap[identifier];
+
+                    return rule;
+                }
+                else
+                {
+                    var rule = new RuleProxy();
+
+                    if(!_proxies.ContainsKey(identifier))
+                    {
+                        _proxies[identifier] = new List<RuleProxy>();
+                    }
+
+                    var referenceList = _proxies[identifier];
+
+                    //  Store the proxy for later resolving it
+                    referenceList.Add(rule);
+
+                    return rule;
+                }
+            }
+
+            private IRule CreateLiteral(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var literal = ruleBodyBody.Fragments["l"].Text;
+                var rule = new LiteralRule(ruleID, literal.Enumerate());
+
+                return rule;
+            }
+
+            private IRule CreateAnyCharacter(string ruleID, RuleMatch ruleBodyBody)
+            {
+                return new MatchAnyCharacterRule(ruleID);
+            }
+
+            private IRule CreateRange(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var lower = ruleBodyBody.Fragments["lower"].Fragments["l"].Text.First;
+                var upper = ruleBodyBody.Fragments["upper"].Fragments["l"].Text.First;
+
+                return new RangeRule(ruleID, lower, upper);
+            }
+
+            private IRule CreateRepeat(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var subRuleBody = ruleBodyBody.Fragments["rule"];
+                var rule = CreateRule(null, subRuleBody);
+                var cardinality = ruleBodyBody.Fragments["cardinality"];
+
+                switch (cardinality.Fragments.Keys.First())
+                {
+                    case "star":
+                        return new RepeatRule(ruleID, rule, null, null);
+                    case "plus":
+                        return new RepeatRule(ruleID, rule, 1, null);
+                    case "question":
+                        return new RepeatRule(ruleID, rule, 0, 1);
+                    case "exact":
+                        {
+                            var exact = cardinality.Fragments.Values.First();
+                            var n = int.Parse(exact.Fragments["n"].Text.ToString());
+
+                            return new RepeatRule(ruleID, rule, n, n);
+                        }
+                    case "minMax":
+                        {
+                            var minMax = cardinality.Fragments.Values.First();
+                            var min = int.Parse(minMax.Fragments["min"].Text.ToString());
+                            var max = int.Parse(minMax.Fragments["max"].Text.ToString());
+
+                            return new RepeatRule(ruleID, rule, min, max);
+                        }
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            private IRule CreateDisjunction(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var head = ruleBodyBody.Fragments["head"];
+                var tail = ruleBodyBody.Fragments["tail"];
+                var headRule = CreateRule(null, head);
+                var tailRules = from c in tail.Repeats
+                                select CreateRule(null, c.Fragments["d"]);
+                var rules = new[] { headRule }.Concat(tailRules);
+
+                return new DisjunctionRule(ruleID, TaggedRule.FromRules(rules));
+            }
+
+            private IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var rules = from tagRule in ruleBodyBody.Repeats
+                            let t = tagRule.Fragments["t"]
+                            let r = tagRule.Fragments["r"]
+                            let rule = CreateRule(null, r)
+                            select CreateTaggedRule(t, rule);
+
+                return new SequenceRule(ruleID, rules);
+            }
+
+            private IRule CreateSubstract(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var primary = ruleBodyBody.Fragments["primary"];
+                var excluded = ruleBodyBody.Fragments["excluded"];
+                var tag = ruleBodyBody.Fragments["t"];
+                var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
+                var excludedRule = CreateRule(null, excluded);
+
+                return new SubstractRule(ruleID, primaryRule, excludedRule);
+            }
+
+            private IRule CreateBracket(string ruleID, RuleMatch ruleBodyBody)
+            {
+                var bracketted = ruleBodyBody.Fragments["r"];
+                var rule = CreateRule(null, bracketted);
+
+                return rule;
+            }
+        }
+        #endregion
+
         private const string MAIN_RULE = "main";
 
         private static readonly Grammar _metaSet = CreateMetaGrammar();
@@ -17,7 +264,8 @@ namespace PasLib
 
             if (match != null)
             {
-                var grammar = CreateGrammar(match);
+                var grammarCreator = new GrammarCreator(match);
+                var grammar = grammarCreator.CreatedGrammar;
 
                 return grammar;
             }
@@ -63,21 +311,21 @@ namespace PasLib
             }, false, false);
             var any = new LiteralRule("any", ".");
             //  Rules
-            var withChildrenTag = new SequenceRule("withChildrenTag", new[]
-            {
-                new TaggedRule("id", identifier),
-                new TaggedRule(new LiteralRule(null, ":"))
-            }, false, false);
             var noChildrenTag = new SequenceRule("noChildrenTag", new[]
             {
                 new TaggedRule("id", identifier),
                 new TaggedRule(new LiteralRule(null, "::"))
             }, false, false);
+            var withChildrenTag = new SequenceRule("withChildrenTag", new[]
+            {
+                new TaggedRule("id", identifier),
+                new TaggedRule(new LiteralRule(null, ":"))
+            }, false, false);
             var noTag = new LiteralRule("noTag", string.Empty);
             var tag = new DisjunctionRule("tag", new[]
             {
-                new TaggedRule("withChildrenTag", withChildrenTag),
                 new TaggedRule("noChildrenTag", noChildrenTag),
+                new TaggedRule("withChildrenTag", withChildrenTag),
                 new TaggedRule("noTag", noTag)
             }, false, false);
             var ruleBodyProxy = new RuleProxy();
@@ -122,6 +370,7 @@ namespace PasLib
             isRecursive: false);
             var repeatable = new DisjunctionRule("repeatable", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("bracket", bracket),
                 new TaggedRule("any", any)
@@ -135,6 +384,7 @@ namespace PasLib
             isRecursive: false);
             var disjunctionable = new DisjunctionRule("disjunctionable", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
@@ -162,6 +412,7 @@ namespace PasLib
             isRecursive: false);
             var sequenceable = new DisjunctionRule("sequenceable", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
@@ -183,6 +434,7 @@ namespace PasLib
                 isRecursive: false);
             var substractable = new DisjunctionRule("substractable", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
@@ -192,6 +444,7 @@ namespace PasLib
             isRecursive: false);
             var substracted = new DisjunctionRule("substracted", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
@@ -209,6 +462,7 @@ namespace PasLib
 
             var ruleBody = new DisjunctionRule("ruleBody", new[]
             {
+                new TaggedRule("ruleRef", identifier),
                 new TaggedRule("literal", literal),
                 new TaggedRule("range", range),
                 new TaggedRule("bracket", bracket),
@@ -300,188 +554,6 @@ namespace PasLib
                 false);
 
             return noN;
-        }
-
-        private static Grammar CreateGrammar(RuleMatch match)
-        {
-            var ruleMap = new Dictionary<string, IRule>();
-            IRule interleave = null;
-
-            foreach (var ruleMatch in match.Repeats)
-            {
-                var tag = ruleMatch.Fragments.Keys.First();
-
-                if (tag == "interleaveDeclaration")
-                {
-                    throw new NotImplementedException();
-                }
-                else if (tag == "ruleDeclaration")
-                {
-                    var subMatch = ruleMatch.Fragments.First().Value;
-                    var ruleID = subMatch.Fragments["id"].Text.ToString();
-                    var ruleBodyMatch = subMatch.Fragments["body"];
-                    var rule = CreateRule(ruleID, ruleBodyMatch);
-
-                    ruleMap[ruleID] = rule;
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
-            }
-
-            return new Grammar(ruleMap.Values, interleave);
-        }
-
-        private static TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
-        {
-            var fragment = tag.Fragments.First();
-
-            switch (fragment.Key)
-            {
-                case "noTag":
-                    return new TaggedRule(rule);
-                case "withChildrenTag":
-                    {
-                        var id = fragment.Value.Fragments.First().Value.Text.ToString();
-
-                        return new TaggedRule(id, rule, true);
-                    }
-                case "noChildrenTag":
-                    {
-                        var id = fragment.Value.Fragments.First().Value.Text.ToString();
-
-                        return new TaggedRule(id, rule, false);
-                    }
-                default:
-                    throw new NotSupportedException(
-                        $"Tag of type {fragment.Key} isn't supported");
-            }
-        }
-
-        private static IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)
-        {
-            var ruleBodyTag = ruleBodyMatch.Fragments.Keys.First();
-            var ruleBodyBody = ruleBodyMatch.Fragments.Values.First();
-
-            switch (ruleBodyTag)
-            {
-                case "literal":
-                    return CreateLiteral(ruleID, ruleBodyBody);
-                case "any":
-                    return CreateAnyCharacter(ruleID, ruleBodyBody);
-                case "range":
-                    return CreateRange(ruleID, ruleBodyBody);
-                case "repeat":
-                    return CreateRepeat(ruleID, ruleBodyBody);
-                case "disjunction":
-                    return CreateDisjunction(ruleID, ruleBodyBody);
-                case "sequence":
-                    return CreateSequence(ruleID, ruleBodyBody);
-                case "substract":
-                    return CreateSubstract(ruleID, ruleBodyBody);
-                case "bracket":
-                    return CreateBracket(ruleID, ruleBodyBody);
-                default:
-                    throw new NotSupportedException(ruleBodyTag);
-            }
-        }
-
-        private static IRule CreateLiteral(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var literal = ruleBodyBody.Fragments["l"].Text;
-            var rule = new LiteralRule(ruleID, literal.Enumerate());
-
-            return rule;
-        }
-
-        private static IRule CreateAnyCharacter(string ruleID, RuleMatch ruleBodyBody)
-        {
-            return new MatchAnyCharacterRule(ruleID);
-        }
-
-        private static IRule CreateRange(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var lower = ruleBodyBody.Fragments["lower"].Fragments["l"].Text.First;
-            var upper = ruleBodyBody.Fragments["upper"].Fragments["l"].Text.First;
-
-            return new RangeRule(ruleID, lower, upper);
-        }
-
-        private static IRule CreateRepeat(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var subRuleBody = ruleBodyBody.Fragments["rule"];
-            var rule = CreateRule(null, subRuleBody);
-            var cardinality = ruleBodyBody.Fragments["cardinality"];
-
-            switch (cardinality.Fragments.Keys.First())
-            {
-                case "star":
-                    return new RepeatRule(ruleID, rule, null, null);
-                case "plus":
-                    return new RepeatRule(ruleID, rule, 1, null);
-                case "question":
-                    return new RepeatRule(ruleID, rule, 0, 1);
-                case "exact":
-                    {
-                        var exact = cardinality.Fragments.Values.First();
-                        var n = int.Parse(exact.Fragments["n"].Text.ToString());
-
-                        return new RepeatRule(ruleID, rule, n, n);
-                    }
-                case "minMax":
-                    {
-                        var minMax = cardinality.Fragments.Values.First();
-                        var min = int.Parse(minMax.Fragments["min"].Text.ToString());
-                        var max = int.Parse(minMax.Fragments["max"].Text.ToString());
-
-                        return new RepeatRule(ruleID, rule, min, max);
-                    }
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        private static IRule CreateDisjunction(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var head = ruleBodyBody.Fragments["head"];
-            var tail = ruleBodyBody.Fragments["tail"];
-            var headRule = CreateRule(null, head);
-            var tailRules = from c in tail.Repeats
-                            select CreateRule(null, c.Fragments["d"]);
-            var rules = new[] { headRule }.Concat(tailRules);
-
-            return new DisjunctionRule(ruleID, TaggedRule.FromRules(rules));
-        }
-
-        private static IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var rules = from tagRule in ruleBodyBody.Repeats
-                        let t = tagRule.Fragments["t"]
-                        let r = tagRule.Fragments["r"]
-                        let rule = CreateRule(null, r)
-                        select CreateTaggedRule(t, rule);
-
-            return new SequenceRule(ruleID, rules);
-        }
-
-        private static IRule CreateSubstract(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var primary = ruleBodyBody.Fragments["primary"];
-            var excluded = ruleBodyBody.Fragments["excluded"];
-            var tag = ruleBodyBody.Fragments["t"];
-            var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
-            var excludedRule = CreateRule(null, excluded);
-
-            return new SubstractRule(ruleID, primaryRule, excludedRule);
-        }
-
-        private static IRule CreateBracket(string ruleID, RuleMatch ruleBodyBody)
-        {
-            var bracketted = ruleBodyBody.Fragments["r"];
-            var rule = CreateRule(null, bracketted);
-
-            return rule;
         }
     }
 }
