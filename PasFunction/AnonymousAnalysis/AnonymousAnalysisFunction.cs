@@ -19,57 +19,59 @@ namespace PasFunction.AnonymousAnalysis
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]HttpRequest req,
             TraceWriter log)
         {
-            log.Info("Begin request.");
-
-            var body =
-                JsonSerializerHelper.Deserialize<AnonymousAnalysisInputModel>(req.Body);
-
-            if (string.IsNullOrWhiteSpace(body.Grammar))
+            try
             {
-                return new BadRequestObjectResult("JSON body should contain 'grammar'");
-            }
-            if (string.IsNullOrWhiteSpace(body.Text))
-            {
-                return new BadRequestObjectResult("JSON body should contain 'text'");
-            }
+                log.Info("Begin request.");
 
-            var grammar = MetaGrammar.ParseGrammar(body.Grammar);
+                var body =
+                    JsonSerializerHelper.Deserialize<AnonymousAnalysisInputModel>(req.Body);
 
-            if (grammar == null)
-            {
-                return new BadRequestObjectResult("Grammar cannot be parsed");
-            }
-            if (string.IsNullOrWhiteSpace(body.Rule))
-            {
-                if (!grammar.HasDefaultRule())
+                if (string.IsNullOrWhiteSpace(body.Grammar))
                 {
-                    return new BadRequestObjectResult("Grammar has no main rule");
+                    return new BadRequestObjectResult("JSON body should contain 'grammar'");
                 }
-            }
-            else
-            {
-                if (!grammar.HasRule(body.Rule))
+                if (string.IsNullOrWhiteSpace(body.Text))
                 {
-                    return new BadRequestObjectResult($"Grammar has no rule '{body.Rule}'");
+                    return new BadRequestObjectResult("JSON body should contain 'text'");
                 }
+
+                var grammar = MetaGrammar.ParseGrammar(body.Grammar);
+
+                if (grammar == null)
+                {
+                    return new BadRequestObjectResult("Grammar cannot be parsed");
+                }
+
+                var match = grammar.Match(body.Rule, body.Text);
+
+                if (match == null)
+                {
+                    return new BadRequestObjectResult("Text cannot be matched by grammar");
+                }
+
+                var outputModel = new AnonymousAnalysisOutputModel(match);
+                var output = JsonSerializerHelper.Serialize(outputModel);
+
+                return new ContentResult
+                {
+                    StatusCode = 200,
+                    ContentType = "application/json",
+                    Content = output
+                };
             }
-
-            var match = grammar.Match(body.Rule, body.Text);
-
-            if (match == null)
+            catch (ParsingException ex)
             {
-                return new BadRequestObjectResult("Text cannot be matched by grammar");
+                return new BadRequestObjectResult(ex.Message);
             }
-
-            var outputModel = new AnonymousAnalysisOutputModel(match);
-            var output = JsonSerializerHelper.Serialize(outputModel);
-
-            return new ContentResult
+            catch
             {
-                StatusCode = 200,
-                ContentType = "application/json",
-                Content = output
-            };
+                return new ContentResult
+                {
+                    StatusCode = 500,
+                    ContentType = "text/plain",
+                    Content = "Internal error:  please report"
+                };
+            }
         }
     }
 }

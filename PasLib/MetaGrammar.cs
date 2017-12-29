@@ -48,19 +48,20 @@ namespace PasLib
 
             private void ResolveProxies()
             {
-                foreach(var pair in _proxies)
+                foreach (var pair in _proxies)
                 {
                     var ruleName = pair.Key;
                     var referenceList = pair.Value;
 
-                    if(!_ruleMap.ContainsKey(ruleName))
+                    if (!_ruleMap.ContainsKey(ruleName))
                     {
-                        throw new ArgumentOutOfRangeException("TODO");
+                        throw new ParsingException(
+                            $"Can't find definition of rule '{ruleName}'");
                     }
 
                     var rule = _ruleMap[ruleName];
 
-                    foreach(var proxy in referenceList)
+                    foreach (var proxy in referenceList)
                     {
                         proxy.ReferencedRule = rule;
                     }
@@ -141,7 +142,7 @@ namespace PasLib
                 {
                     var rule = new RuleProxy();
 
-                    if(!_proxies.ContainsKey(identifier))
+                    if (!_proxies.ContainsKey(identifier))
                     {
                         _proxies[identifier] = new List<RuleProxy>();
                     }

@@ -40,7 +40,7 @@ namespace PasLib
 
         public bool HasRule(string ruleName)
         {
-            if(string.IsNullOrWhiteSpace(ruleName))
+            if (string.IsNullOrWhiteSpace(ruleName))
             {
                 throw new ArgumentNullException(nameof(ruleName));
             }
@@ -65,7 +65,7 @@ namespace PasLib
             }
             if (!_ruleMap.ContainsKey(ruleName))
             {
-                throw new ArgumentOutOfRangeException(nameof(ruleName), "Unknown rule");
+                throw new ParsingException($"Unknown rule to match:  '{ruleName}'");
             }
 
             var rule = _ruleMap[ruleName];
