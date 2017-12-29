@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PasLib;
+using System;
 
 namespace PasFunction.AnonymousAnalysis
 {
@@ -37,6 +38,20 @@ namespace PasFunction.AnonymousAnalysis
             if (grammar == null)
             {
                 return new BadRequestObjectResult("Grammar cannot be parsed");
+            }
+            if (string.IsNullOrWhiteSpace(body.Rule))
+            {
+                if (!grammar.HasDefaultRule())
+                {
+                    return new BadRequestObjectResult("Grammar has no main rule");
+                }
+            }
+            else
+            {
+                if (!grammar.HasRule(body.Rule))
+                {
+                    return new BadRequestObjectResult($"Grammar has no rule '{body.Rule}'");
+                }
             }
 
             var match = grammar.Match(body.Rule, body.Text);

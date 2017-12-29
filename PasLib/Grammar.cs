@@ -27,13 +27,39 @@ namespace PasLib
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }
 
+        public IEnumerable<string> RuleNames
+        {
+            get
+            {
+                var names = from rule in _ruleMap.Values
+                            select rule.RuleName;
+
+                return names;
+            }
+        }
+
+        public bool HasRule(string ruleName)
+        {
+            if(string.IsNullOrWhiteSpace(ruleName))
+            {
+                throw new ArgumentNullException(nameof(ruleName));
+            }
+
+            return RuleNames.Contains(ruleName);
+        }
+
+        public bool HasDefaultRule()
+        {
+            return HasRule(DEFAULT_RULE_NAME);
+        }
+
         public RuleMatch Match(string ruleName, SubString text, int? depth = null)
         {
             if (text.IsNull)
             {
                 throw new ArgumentNullException(nameof(text));
             }
-            if(string.IsNullOrWhiteSpace(ruleName))
+            if (string.IsNullOrWhiteSpace(ruleName))
             {
                 ruleName = DEFAULT_RULE_NAME;
             }
