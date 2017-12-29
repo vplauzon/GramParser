@@ -34,8 +34,14 @@ namespace PasLib
                     {
                         var subMatch = ruleMatch.Fragments.First().Value;
                         var ruleID = subMatch.Fragments["id"].Text.ToString();
-                        var ruleBodyMatch = subMatch.Fragments["body"];
-                        var rule = CreateRule(ruleID, ruleBodyMatch);
+                        var parameterAssignationList = subMatch.Fragments["params"];
+                        var ruleBody = subMatch.Fragments["body"];
+                        var rule = CreateRule(ruleID, ruleBody);
+
+                        if(parameterAssignationList.Repeats.Count!=0)
+                        {
+                            throw new NotImplementedException();
+                        }
 
                         _ruleMap[ruleID] = rule;
                     }
@@ -531,6 +537,7 @@ namespace PasLib
             var ruleDeclaration = new SequenceRule("ruleDeclaration", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "rule")),
+                new TaggedRule("params", new RepeatRule(null, parameterAssignationList, 0, 1)),
                 new TaggedRule("id", identifier),
                 new TaggedRule(null, new LiteralRule(null, "=")),
                 new TaggedRule("body", ruleBody),
