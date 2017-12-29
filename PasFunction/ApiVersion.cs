@@ -6,7 +6,7 @@ namespace PasFunction
 {
     internal static class ApiVersion
     {
-        public static string Number { get { return "0.0.78"; } }
+        public static string Number { get { return "0.0.79"; } }
 
         public static string Build { get { return "BUILD_VALUE"; } }
 

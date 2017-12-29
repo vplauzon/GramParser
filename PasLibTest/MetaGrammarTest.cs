@@ -255,6 +255,12 @@ namespace PasLibTest
             AdHocTest("Comments.txt", "main", "aaaaaaa");
         }
 
+        [TestMethod]
+        public void Interleave()
+        {
+            AdHocTest("Interleave.txt", "main", "aaZZZaazZzzaaaZ");
+        }
+
         private void AdHocTest(string grammarFile, string ruleName, string sample)
         {
             var grammarText = GetResource("AdHoc." + grammarFile);

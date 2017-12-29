@@ -25,7 +25,10 @@ namespace PasLib
 
                     if (tag == "interleaveDeclaration")
                     {
-                        throw new NotImplementedException();
+                        var subMatch = ruleMatch.Fragments.First().Value;
+                        var ruleBodyMatch = subMatch.Fragments["body"];
+
+                        interleave = CreateRule("#interleave", ruleBodyMatch);
                     }
                     else if (tag == "ruleDeclaration")
                     {
@@ -491,7 +494,7 @@ namespace PasLib
             {
                 new TaggedRule(new LiteralRule(null, "interleave")),
                 new TaggedRule(new LiteralRule(null, "=")),
-                new TaggedRule("ruleBody", ruleBodyProxy),
+                new TaggedRule("body", ruleBodyProxy),
                 new TaggedRule(new LiteralRule(null, ";"))
             },
             isRecursive: false);
