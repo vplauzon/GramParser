@@ -26,7 +26,6 @@ namespace PasFunction.AnonymousAnalysis
 
                 try
                 {
-
                     if (string.IsNullOrWhiteSpace(body.Grammar))
                     {
                         return new BadRequestObjectResult("JSON body should contain 'grammar'");
@@ -36,7 +35,7 @@ namespace PasFunction.AnonymousAnalysis
                         return new BadRequestObjectResult("JSON body should contain 'text'");
                     }
 
-                    var grammar = MetaGrammar.ParseGrammar(body.Grammar);
+                    var grammar = GrammarCache.ParseGrammar(body.Grammar);
 
                     if (grammar == null)
                     {
