@@ -38,7 +38,7 @@ namespace PasLib
                         var ruleBody = subMatch.Fragments["body"];
                         var rule = CreateRule(ruleID, ruleBody);
 
-                        if(parameterAssignationList.Repeats.Count!=0)
+                        if (parameterAssignationList.Repeats.Count != 0)
                         {
                             throw new NotImplementedException();
                         }
@@ -47,12 +47,12 @@ namespace PasLib
                     }
                     else
                     {
-                        throw new NotSupportedException();
+                        throw new NotSupportedException($"Tag '{tag}' for declaration");
                     }
                 }
 
                 ResolveProxies();
-                CreatedGrammar = new Grammar(_ruleMap.Values, interleave);
+                CreatedGrammar = new Grammar(_ruleMap, interleave);
             }
 
             private void ResolveProxies()
@@ -555,7 +555,9 @@ namespace PasLib
 
             ruleBodyProxy.ReferencedRule = ruleBody;
 
-            return new Grammar(new[] { main }, interleave);
+            return new Grammar(
+                new Dictionary<string, IRule>() { { main.RuleName, main } },
+                interleave);
         }
 
         private static IRule GetCharacterRule()

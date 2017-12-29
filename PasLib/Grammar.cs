@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -9,17 +10,17 @@ namespace PasLib
     public class Grammar
     {
         private const string DEFAULT_RULE_NAME = "main";
-        private readonly IDictionary<string, IRule> _ruleMap;
+        private readonly IImmutableDictionary<string, IRule> _ruleMap;
         private readonly IRule _interleaveRule;
 
-        internal Grammar(IEnumerable<IRule> rules, IRule interleaveRule)
+        internal Grammar(IDictionary<string, IRule> ruleMap, IRule interleaveRule)
         {
-            if (rules == null || !rules.Any())
+            if (ruleMap == null || !ruleMap.Any())
             {
-                throw new ArgumentNullException(nameof(rules));
+                throw new ArgumentNullException(nameof(ruleMap));
             }
 
-            _ruleMap = rules.ToDictionary(r => r.RuleName, r => r);
+            _ruleMap = ImmutableDictionary<string, IRule>.Empty.AddRange(ruleMap);
             _interleaveRule = interleaveRule == null
                 ? null
                 : new RepeatRule(null, interleaveRule, null, null, false, false);
