@@ -1,5 +1,5 @@
 ﻿#	Comments & interleaves
-rule(interleave=false) Comment = "#" (. - ("\r" | "\n"))+;
+rule(interleave=false) Comment = "#" (. - ("\r" | "\n"))*;
 interleave = (" " | "\r" | "\n" | "\t") | comments;
 
 #	tokens

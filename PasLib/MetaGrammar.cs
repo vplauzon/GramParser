@@ -279,11 +279,24 @@ namespace PasLib
         private static Grammar CreateMetaGrammar()
         {
             //  Comments & interleaves
+            var carriageReturn = new DisjunctionRule("#carriageReturn", TaggedRule.FromRules(
+                new LiteralRule(null, "\r"),
+                new LiteralRule(null, "\n")), false, false);
+            var commentContentChar = new SubstractRule("#commentContentChar",
+                new TaggedRule(new MatchAnyCharacterRule(null)),
+                carriageReturn,
+                false);
+            var commentContent =
+                new RepeatRule(null, commentContentChar, null, null, false, false);
+            var comment = new SequenceRule("comment", TaggedRule.FromRules(
+                new LiteralRule(null, "#"),
+                commentContent), false, false);
             var interleave = new DisjunctionRule("$interleave$", TaggedRule.FromRules(
                 new LiteralRule(null, " "),
                 new LiteralRule(null, "\r"),
                 new LiteralRule(null, "\n"),
-                new LiteralRule(null, "\t")), false, false);
+                new LiteralRule(null, "\t"),
+                comment), false, false);
             //  Tokens
             var identifierChar = new DisjunctionRule(null, TaggedRule.FromRules(
                 new RangeRule(null, 'a', 'z'),

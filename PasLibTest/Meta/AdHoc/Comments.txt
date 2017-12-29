@@ -1,0 +1,4 @@
+﻿#	Comment before
+rule main #	Comment within
+= "a"*; #	Comment in between
+#	Comment after

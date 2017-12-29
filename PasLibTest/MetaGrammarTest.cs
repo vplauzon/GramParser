@@ -249,6 +249,12 @@ namespace PasLibTest
             AdHocTest("TwoRules.txt", "main", "aaaaaaabbbb");
         }
 
+        [TestMethod]
+        public void Comments()
+        {
+            AdHocTest("Comments.txt", "main", "aaaaaaa");
+        }
+
         private void AdHocTest(string grammarFile, string ruleName, string sample)
         {
             var grammarText = GetResource("AdHoc." + grammarFile);
