@@ -14,8 +14,9 @@ namespace PasLib
             string ruleName,
             TaggedRule primary,
             IRule excluded,
+            bool? hasInterleave = null,
             bool? isRecursive = null)
-            : base(ruleName, false, isRecursive, false)
+            : base(ruleName, hasInterleave, isRecursive, false)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));

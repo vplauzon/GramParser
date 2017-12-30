@@ -24,6 +24,7 @@
   <ItemGroup>
     <None Remove="Meta\AdHoc\Comments.txt" />
     <None Remove="Meta\AdHoc\Interleave.txt" />
+    <None Remove="Meta\AdHoc\RepeatWithInterleaves.txt" />
     <None Remove="Meta\AdHoc\TwoRules.txt" />
     <None Remove="Meta\AnyGrammar.txt" />
     <None Remove="Meta\DisjunctionGrammar.txt" />
@@ -47,6 +48,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Meta\AdHoc\Comments.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Interleave.txt" />
+    <EmbeddedResource Include="Meta\AdHoc\RepeatWithInterleaves.txt" />
     <EmbeddedResource Include="Meta\AdHoc\TwoRules.txt" />
     <EmbeddedResource Include="Meta\Simple\AnyGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\Disjunction3TermsGrammar.txt" />

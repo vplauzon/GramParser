@@ -1,6 +1,6 @@
 ﻿#	Comments & interleaves
-rule(interleave=false) Comment = "#" (. - ("\r" | "\n"))*;
-interleave = (" " | "\r" | "\n" | "\t") | comments;
+rule(interleave=false) comment = "#" (. - ("\r" | "\n"))*;
+interleave = (" " | "\r" | "\n" | "\t") | comment;
 
 #	tokens
 rule(interleave=false) identifier = ("a".."z" | "A".."Z" | "0".."9")+;
@@ -42,7 +42,7 @@ rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
 rule boolean = true | false;
 rule parameterAssignation = id:identifier "=" value:boolean;
 rule parameterAssignationList = "(" head:parameterAssignation
-	tail:("," parameterAssignation)* ")";
+	tail:("," pa:parameterAssignation)* ")";
 rule ruleDeclaration = "rule" params:parameterAssignationList?
 	id:identifier "=" body:ruleBody ";";
 rule declaration = interleaveDeclaration:interleaveDeclaration

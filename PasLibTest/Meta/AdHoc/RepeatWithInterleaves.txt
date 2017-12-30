@@ -1,0 +1,4 @@
+﻿interleave = " " | "z";
+rule(interleave=false) a = "a"*;
+rule(interleave=true, recursive=true) b = "b"*;
+rule c = "c"*;

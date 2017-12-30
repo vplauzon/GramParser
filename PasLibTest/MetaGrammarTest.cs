@@ -26,14 +26,14 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(false, "main", "a"),
-                Tuple.Create(false, "main", "V"),
-                Tuple.Create(false, "main", "vvv"),
-                Tuple.Create(true, "main", "v"),
-                Tuple.Create(false, "main", "z"),
+                (false, "main", "a"),
+                (false, "main", "V"),
+                (false, "main", "vvv"),
+                (true, "main", "v"),
+                (false, "main", "z"),
             };
 
-            SimpleTest("OneLetterOneRuleGrammar.txt", samples);
+            Test("Simple.OneLetterOneRuleGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -41,17 +41,17 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "a", "a"),
-                Tuple.Create(false, "a", "b"),
-                Tuple.Create(true, "c", "c"),
-                Tuple.Create(false, "c", "d"),
-                Tuple.Create(true, "F", "F"),
-                Tuple.Create(false, "F", "f"),
-                Tuple.Create(true, "zero", "0"),
-                Tuple.Create(false, "zero", "1")
+                (true, "a", "a"),
+                (false, "a", "b"),
+                (true, "c", "c"),
+                (false, "c", "d"),
+                (true, "F", "F"),
+                (false, "F", "f"),
+                (true, "zero", "0"),
+                (false, "zero", "1")
             };
 
-            SimpleTest("LiteralGrammar.txt", samples);
+            Test("Simple.LiteralGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -59,17 +59,17 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "main", "a"),
-                Tuple.Create(true, "main", "B"),
-                Tuple.Create(true, "main", "z"),
-                Tuple.Create(true, "main", "!"),
-                Tuple.Create(true, "main", ";"),
-                Tuple.Create(true, "main", " "),
-                Tuple.Create(false, "main", "ab"),
-                Tuple.Create(false, "main", "")
+                (true, "main", "a"),
+                (true, "main", "B"),
+                (true, "main", "z"),
+                (true, "main", "!"),
+                (true, "main", ";"),
+                (true, "main", " "),
+                (false, "main", "ab"),
+                (false, "main", "")
             };
 
-            SimpleTest("AnyGrammar.txt", samples);
+            Test("Simple.AnyGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -77,26 +77,26 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "ac", "a"),
-                Tuple.Create(true, "ac", "b"),
-                Tuple.Create(true, "ac", "c"),
-                Tuple.Create(false, "ac", "d"),
-                Tuple.Create(false, "ac", "A"),
-                Tuple.Create(true, "DG", "D"),
-                Tuple.Create(true, "DG", "F"),
-                Tuple.Create(true, "DG", "G"),
-                Tuple.Create(false, "DG", "d"),
-                Tuple.Create(false, "DG", "C"),
-                Tuple.Create(true, "num", "0"),
-                Tuple.Create(true, "num", "2"),
-                Tuple.Create(true, "num", "6"),
-                Tuple.Create(true, "num", "9"),
-                Tuple.Create(false, "num", "a"),
-                Tuple.Create(false, "num", "Z"),
-                Tuple.Create(false, "num", "!")
+                (true, "ac", "a"),
+                (true, "ac", "b"),
+                (true, "ac", "c"),
+                (false, "ac", "d"),
+                (false, "ac", "A"),
+                (true, "DG", "D"),
+                (true, "DG", "F"),
+                (true, "DG", "G"),
+                (false, "DG", "d"),
+                (false, "DG", "C"),
+                (true, "num", "0"),
+                (true, "num", "2"),
+                (true, "num", "6"),
+                (true, "num", "9"),
+                (false, "num", "a"),
+                (false, "num", "Z"),
+                (false, "num", "!")
             };
 
-            SimpleTest("RangeGrammar.txt", samples);
+            Test("Simple.RangeGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -104,41 +104,41 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "a", ""),
-                Tuple.Create(true, "a", "a"),
-                Tuple.Create(true, "a", "aa"),
-                Tuple.Create(true, "a", "aaa"),
-                Tuple.Create(true, "a", "aaaaaaaaaaaaaaaaa"),
-                Tuple.Create(false, "a", "b"),
-                Tuple.Create(true, "ab", ""),
-                Tuple.Create(true, "ab", "ab"),
-                Tuple.Create(true, "ab", "abab"),
-                Tuple.Create(true, "ab", "ababababababab"),
-                Tuple.Create(false, "ab", "abba"),
-                Tuple.Create(true, "abc", ""),
-                Tuple.Create(true, "abc", "abc"),
-                Tuple.Create(true, "abc", "abcabc"),
-                Tuple.Create(true, "abc", "abcabcabcabcabcabcabcabcabcabcabcabcabcabc"),
-                Tuple.Create(false, "abc", "abccba"),
-                Tuple.Create(true, "optional", ""),
-                Tuple.Create(true, "optional", "Hi"),
-                Tuple.Create(false, "optional", "HiHi"),
-                Tuple.Create(false, "atLeast", ""),
-                Tuple.Create(true, "atLeast", "ab"),
-                Tuple.Create(true, "atLeast", "abab"),
-                Tuple.Create(true, "atLeast", "abababababab"),
-                Tuple.Create(true, "exact3", "abcabcabc"),
-                Tuple.Create(false, "exact3", "abcabc"),
-                Tuple.Create(false, "exact3", "abcabcabcabc"),
-                Tuple.Create(false, "exact3", ""),
-                Tuple.Create(true, "between34", "defdefdef"),
-                Tuple.Create(true, "between34", "defdefdefdef"),
-                Tuple.Create(false, "between34", "defdefdefdefdef"),
-                Tuple.Create(false, "between34", "defdef"),
-                Tuple.Create(false, "between34", "")
+                (true, "a", ""),
+                (true, "a", "a"),
+                (true, "a", "aa"),
+                (true, "a", "aaa"),
+                (true, "a", "aaaaaaaaaaaaaaaaa"),
+                (false, "a", "b"),
+                (true, "ab", ""),
+                (true, "ab", "ab"),
+                (true, "ab", "abab"),
+                (true, "ab", "ababababababab"),
+                (false, "ab", "abba"),
+                (true, "abc", ""),
+                (true, "abc", "abc"),
+                (true, "abc", "abcabc"),
+                (true, "abc", "abcabcabcabcabcabcabcabcabcabcabcabcabcabc"),
+                (false, "abc", "abccba"),
+                (true, "optional", ""),
+                (true, "optional", "Hi"),
+                (false, "optional", "HiHi"),
+                (false, "atLeast", ""),
+                (true, "atLeast", "ab"),
+                (true, "atLeast", "abab"),
+                (true, "atLeast", "abababababab"),
+                (true, "exact3", "abcabcabc"),
+                (false, "exact3", "abcabc"),
+                (false, "exact3", "abcabcabcabc"),
+                (false, "exact3", ""),
+                (true, "between34", "defdefdef"),
+                (true, "between34", "defdefdefdef"),
+                (false, "between34", "defdefdefdefdef"),
+                (false, "between34", "defdef"),
+                (false, "between34", "")
             };
 
-            SimpleTest("RepeatGrammar.txt", samples);
+            Test("Simple.RepeatGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -146,15 +146,15 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "myrule", "a"),
-                Tuple.Create(true, "myrule", "b"),
-                Tuple.Create(true, "myrule", "c"),
-                Tuple.Create(false, "myrule", "d"),
-                Tuple.Create(false, "myrule", "aa"),
-                Tuple.Create(false, "myrule", "B")
+                (true, "myrule", "a"),
+                (true, "myrule", "b"),
+                (true, "myrule", "c"),
+                (false, "myrule", "d"),
+                (false, "myrule", "aa"),
+                (false, "myrule", "B")
             };
 
-            SimpleTest("Disjunction3TermsGrammar.txt", samples);
+            Test("Simple.Disjunction3TermsGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -162,24 +162,24 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "ab", "a"),
-                Tuple.Create(true, "ab", "b"),
-                Tuple.Create(false, "ab", "c"),
-                Tuple.Create(true, "abc", "a"),
-                Tuple.Create(true, "abc", "b"),
-                Tuple.Create(true, "abc", "c"),
-                Tuple.Create(false, "abc", "d"),
-                Tuple.Create(true, "abcd", "a"),
-                Tuple.Create(true, "abcd", "b"),
-                Tuple.Create(true, "abcd", "c"),
-                Tuple.Create(true, "abcd", "d"),
-                Tuple.Create(false, "abcd", "e"),
-                Tuple.Create(true, "hiBob", "Hi"),
-                Tuple.Create(true, "hiBob", "Bob"),
-                Tuple.Create(false, "hiBob", "How")
+                (true, "ab", "a"),
+                (true, "ab", "b"),
+                (false, "ab", "c"),
+                (true, "abc", "a"),
+                (true, "abc", "b"),
+                (true, "abc", "c"),
+                (false, "abc", "d"),
+                (true, "abcd", "a"),
+                (true, "abcd", "b"),
+                (true, "abcd", "c"),
+                (true, "abcd", "d"),
+                (false, "abcd", "e"),
+                (true, "hiBob", "Hi"),
+                (true, "hiBob", "Bob"),
+                (false, "hiBob", "How")
             };
 
-            SimpleTest("DisjunctionGrammar.txt", samples);
+            Test("Simple.DisjunctionGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -187,17 +187,17 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "ab", "ab"),
-                Tuple.Create(false, "ab", "a"),
-                Tuple.Create(true, "abc", "abc"),
-                Tuple.Create(false, "abc", "a"),
-                Tuple.Create(true, "abcd", "abcd"),
-                Tuple.Create(false, "abcd", "a"),
-                Tuple.Create(true, "hiBob", "HiBob"),
-                Tuple.Create(false, "hiBob", "Hi")
+                (true, "ab", "ab"),
+                (false, "ab", "a"),
+                (true, "abc", "abc"),
+                (false, "abc", "a"),
+                (true, "abcd", "abcd"),
+                (false, "abcd", "a"),
+                (true, "hiBob", "HiBob"),
+                (false, "hiBob", "Hi")
             };
 
-            SimpleTest("SequenceGrammar.txt", samples);
+            Test("Simple.SequenceGrammar.txt", samples);
         }
 
         [TestMethod]
@@ -205,40 +205,17 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                Tuple.Create(true, "a", "a"),
-                Tuple.Create(false, "a", "aa"),
-                Tuple.Create(true, "a", "aaa"),
-                Tuple.Create(true, "hiBang", "Hi"),
-                Tuple.Create(true, "hiBang", "!"),
-                Tuple.Create(false, "hiBang", "Bob"),
-                Tuple.Create(false, "hiBang", "Hi!"),
-                Tuple.Create(false, "hiBang", "HiBob!")
+                (true, "a", "a"),
+                (false, "a", "aa"),
+                (true, "a", "aaa"),
+                (true, "hiBang", "Hi"),
+                (true, "hiBang", "!"),
+                (false, "hiBang", "Bob"),
+                (false, "hiBang", "Hi!"),
+                (false, "hiBang", "HiBob!")
             };
 
-            SimpleTest("SubstractGrammar.txt", samples);
-        }
-
-        private void SimpleTest(string grammarFile, Tuple<bool, string, string>[] samples)
-        {
-            var grammar = GetResource("Simple." + grammarFile);
-            var ruleSet = MetaGrammar.ParseGrammar(grammar);
-
-            Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
-            for (int i = 0; i != samples.Length; ++i)
-            {
-                var isSuccess = samples[i].Item1;
-                var ruleName = samples[i].Item2;
-                var text = samples[i].Item3;
-                var match = ruleSet.Match(ruleName, text);
-
-                Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
-
-                if (isSuccess)
-                {
-                    Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
-                    Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-                }
-            }
+            Test("Simple.SubstractGrammar.txt", samples);
         }
         #endregion
 
@@ -246,31 +223,38 @@ namespace PasLibTest
         [TestMethod]
         public void TwoRules()
         {
-            AdHocTest("TwoRules.txt", "main", "aaaaaaabbbb");
+            Test("AdHoc.TwoRules.txt", new[] { (true, "main", "aaaaaaabbbb") });
         }
 
         [TestMethod]
         public void Comments()
         {
-            AdHocTest("Comments.txt", "main", "aaaaaaa");
+            Test("AdHoc.Comments.txt", new[] { (true, "main", "aaaaaaa") });
         }
 
         [TestMethod]
         public void Interleave()
         {
-            AdHocTest("Interleave.txt", "main", "aaZZZaazZzzaaaZ");
+            Test("AdHoc.Interleave.txt", new[] { (true, "main", "aaZZZaazZzzaaa") });
         }
 
-        private void AdHocTest(string grammarFile, string ruleName, string sample)
+        [TestMethod]
+        public void RepeatWithInterleaves()
         {
-            var grammarText = GetResource("AdHoc." + grammarFile);
-            var grammar = MetaGrammar.ParseGrammar(grammarText);
+            var samples = new[]
+            {
+                (true, "a", "aaaaa"),
+                (false, "a", "aaazaa"),
+                (false, "a", "aaa aa"),
+                (false, "a", "aaa    aa"),
+                (true, "b", "bbbbbbb"),
+                (true, "b", "bbb bb zbb"),
+                (true, "c", "cccccccccc"),
+                (true, "c", "cccc  cccccc"),
+                (true, "c", "cccc  ccczzzccc")
+            };
 
-            Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
-
-            var match = grammar.Match(ruleName, sample);
-
-            Assert.IsNotNull(match != null, $"Success");
+            Test("AdHoc.RepeatWithInterleaves.txt", samples);
         }
         #endregion
 
@@ -285,6 +269,29 @@ namespace PasLibTest
                 var text = reader.ReadToEnd();
 
                 return text;
+            }
+        }
+
+        private void Test(
+            string grammarFile,
+            (bool isSuccess, string ruleName, string text)[] samples)
+        {
+            var grammar = GetResource(grammarFile);
+            var ruleSet = MetaGrammar.ParseGrammar(grammar);
+
+            Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
+            for (int i = 0; i != samples.Length; ++i)
+            {
+                (var isSuccess, var ruleName, var text) = samples[i];
+                var match = ruleSet.Match(ruleName, text);
+
+                Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
+
+                if (isSuccess)
+                {
+                    Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
+                    Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
+                }
             }
         }
     }

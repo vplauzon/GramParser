@@ -10,6 +10,26 @@ namespace PasLib
         #region Inner Types
         private class GrammarCreator
         {
+            #region Inner Types
+            private class PropertyBag
+            {
+                public static PropertyBag Default { get; } = new PropertyBag();
+
+                public bool? HasInterleave { get; set; }
+
+                public bool? IsRecursive { get; set; }
+
+                public bool IsDefault
+                {
+                    get
+                    {
+                        return !HasInterleave.HasValue
+                            && !IsRecursive.HasValue;
+                    }
+                }
+            }
+            #endregion
+
             private readonly Dictionary<string, IRule> _ruleMap =
                 new Dictionary<string, IRule>();
             private readonly Dictionary<string, List<RuleProxy>> _proxies =
@@ -28,19 +48,15 @@ namespace PasLib
                     {
                         var ruleBodyMatch = subMatch.Fragments.First().Match;
 
-                        interleave = CreateRule("#interleave", ruleBodyMatch);
+                        interleave = CreateRule(
+                            "#interleave", PropertyBag.Default, ruleBodyMatch);
                     }
                     else if (taggedMatch.Tag == "ruleDeclaration")
                     {
                         var ruleID = subMatch.GetFragments("id").Text.ToString();
                         var parameterAssignationList = subMatch.GetFragments("params");
                         var ruleBody = subMatch.GetFragments("body");
-                        var rule = CreateRule(ruleID, ruleBody);
-
-                        if (parameterAssignationList.Repeats.Count != 0)
-                        {
-                            throw new NotImplementedException();
-                        }
+                        var rule = CreateRule(ruleID, parameterAssignationList, ruleBody);
 
                         _ruleMap[ruleID] = rule;
                     }
@@ -104,7 +120,25 @@ namespace PasLib
                 }
             }
 
-            private IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)
+            private IRule CreateRule(RuleMatch ruleBodyMatch)
+            {
+                return CreateRule(null, PropertyBag.Default, ruleBodyMatch);
+            }
+
+            private IRule CreateRule(
+                string ruleID,
+                RuleMatch parameterAssignationList,
+                RuleMatch ruleBodyMatch)
+            {
+                var propertyBag = CreatePropertyBag(parameterAssignationList);
+
+                return CreateRule(ruleID, propertyBag, ruleBodyMatch);
+            }
+
+            private IRule CreateRule(
+                string ruleID,
+                PropertyBag propertyBag,
+                RuleMatch ruleBodyMatch)
             {
                 var ruleBodyTag = ruleBodyMatch.Fragments.First().Tag;
                 var ruleBodyBody = ruleBodyMatch.Fragments.First().Match;
@@ -112,30 +146,110 @@ namespace PasLib
                 switch (ruleBodyTag)
                 {
                     case "ruleRef":
-                        return CreateRuleReference(ruleID, ruleBodyBody);
+                        return CreateRuleReference(ruleID, ruleBodyBody, propertyBag);
                     case "literal":
-                        return CreateLiteral(ruleID, ruleBodyBody);
+                        return CreateLiteral(ruleID, ruleBodyBody, propertyBag);
                     case "any":
-                        return CreateAnyCharacter(ruleID, ruleBodyBody);
+                        return CreateAnyCharacter(ruleID, ruleBodyBody, propertyBag);
                     case "range":
-                        return CreateRange(ruleID, ruleBodyBody);
+                        return CreateRange(ruleID, ruleBodyBody, propertyBag);
                     case "repeat":
-                        return CreateRepeat(ruleID, ruleBodyBody);
+                        return CreateRepeat(ruleID, ruleBodyBody, propertyBag);
                     case "disjunction":
-                        return CreateDisjunction(ruleID, ruleBodyBody);
+                        return CreateDisjunction(ruleID, ruleBodyBody, propertyBag);
                     case "sequence":
-                        return CreateSequence(ruleID, ruleBodyBody);
+                        return CreateSequence(ruleID, ruleBodyBody, propertyBag);
                     case "substract":
-                        return CreateSubstract(ruleID, ruleBodyBody);
+                        return CreateSubstract(ruleID, ruleBodyBody, propertyBag);
                     case "bracket":
-                        return CreateBracket(ruleID, ruleBodyBody);
+                        return CreateBracket(ruleID, ruleBodyBody, propertyBag);
                     default:
                         throw new NotSupportedException(ruleBodyTag);
                 }
             }
 
-            private IRule CreateRuleReference(string ruleID, RuleMatch ruleBodyBody)
+            private PropertyBag CreatePropertyBag(RuleMatch parameterAssignationList)
             {
+                if (parameterAssignationList == null
+                    || parameterAssignationList.Repeats.Count == 0)
+                {
+                    return PropertyBag.Default;
+                }
+                else
+                {
+                    var list = parameterAssignationList.Repeats.First();
+                    var head = list.Fragments[0].Match;
+                    var tail = list.Fragments[1].Match;
+                    var tailParamAssignations = from t in tail.Repeats
+                                                select t.Fragments.First().Match;
+                    var paramAssignations = tailParamAssignations.Append(head);
+                    var bag = new PropertyBag();
+
+                    foreach (var assignation in paramAssignations)
+                    {
+                        var id = assignation.Fragments[0].Match.Text.ToString();
+                        var value = assignation.Fragments[1].Match.Text.ToString();
+
+                        switch (id)
+                        {
+                            case "interleave":
+                                AssignInterleaveToBag(bag, value);
+                                break;
+                            case "recursive":
+                                AssignRecursiveToBag(bag, value);
+                                break;
+                            default:
+                                throw new ParsingException(
+                                    $"Parameter '{id}' isn't supported");
+                        }
+                    }
+
+                    return bag;
+                }
+            }
+
+            private static void AssignInterleaveToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.HasInterleave = true;
+                        break;
+                    case "false":
+                        bag.HasInterleave = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for interleave parameter");
+                }
+            }
+
+            private static void AssignRecursiveToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.IsRecursive = true;
+                        break;
+                    case "false":
+                        bag.IsRecursive = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for recursive parameter");
+                }
+            }
+
+            private IRule CreateRuleReference(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag propertyBag)
+            {
+                if (!propertyBag.IsDefault)
+                {
+                    throw new NotSupportedException("Rule reference can't have parameters");
+                }
+
                 var identifier = ruleBodyBody.Text.ToString();
 
                 //  If the referenced rule has already been parsed we insert it
@@ -164,49 +278,80 @@ namespace PasLib
                 }
             }
 
-            private IRule CreateLiteral(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateLiteral(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag propertyBag)
             {
+                if (!propertyBag.IsDefault)
+                {
+                    throw new NotSupportedException("Literal rule can't have parameters");
+                }
+
                 var literal = ruleBodyBody.Fragments.First().Match.Text;
                 var rule = new LiteralRule(ruleID, literal.Enumerate());
 
                 return rule;
             }
 
-            private IRule CreateAnyCharacter(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateAnyCharacter(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag propertyBag)
             {
+                if (!propertyBag.IsDefault)
+                {
+                    throw new NotSupportedException("Any character rule can't have parameters");
+                }
+
                 return new MatchAnyCharacterRule(ruleID);
             }
 
-            private IRule CreateRange(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateRange(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag propertyBag)
             {
+                if (!propertyBag.IsDefault)
+                {
+                    throw new NotSupportedException("Range rule can't have parameters");
+                }
+
                 var lower =
-                    ruleBodyBody.GetFragments("lower").Fragments.First().Match.Text.First;
+                            ruleBodyBody.GetFragments("lower").Fragments.First().Match.Text.First;
                 var upper =
                     ruleBodyBody.GetFragments("upper").Fragments.First().Match.Text.First;
 
                 return new RangeRule(ruleID, lower, upper);
             }
 
-            private IRule CreateRepeat(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateRepeat(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag bag)
             {
                 var subRuleBody = ruleBodyBody.GetFragments("rule");
-                var rule = CreateRule(null, subRuleBody);
+                var rule = CreateRule(subRuleBody);
                 var cardinality = ruleBodyBody.GetFragments("cardinality");
 
                 switch (cardinality.Fragments.First().Tag)
                 {
                     case "star":
-                        return new RepeatRule(ruleID, rule, null, null);
+                        return new RepeatRule(
+                            ruleID, rule, null, null, bag.HasInterleave, bag.IsRecursive);
                     case "plus":
-                        return new RepeatRule(ruleID, rule, 1, null);
+                        return new RepeatRule(
+                            ruleID, rule, 1, null, bag.HasInterleave, bag.IsRecursive);
                     case "question":
-                        return new RepeatRule(ruleID, rule, 0, 1);
+                        return new RepeatRule(
+                            ruleID, rule, 0, 1, bag.HasInterleave, bag.IsRecursive);
                     case "exact":
                         {
                             var exact = cardinality.Fragments.First().Match;
                             var n = int.Parse(exact.Fragments.First().Match.Text.ToString());
 
-                            return new RepeatRule(ruleID, rule, n, n);
+                            return new RepeatRule(
+                                ruleID, rule, n, n, bag.HasInterleave, bag.IsRecursive);
                         }
                     case "minMax":
                         {
@@ -214,55 +359,69 @@ namespace PasLib
                             var min = int.Parse(minMax.GetFragments("min").Text.ToString());
                             var max = int.Parse(minMax.GetFragments("max").Text.ToString());
 
-                            return new RepeatRule(ruleID, rule, min, max);
+                            return new RepeatRule(
+                                ruleID, rule, min, max, bag.HasInterleave, bag.IsRecursive);
                         }
                     default:
                         throw new NotSupportedException();
                 }
             }
 
-            private IRule CreateDisjunction(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateDisjunction(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag bag)
             {
                 var headTag = ruleBodyBody.GetFragments("t");
                 var head = ruleBodyBody.GetFragments("head");
                 var tail = ruleBodyBody.GetFragments("tail");
-                var headRule = CreateTaggedRule(headTag, CreateRule(null, head));
+                var headRule = CreateTaggedRule(headTag, CreateRule(head));
                 var tailRules = from c in tail.Repeats
                                 let tailTag = c.GetFragments("t")
                                 let tailDisjunctable = c.GetFragments("d")
                                 select CreateTaggedRule(
-                                    tailTag, CreateRule(null, tailDisjunctable));
+                                    tailTag, CreateRule(tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
 
-                return new DisjunctionRule(ruleID, rules);
+                return new DisjunctionRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
             }
 
-            private IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateSequence(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag bag)
             {
                 var rules = from tagRule in ruleBodyBody.Repeats
                             let t = tagRule.GetFragments("t")
                             let r = tagRule.GetFragments("r")
-                            let rule = CreateRule(null, r)
+                            let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
-                return new SequenceRule(ruleID, rules);
+                return new SequenceRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
             }
 
-            private IRule CreateSubstract(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateSubstract(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag bag)
             {
                 var primary = ruleBodyBody.GetFragments("primary");
                 var excluded = ruleBodyBody.GetFragments("excluded");
                 var tag = ruleBodyBody.GetFragments("t");
-                var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
-                var excludedRule = CreateRule(null, excluded);
+                var primaryRule = CreateTaggedRule(tag, CreateRule(primary));
+                var excludedRule = CreateRule(excluded);
 
-                return new SubstractRule(ruleID, primaryRule, excludedRule);
+                return new SubstractRule(
+                    ruleID, primaryRule, excludedRule, bag.HasInterleave, bag.IsRecursive);
             }
 
-            private IRule CreateBracket(string ruleID, RuleMatch ruleBodyBody)
+            private IRule CreateBracket(
+                string ruleID,
+                RuleMatch ruleBodyBody,
+                PropertyBag bag)
             {
                 var bracketted = ruleBodyBody.Fragments.First().Match;
-                var rule = CreateRule(null, bracketted);
+                var rule = CreateRule(null, bag, bracketted);
 
                 return rule;
             }
@@ -525,7 +684,7 @@ namespace PasLib
             var innerParameterAssignationList = new SequenceRule(null, new[]
             {
                 new TaggedRule(new LiteralRule(null, ",")),
-                new TaggedRule(parameterAssignation)
+                new TaggedRule("pa", parameterAssignation)
             });
             var parameterAssignationList = new SequenceRule("parameterAssignationList", new[]
             {
