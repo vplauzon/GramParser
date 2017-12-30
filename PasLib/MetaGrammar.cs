@@ -222,14 +222,18 @@ namespace PasLib
 
             private IRule CreateDisjunction(string ruleID, RuleMatch ruleBodyBody)
             {
+                var headTag = ruleBodyBody.Fragments["t"];
                 var head = ruleBodyBody.Fragments["head"];
                 var tail = ruleBodyBody.Fragments["tail"];
-                var headRule = CreateRule(null, head);
+                var headRule = CreateTaggedRule(headTag, CreateRule(null, head));
                 var tailRules = from c in tail.Repeats
-                                select CreateRule(null, c.Fragments["d"]);
+                                let tailTag = c.Fragments["t"]
+                                let tailDisjunctable = c.Fragments["d"]
+                                select CreateTaggedRule(
+                                    tailTag, CreateRule(null, tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
 
-                return new DisjunctionRule(ruleID, TaggedRule.FromRules(rules));
+                return new DisjunctionRule(ruleID, rules);
             }
 
             private IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
