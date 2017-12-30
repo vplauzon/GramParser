@@ -21,21 +21,20 @@ namespace PasLib
 
                 foreach (var ruleMatch in match.Repeats)
                 {
-                    var tag = ruleMatch.Fragments.Keys.First();
+                    var taggedMatch = ruleMatch.Fragments.First();
+                    var subMatch = taggedMatch.Match;
 
-                    if (tag == "interleaveDeclaration")
+                    if (taggedMatch.Tag == "interleaveDeclaration")
                     {
-                        var subMatch = ruleMatch.Fragments.First().Value;
-                        var ruleBodyMatch = subMatch.Fragments["body"];
+                        var ruleBodyMatch = subMatch.Fragments.First().Match;
 
                         interleave = CreateRule("#interleave", ruleBodyMatch);
                     }
-                    else if (tag == "ruleDeclaration")
+                    else if (taggedMatch.Tag == "ruleDeclaration")
                     {
-                        var subMatch = ruleMatch.Fragments.First().Value;
-                        var ruleID = subMatch.Fragments["id"].Text.ToString();
-                        var parameterAssignationList = subMatch.Fragments["params"];
-                        var ruleBody = subMatch.Fragments["body"];
+                        var ruleID = subMatch.GetFragments("id").Text.ToString();
+                        var parameterAssignationList = subMatch.GetFragments("params");
+                        var ruleBody = subMatch.GetFragments("body");
                         var rule = CreateRule(ruleID, ruleBody);
 
                         if (parameterAssignationList.Repeats.Count != 0)
@@ -47,7 +46,7 @@ namespace PasLib
                     }
                     else
                     {
-                        throw new NotSupportedException($"Tag '{tag}' for declaration");
+                        throw new NotSupportedException($"Tag '{taggedMatch}' for declaration");
                     }
                 }
 
@@ -83,32 +82,32 @@ namespace PasLib
             {
                 var fragment = tag.Fragments.First();
 
-                switch (fragment.Key)
+                switch (fragment.Tag)
                 {
                     case "noTag":
                         return new TaggedRule(rule);
                     case "withChildrenTag":
                         {
-                            var id = fragment.Value.Fragments.First().Value.Text.ToString();
+                            var id = fragment.Match.Fragments.First().Match.Text.ToString();
 
                             return new TaggedRule(id, rule, true);
                         }
                     case "noChildrenTag":
                         {
-                            var id = fragment.Value.Fragments.First().Value.Text.ToString();
+                            var id = fragment.Match.Fragments.First().Match.Text.ToString();
 
                             return new TaggedRule(id, rule, false);
                         }
                     default:
                         throw new NotSupportedException(
-                            $"Tag of type {fragment.Key} isn't supported");
+                            $"Tag of type {fragment.Tag} isn't supported");
                 }
             }
 
             private IRule CreateRule(string ruleID, RuleMatch ruleBodyMatch)
             {
-                var ruleBodyTag = ruleBodyMatch.Fragments.Keys.First();
-                var ruleBodyBody = ruleBodyMatch.Fragments.Values.First();
+                var ruleBodyTag = ruleBodyMatch.Fragments.First().Tag;
+                var ruleBodyBody = ruleBodyMatch.Fragments.First().Match;
 
                 switch (ruleBodyTag)
                 {
@@ -167,7 +166,7 @@ namespace PasLib
 
             private IRule CreateLiteral(string ruleID, RuleMatch ruleBodyBody)
             {
-                var literal = ruleBodyBody.Fragments["l"].Text;
+                var literal = ruleBodyBody.Fragments.First().Match.Text;
                 var rule = new LiteralRule(ruleID, literal.Enumerate());
 
                 return rule;
@@ -180,19 +179,21 @@ namespace PasLib
 
             private IRule CreateRange(string ruleID, RuleMatch ruleBodyBody)
             {
-                var lower = ruleBodyBody.Fragments["lower"].Fragments["l"].Text.First;
-                var upper = ruleBodyBody.Fragments["upper"].Fragments["l"].Text.First;
+                var lower =
+                    ruleBodyBody.GetFragments("lower").Fragments.First().Match.Text.First;
+                var upper =
+                    ruleBodyBody.GetFragments("upper").Fragments.First().Match.Text.First;
 
                 return new RangeRule(ruleID, lower, upper);
             }
 
             private IRule CreateRepeat(string ruleID, RuleMatch ruleBodyBody)
             {
-                var subRuleBody = ruleBodyBody.Fragments["rule"];
+                var subRuleBody = ruleBodyBody.GetFragments("rule");
                 var rule = CreateRule(null, subRuleBody);
-                var cardinality = ruleBodyBody.Fragments["cardinality"];
+                var cardinality = ruleBodyBody.GetFragments("cardinality");
 
-                switch (cardinality.Fragments.Keys.First())
+                switch (cardinality.Fragments.First().Tag)
                 {
                     case "star":
                         return new RepeatRule(ruleID, rule, null, null);
@@ -202,16 +203,16 @@ namespace PasLib
                         return new RepeatRule(ruleID, rule, 0, 1);
                     case "exact":
                         {
-                            var exact = cardinality.Fragments.Values.First();
-                            var n = int.Parse(exact.Fragments["n"].Text.ToString());
+                            var exact = cardinality.Fragments.First().Match;
+                            var n = int.Parse(exact.Fragments.First().Match.Text.ToString());
 
                             return new RepeatRule(ruleID, rule, n, n);
                         }
                     case "minMax":
                         {
-                            var minMax = cardinality.Fragments.Values.First();
-                            var min = int.Parse(minMax.Fragments["min"].Text.ToString());
-                            var max = int.Parse(minMax.Fragments["max"].Text.ToString());
+                            var minMax = cardinality.Fragments.First().Match;
+                            var min = int.Parse(minMax.GetFragments("min").Text.ToString());
+                            var max = int.Parse(minMax.GetFragments("max").Text.ToString());
 
                             return new RepeatRule(ruleID, rule, min, max);
                         }
@@ -222,13 +223,13 @@ namespace PasLib
 
             private IRule CreateDisjunction(string ruleID, RuleMatch ruleBodyBody)
             {
-                var headTag = ruleBodyBody.Fragments["t"];
-                var head = ruleBodyBody.Fragments["head"];
-                var tail = ruleBodyBody.Fragments["tail"];
+                var headTag = ruleBodyBody.GetFragments("t");
+                var head = ruleBodyBody.GetFragments("head");
+                var tail = ruleBodyBody.GetFragments("tail");
                 var headRule = CreateTaggedRule(headTag, CreateRule(null, head));
                 var tailRules = from c in tail.Repeats
-                                let tailTag = c.Fragments["t"]
-                                let tailDisjunctable = c.Fragments["d"]
+                                let tailTag = c.GetFragments("t")
+                                let tailDisjunctable = c.GetFragments("d")
                                 select CreateTaggedRule(
                                     tailTag, CreateRule(null, tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
@@ -239,8 +240,8 @@ namespace PasLib
             private IRule CreateSequence(string ruleID, RuleMatch ruleBodyBody)
             {
                 var rules = from tagRule in ruleBodyBody.Repeats
-                            let t = tagRule.Fragments["t"]
-                            let r = tagRule.Fragments["r"]
+                            let t = tagRule.GetFragments("t")
+                            let r = tagRule.GetFragments("r")
                             let rule = CreateRule(null, r)
                             select CreateTaggedRule(t, rule);
 
@@ -249,9 +250,9 @@ namespace PasLib
 
             private IRule CreateSubstract(string ruleID, RuleMatch ruleBodyBody)
             {
-                var primary = ruleBodyBody.Fragments["primary"];
-                var excluded = ruleBodyBody.Fragments["excluded"];
-                var tag = ruleBodyBody.Fragments["t"];
+                var primary = ruleBodyBody.GetFragments("primary");
+                var excluded = ruleBodyBody.GetFragments("excluded");
+                var tag = ruleBodyBody.GetFragments("t");
                 var primaryRule = CreateTaggedRule(tag, CreateRule(null, primary));
                 var excludedRule = CreateRule(null, excluded);
 
@@ -260,7 +261,7 @@ namespace PasLib
 
             private IRule CreateBracket(string ruleID, RuleMatch ruleBodyBody)
             {
-                var bracketted = ruleBodyBody.Fragments["r"];
+                var bracketted = ruleBodyBody.Fragments.First().Match;
                 var rule = CreateRule(null, bracketted);
 
                 return rule;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace PasLib
@@ -31,7 +32,7 @@ namespace PasLib
                 context,
                 context.Text,
                 0,
-                TaggedRule.EMPTY_FRAGMENTS);
+                ImmutableList<TaggedRuleMatch>.Empty);
 
             return matches;
         }
@@ -54,7 +55,7 @@ namespace PasLib
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
-            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
+            ImmutableList<TaggedRuleMatch> fragments)
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace PasLib
@@ -31,7 +32,8 @@ namespace PasLib
 
                 foreach (var m in matches)
                 {
-                    var fragments = rule.AddFragment(TaggedRule.EMPTY_FRAGMENTS, m);
+                    var fragments =
+                        rule.AddFragment(ImmutableList<TaggedRuleMatch>.Empty, m);
 
                     yield return new RuleMatch(this, m.Text, fragments);
                 }

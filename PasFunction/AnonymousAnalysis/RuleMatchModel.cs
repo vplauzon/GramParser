@@ -1,5 +1,6 @@
 ﻿using PasLib;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace PasFunction.AnonymousAnalysis
@@ -8,6 +9,11 @@ namespace PasFunction.AnonymousAnalysis
     {
         public RuleMatchModel(RuleMatch match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
             Rule = match.Rule.RuleName;
             Text = match.Text.ToString();
             if (match.Repeats != null && match.Repeats.Count > 0)
@@ -19,15 +25,10 @@ namespace PasFunction.AnonymousAnalysis
             }
             if (match.Fragments != null && match.Fragments.Count > 0)
             {
-                var dictionary = new Dictionary<string, RuleMatchModel>();
-                
-                foreach(var f in match.Fragments)
-                {
-                    var model = new RuleMatchModel(f.Value);
+                var fragments = from f in match.Fragments
+                                select new TaggedRuleMatchModel(f);
 
-                    dictionary.Add(f.Key, model);
-                }
-                Fragments = dictionary;
+                Fragments = fragments.ToArray();
             }
         }
 
@@ -37,6 +38,6 @@ namespace PasFunction.AnonymousAnalysis
 
         public RuleMatchModel[] Repeats { get; }
 
-        public Dictionary<string, RuleMatchModel> Fragments { get; }
+        public TaggedRuleMatchModel[] Fragments { get; }
     }
 }

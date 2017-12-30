@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -23,9 +24,6 @@ namespace PasLib
             DoIncludeChildren = doIncludeChildren;
         }
 
-        public static IEnumerable<KeyValuePair<string, RuleMatch>> EMPTY_FRAGMENTS { get; }
-            = new KeyValuePair<string, RuleMatch>[0];
-
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
         {
             return FromRules(rules as IEnumerable<IRule>);
@@ -47,13 +45,13 @@ namespace PasLib
 
         public bool DoIncludeChildren { get; }
 
-        public IEnumerable<KeyValuePair<string, RuleMatch>> AddFragment(
-            IEnumerable<KeyValuePair<string, RuleMatch>> fragments,
+        public ImmutableList<TaggedRuleMatch> AddFragment(
+            ImmutableList<TaggedRuleMatch> fragments,
             RuleMatch match)
         {
             return Tag == null
                 ? fragments
-                : fragments.Prepend(new KeyValuePair<string, RuleMatch>(Tag, FormatMatch(match)));
+                : fragments.Add(new TaggedRuleMatch(Tag, FormatMatch(match)));
         }
 
         public override string ToString()

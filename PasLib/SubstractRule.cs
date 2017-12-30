@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace PasLib
@@ -37,14 +38,12 @@ namespace PasLib
                 {
                     if (_primary.HasTag)
                     {
-                        var fragment = new KeyValuePair<string, RuleMatch>(
-                            _primary.Tag,
-                            primaryMatch);
+                        var fragment = new TaggedRuleMatch(_primary.Tag, primaryMatch);
 
                         yield return new RuleMatch(
                             this,
                             primaryMatch.Text,
-                            new[] { fragment });
+                            ImmutableList<TaggedRuleMatch>.Empty.Add(fragment));
                     }
                     else
                     {

@@ -47,11 +47,19 @@ namespace PasLib
         {
         }
 
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            IEnumerable<TaggedRuleMatch> fragments)
+            : this(rule, text, text.Length, fragments)
+        {
+        }
+
         private RuleMatch(
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
+            IEnumerable<TaggedRuleMatch> fragments)
             : this(rule, text, lengthWithInterleaves)
         {
             if (fragments == null)
@@ -60,16 +68,8 @@ namespace PasLib
             }
 
             Fragments = fragments.Any()
-                ? ImmutableDictionary<string, RuleMatch>.Empty.AddRange(fragments)
+                ? ImmutableList<TaggedRuleMatch>.Empty.AddRange(fragments)
                 : null;
-        }
-
-        public RuleMatch(
-            IRule rule,
-            SubString text,
-            IEnumerable<KeyValuePair<string, RuleMatch>> fragments)
-            : this(rule, text, text.Length, fragments)
-        {
         }
 
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
@@ -82,7 +82,29 @@ namespace PasLib
 
         public IImmutableList<RuleMatch> Repeats { get; } = ImmutableList<RuleMatch>.Empty;
 
-        public IImmutableDictionary<string, RuleMatch> Fragments { get; }
+        public IImmutableList<TaggedRuleMatch> Fragments { get; }
+
+        public RuleMatch GetFragments(string tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag))
+            {
+                throw new ArgumentNullException(nameof(tag));
+            }
+            if (Fragments == null)
+            {
+                throw new IndexOutOfRangeException("There are no fragments");
+            }
+
+            foreach (var taggedMatch in Fragments)
+            {
+                if (taggedMatch.Tag == tag)
+                {
+                    return taggedMatch.Match;
+                }
+            }
+
+            throw new IndexOutOfRangeException($"No fragment with tag '{tag}'");
+        }
 
         public RuleMatch ChangeRule(IRule rule)
         {
