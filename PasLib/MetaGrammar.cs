@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -288,10 +289,62 @@ namespace PasLib
                     throw new NotSupportedException("Literal rule can't have parameters");
                 }
 
-                var literal = ruleBodyBody.Fragments.First().Match.Text;
-                var rule = new LiteralRule(ruleID, literal.Enumerate());
+                var literal = ruleBodyBody.Fragments.First().Match;
+                var characters = from l in literal.Repeats
+                                 let c = GetCharacter(l)
+                                 select c;
+                var rule = new LiteralRule(ruleID, characters);
 
                 return rule;
+            }
+
+            private char GetCharacter(RuleMatch character)
+            {
+                var charFragment = character.Fragments.First();
+                var subMatch = charFragment.Match;
+
+                switch (charFragment.Tag)
+                {
+                    case "normal":
+                        return subMatch.Text.First;
+                    case "escapeLetter":
+                        return GetEscapeLetter(subMatch.Fragments.First().Match.Text.First);
+                    case "escapeQuote":
+                        return '\"';
+                    case "escapeBackslash":
+                        return '\\';
+                    case "escapeHexa":
+                        return (char)int.Parse(
+                            subMatch.Fragments.First().Match.Text.ToString(),
+                            NumberStyles.HexNumber);
+                    default:
+                        throw new NotSupportedException(
+                            $"Character tag not supported:  '{charFragment.Tag}'");
+                }
+            }
+
+            private char GetEscapeLetter(char letter)
+            {
+                switch (letter)
+                {
+                    case 'a':
+                        return '\a';
+                    case 'b':
+                        return '\b';
+                    case 'f':
+                        return '\f';
+                    case 'n':
+                        return '\n';
+                    case 'r':
+                        return '\r';
+                    case 't':
+                        return '\t';
+                    case 'v':
+                        return '\v';
+                    default:
+                        throw new ParsingException(
+                            $"Character escape not supported:  \\{letter}");
+                }
             }
 
             private IRule CreateAnyCharacter(
@@ -318,11 +371,13 @@ namespace PasLib
                 }
 
                 var lower =
-                            ruleBodyBody.GetFragments("lower").Fragments.First().Match.Text.First;
+                            ruleBodyBody.GetFragments("lower").Fragments.First().Match;
                 var upper =
-                    ruleBodyBody.GetFragments("upper").Fragments.First().Match.Text.First;
+                    ruleBodyBody.GetFragments("upper").Fragments.First().Match;
+                var lowerChar = GetCharacter(lower);
+                var upperChar = GetCharacter(upper);
 
-                return new RangeRule(ruleID, lower, upper);
+                return new RangeRule(ruleID, lowerChar, upperChar);
             }
 
             private IRule CreateRepeat(
@@ -487,13 +542,13 @@ namespace PasLib
             var quotedCharacter = new SequenceRule("quotedCharacter", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
-                new TaggedRule("l", character),
+                new TaggedRule("l", character, true),
                 new TaggedRule(null, new LiteralRule(null, "\""))
             }, false, false);
             var literal = new SequenceRule("literal", new[]
             {
                 new TaggedRule(null, new LiteralRule(null, "\"")),
-                new TaggedRule("l", new RepeatRule(null, character, null, null)),
+                new TaggedRule("l", new RepeatRule(null, character, null, null), true),
                 new TaggedRule(null, new LiteralRule(null, "\""))
             }, false, false);
             var any = new LiteralRule("any", ".");
@@ -742,8 +797,53 @@ namespace PasLib
                 new TaggedRule(null, noR),
                 new LiteralRule(null, "\n"),
                 false);
+            var noBackSlash = new SubstractRule(
+                null,
+                new TaggedRule(null, noN),
+                new LiteralRule(null, "\\"),
+                false);
+            var escapeQuote = new LiteralRule(null, "\\\"");
+            var escapeBackslash = new LiteralRule(null, "\\\\");
+            var escapeLetter = new SequenceRule(null, new[]
+            {
+                new TaggedRule(new LiteralRule(null, "\\")),
+                new TaggedRule("l", new DisjunctionRule(null, TaggedRule.FromRules(new[]
+                {
+                    new LiteralRule(null, "a"),
+                    new LiteralRule(null, "b"),
+                    new LiteralRule(null, "f"),
+                    new LiteralRule(null, "n"),
+                    new LiteralRule(null, "r"),
+                    new LiteralRule(null, "t"),
+                    new LiteralRule(null, "v")
+                })))
+            }, false, false);
+            var escapeHexa = new SequenceRule(null, new[]
+            {
+                new TaggedRule(new LiteralRule(null, "\\x")),
+                new TaggedRule("h", new RepeatRule(
+                    null,
+                    new DisjunctionRule(null, TaggedRule.FromRules(new[]
+                    {
+                        new RangeRule(null, '0', '9'),
+                        new RangeRule(null, 'a', 'f'),
+                        new RangeRule(null, 'A', 'F')
+                    }), false, false),
+                    1,
+                    2,
+                    false,
+                    false))
+            }, false, false);
+            var character = new DisjunctionRule("character", new[]
+            {
+                new TaggedRule("normal", noBackSlash, true),
+                new TaggedRule("escapeQuote", escapeQuote, true),
+                new TaggedRule("escapeBackslash", escapeBackslash, true),
+                new TaggedRule("escapeLetter", escapeLetter, true),
+                new TaggedRule("escapeHexa", escapeHexa, true)
+            }, false, false);
 
-            return noN;
+            return character;
         }
     }
 }

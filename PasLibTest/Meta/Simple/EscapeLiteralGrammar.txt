@@ -1,0 +1,6 @@
+﻿rule ab = "a\nb";
+rule cd = "c\rd";
+rule tab = "e\tf";
+rule slash = "g\\h";
+rule hexa = "i\x51j";	# \x51 = 'Q'
+rule range = "\x41".."\x4C";  #"A".."L"

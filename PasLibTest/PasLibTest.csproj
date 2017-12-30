@@ -36,6 +36,7 @@
     <None Remove="Meta\Simple\AnyGrammar.txt" />
     <None Remove="Meta\Simple\Disjunction3TermsGrammar.txt" />
     <None Remove="Meta\Simple\DisjunctionGrammar.txt" />
+    <None Remove="Meta\Simple\EscapeLiteralGrammar.txt" />
     <None Remove="Meta\Simple\LiteralGrammar.txt" />
     <None Remove="Meta\Simple\OneLetterOneRuleGrammar.txt" />
     <None Remove="Meta\Simple\RangeGrammar.txt" />
@@ -53,6 +54,7 @@
     <EmbeddedResource Include="Meta\Simple\AnyGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\Disjunction3TermsGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\DisjunctionGrammar.txt" />
+    <EmbeddedResource Include="Meta\Simple\EscapeLiteralGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\LiteralGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\OneLetterOneRuleGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\RangeGrammar.txt" />

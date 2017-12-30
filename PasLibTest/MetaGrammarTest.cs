@@ -55,6 +55,26 @@ namespace PasLibTest
         }
 
         [TestMethod]
+        public void EscapeLiteral()
+        {
+            var samples = new[]
+            {
+                (true, "ab", "a\nb"),
+                (true, "cd", "c\rd"),
+                (true, "tab", "e\tf"),
+                (true, "slash", "g\\h"),
+                (true, "hexa", "i\x51j"),
+                (true, "range", "A"),
+                (true, "range", "F"),
+                (true, "range", "L"),
+                (false, "range", "O"),
+                (false, "range", "a")
+            };
+
+            Test("Simple.EscapeLiteralGrammar.txt", samples);
+        }
+
+        [TestMethod]
         public void Any()
         {
             var samples = new[]
