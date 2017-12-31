@@ -7,12 +7,12 @@ namespace PasLib
 {
     internal class SubstractRule : RuleBase
     {
-        private readonly TaggedRule _primary;
+        private readonly IRule _primary;
         private readonly IRule _excluded;
 
         public SubstractRule(
             string ruleName,
-            TaggedRule primary,
+            IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
             bool? isRecursive = null,
@@ -25,7 +25,7 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var primaryMatches = context.InvokeRule(_primary.Rule);
+            var primaryMatches = context.InvokeRule(_primary);
 
             foreach (var primaryMatch in primaryMatches)
             {
@@ -38,28 +38,11 @@ namespace PasLib
 
                 if (!excludedExactLength.Any())
                 {
-                    if (_primary.HasTag)
-                    {
-                        var fragment = new NamedRuleMatch(_primary.Tag, primaryMatch);
+                    var match = new RuleMatch(this, primaryText, new[] { primaryMatch });
 
-                        yield return new RuleMatch(
-                            this,
-                            primaryMatch.Text,
-                            ImmutableList<NamedRuleMatch>.Empty.Add(fragment));
-                    }
-                    else
-                    {
-                        yield return primaryMatch.ChangeRule(this);
-                    }
+                    yield return match;
                 }
             }
-        }
-
-        private IDictionary<string, RuleMatch> CreateFragments(
-            RuleMatch match,
-            SubString text)
-        {
-            return new Dictionary<string, RuleMatch>() { { _primary.Tag, match } };
         }
 
         public override string ToString()

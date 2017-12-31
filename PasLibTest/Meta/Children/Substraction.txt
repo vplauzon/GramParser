@@ -1,0 +1,6 @@
+﻿rule a = "a"*;
+rule b = "b"*;
+
+rule(children=true) with = a - b;
+rule(children=false) without = a - b;
+rule unspecified = a - b;

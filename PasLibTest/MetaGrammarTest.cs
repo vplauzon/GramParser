@@ -291,35 +291,53 @@ namespace PasLibTest
 
         #region Children
         [TestMethod]
-        public void ChildrenRepeatWith()
+        public void ChildrenRepeat()
         {
-            var grammarText = GetResource("Children.Repeat.txt");
+            TestChildren("Children.Repeat.txt", "aaaa", 4);
+        }
+
+        [TestMethod]
+        public void ChildrenDisjunction()
+        {
+            TestChildren("Children.Disjunction.txt", "aaaa", 1);
+        }
+
+        [TestMethod]
+        public void ChildrenSequence()
+        {
+            TestChildren("Children.Sequence.txt", "aaaa", 2);
+        }
+
+        [TestMethod]
+        public void ChildrenSubstraction()
+        {
+            TestChildren("Children.Substraction.txt", "aaaa", 1);
+        }
+
+        private void TestChildren(string resourceName, string text, int expectedChildren)
+        {
+            var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
 
             foreach (var rule in new[] { "with", "unspecified" })
             {
-                var text = "aaaa";
                 var match = grammar.Match(rule, text);
 
                 Assert.IsNotNull(match, "Match - " + rule);
                 Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
                 Assert.IsNotNull(match.Children, "Children - " + rule);
-                Assert.AreEqual(text.Length, match.Children.Count(), "#Children - " + rule);
+                Assert.AreEqual(expectedChildren, match.Children.Count(), "#Children - " + rule);
             }
-        }
 
-        [TestMethod]
-        public void ChildrenRepeatWithout()
-        {
-            var grammarText = GetResource("Children.Repeat.txt");
-            var grammar = MetaGrammar.ParseGrammar(grammarText);
-            var text = "aaaa";
-            var match = grammar.Match("without", text);
+            {
+                var rule = "without";
+                var match = grammar.Match("without", text);
 
-            Assert.IsNotNull(match, "Match");
-            Assert.IsNull(match.NamedChildren, "NamedChildren");
-            Assert.IsNotNull(match.Children, "Children");
-            Assert.AreEqual(0, match.Children.Count(), "#Children");
+                Assert.IsNotNull(match, "Match - " + rule);
+                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsNotNull(match.Children, "Children - " + rule);
+                Assert.AreEqual(0, match.Children.Count(), "#Children - " + rule);
+            }
         }
         #endregion
 

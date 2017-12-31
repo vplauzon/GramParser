@@ -539,8 +539,7 @@ namespace PasLib
             {
                 var primary = ruleBodyBody.GetChild("primary");
                 var excluded = ruleBodyBody.GetChild("excluded");
-                var tag = ruleBodyBody.GetChild("t");
-                var primaryRule = CreateTaggedRule(tag, CreateRule(primary));
+                var primaryRule = CreateRule(primary);
                 var excludedRule = CreateRule(excluded);
 
                 return new SubstractRule(
@@ -593,7 +592,7 @@ namespace PasLib
                 new LiteralRule(null, "\r"),
                 new LiteralRule(null, "\n")), false, false);
             var commentContentChar = new SubstractRule("#commentContentChar",
-                new TaggedRule(new MatchAnyCharacterRule(null)),
+                new MatchAnyCharacterRule(null),
                 carriageReturn,
                 false);
             var commentContent =
@@ -796,7 +795,6 @@ namespace PasLib
             isRecursive: false);
             var substract = new SequenceRule("substract", new[]
             {
-                new TaggedRule("t", tag),
                 new TaggedRule("primary", substractable),
                 new TaggedRule(null, new LiteralRule(null, "-")),
                 new TaggedRule("excluded", substracted)
@@ -882,10 +880,9 @@ namespace PasLib
 
         private static IRule GetCharacterRule()
         {
-            var any = new MatchAnyCharacterRule(null);
             var normal = new SubstractRule(
                 null,
-                new TaggedRule(null, any),
+                new MatchAnyCharacterRule(null),
                 new DisjunctionRule(null, TaggedRule.FromRules(new[]
                 {
                     new LiteralRule(null, "\""),

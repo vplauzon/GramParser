@@ -39,7 +39,7 @@ rule substractable = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | any:any | repeat:repeat;
 rule substracted = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | repeat:repeat;
-rule substract = t:tag primary:substractable "-" excluded:substracted;
+rule substract = primary:substractable "-" excluded:substracted;
 rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;

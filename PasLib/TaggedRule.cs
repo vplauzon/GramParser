@@ -8,11 +8,16 @@ namespace PasLib
 {
     internal class TaggedRule
     {
-        public TaggedRule(IRule rule) : this(null, rule, true)
+        public TaggedRule(IRule rule)
+            : this(null, rule)
         {
         }
 
-        public TaggedRule(string tag, IRule rule, bool doIncludeChildren = true)
+        public TaggedRule(
+            string tag,
+            IRule rule,
+            bool doIncludeChildren = true,
+            MatchSelection matchSelectionState = MatchSelection.Unspecified)
         {
             if (tag == string.Empty)
             {
@@ -22,6 +27,9 @@ namespace PasLib
             Tag = tag;
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             DoIncludeChildren = doIncludeChildren;
+            MatchSelectionState = HasTag
+                ? MatchSelection.GrandChildren
+                : MatchSelection.Unspecified;
         }
 
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
@@ -45,14 +53,7 @@ namespace PasLib
 
         public bool DoIncludeChildren { get; }
 
-        public ImmutableList<NamedRuleMatch> AddFragment(
-            ImmutableList<NamedRuleMatch> fragments,
-            RuleMatch match)
-        {
-            return Tag == null
-                ? fragments
-                : fragments.Add(new NamedRuleMatch(Tag, FormatMatch(match)));
-        }
+        public MatchSelection MatchSelectionState { get; }
 
         public override string ToString()
         {
@@ -62,11 +63,6 @@ namespace PasLib
                     : Rule.RuleName;
 
             return $"{Tag}{colons}({rule})";
-        }
-
-        private RuleMatch FormatMatch(RuleMatch match)
-        {
-            return DoIncludeChildren ? match : match.RemoveChildren();
         }
     }
 }

@@ -233,8 +233,9 @@ namespace PasLibTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-                    Assert.IsNull(match.NamedChildren, $"Fragments - {i}");
-                    Assert.IsFalse(match.Children.Any(), $"Repeats - {i}");
+                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.IsNotNull(match.Children, $"Children - {i}");
+                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
             }
         }
@@ -429,7 +430,7 @@ namespace PasLibTest
             };
             var range = new RangeRule(null, 'a', 'z');
             var exclusion = new RangeRule(null, 'f', 'h');
-            var rule = new SubstractRule("Substract", new TaggedRule(null, range), exclusion);
+            var rule = new SubstractRule("Substract", range, exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
             {
@@ -467,7 +468,7 @@ namespace PasLibTest
             var exclusion = new RangeRule(null, 'f', 'h');
             var rule = new SubstractRule(
                 "Substract",
-                new TaggedRule("mine", range),
+                range,
                 exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
@@ -485,8 +486,9 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.NamedChildren, $"Fragments - {i}");
-                    Assert.AreEqual(1, match.NamedChildren.Count, $"Fragments Count - {i}");
+                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.IsNotNull(match.Children, $"Children - {i}");
+                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
             }
         }

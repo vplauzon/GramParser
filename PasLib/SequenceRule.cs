@@ -7,6 +7,8 @@ namespace PasLib
 {
     internal class SequenceRule : RuleBase
     {
+        private readonly TaggedRuleCollection _rules;
+
         public SequenceRule(
             string ruleName,
             IEnumerable<TaggedRule> rules,
@@ -20,20 +22,18 @@ namespace PasLib
                 throw new ArgumentNullException(nameof(rules));
             }
 
-            Rules = rules.ToArray();
+            _rules = new TaggedRuleCollection(rules);
         }
-
-        public TaggedRule[] Rules { get; }
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             var matches = RecurseMatch(
-                Rules,
+                _rules,
                 context.ContextID,
                 context,
                 context.Text,
                 0,
-                ImmutableList<NamedRuleMatch>.Empty);
+                ImmutableList<(TaggedRule, RuleMatch)>.Empty);
 
             return matches;
         }
@@ -41,7 +41,7 @@ namespace PasLib
         #region object methods
         public override string ToString()
         {
-            var rules = from t in Rules
+            var rules = from t in _rules
                         select t.ToString();
 
             return ToStringRuleName()
@@ -56,16 +56,16 @@ namespace PasLib
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
-            ImmutableList<NamedRuleMatch> fragments)
+            ImmutableList<(TaggedRule, RuleMatch)> matches)
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);
-            var matches = context.InvokeRule(currentRule.Rule);
+            var potentials = context.InvokeRule(currentRule.Rule);
 
-            foreach (var match in matches)
+            foreach (var match in potentials)
             {
                 var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
-                var newFragments = currentRule.AddFragment(fragments, match);
+                var newMatches = _rules.AddMatch(matches, currentRule, match);
 
                 if (remainingRules.Any())
                 {   //  Recurse
@@ -76,24 +76,19 @@ namespace PasLib
                         newContext,
                         originalText,
                         newTotalMatchLength,
-                        newFragments);
+                        newMatches);
 
                     foreach (var m in downstreamMatches)
                     {
                         yield return m;
                     }
                 }   //  End recursion
-                else if (newFragments.Any())
-                {
-                    yield return new RuleMatch(
-                        this,
-                        originalText.Take(newTotalMatchLength),
-                        newFragments);
-                }
                 else
                 {
-                    yield return
-                        new RuleMatch(this, originalText.Take(newTotalMatchLength));
+                    yield return _rules.CreateMatch(
+                        this,
+                        originalText.Take(newTotalMatchLength),
+                        newMatches);
                 }
             }
         }
