@@ -7,7 +7,7 @@ namespace PasLib
 {
     public class ExplorerContext
     {
-        private const int DEFAULT_MAX_DEPTH = 40;
+        private const int DEFAULT_MAX_DEPTH = 50;
 
         private readonly SubString _text;
         private readonly IRule _interleaveRule;
@@ -94,7 +94,7 @@ namespace PasLib
             }
             if (_depth <= 1)
             {
-                throw new InvalidOperationException("Too much recursion");
+                throw new ParsingException("Recursion exceeds limits");
             }
 
             var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);

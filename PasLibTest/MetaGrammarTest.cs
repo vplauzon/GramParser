@@ -155,7 +155,18 @@ namespace PasLibTest
                 (true, "between34", "defdefdefdef"),
                 (false, "between34", "defdefdefdefdef"),
                 (false, "between34", "defdef"),
-                (false, "between34", "")
+                (false, "between34", ""),
+                (false, "min", "gh"),
+                (true, "min", "ghgh"),
+                (true, "min", "ghghghghghghghgh"),
+                (true, "max", ""),
+                (true, "max", "ij"),
+                (true, "max", "ijijij"),
+                (false, "max", "ijijijij"),
+                (false, "minmax", "kl"),
+                (true, "minmax", "klkl"),
+                (true, "minmax", "klklklkl"),
+                (false, "minmax", "klklklklkl")
             };
 
             Test("Simple.RepeatGrammar.txt", samples);

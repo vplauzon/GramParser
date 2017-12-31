@@ -248,7 +248,7 @@ namespace PasLib
             {
                 if (!propertyBag.IsDefault)
                 {
-                    throw new NotSupportedException("Rule reference can't have parameters");
+                    throw new ParsingException("Rule reference can't have parameters");
                 }
 
                 var identifier = ruleBodyBody.Text.ToString();
@@ -284,11 +284,6 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag)
             {
-                if (!propertyBag.IsDefault)
-                {
-                    throw new NotSupportedException("Literal rule can't have parameters");
-                }
-
                 var literal = ruleBodyBody.Fragments.First().Match;
                 var characters = from l in literal.Repeats
                                  let c = GetCharacter(l)
@@ -352,11 +347,6 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag)
             {
-                if (!propertyBag.IsDefault)
-                {
-                    throw new NotSupportedException("Any character rule can't have parameters");
-                }
-
                 return new MatchAnyCharacterRule(ruleID);
             }
 
@@ -365,11 +355,6 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag)
             {
-                if (!propertyBag.IsDefault)
-                {
-                    throw new NotSupportedException("Range rule can't have parameters");
-                }
-
                 var lower =
                             ruleBodyBody.GetFragments("lower").Fragments.First().Match;
                 var upper =
@@ -410,15 +395,49 @@ namespace PasLib
                         }
                     case "minMax":
                         {
-                            var minMax = cardinality.Fragments.First().Match;
-                            var min = int.Parse(minMax.GetFragments("min").Text.ToString());
-                            var max = int.Parse(minMax.GetFragments("max").Text.ToString());
+                            var minMaxCardinality = cardinality.Fragments.First().Match;
+                            (var min, var max) = GetMinMaxCardinality(minMaxCardinality);
 
                             return new RepeatRule(
                                 ruleID, rule, min, max, bag.HasInterleave, bag.IsRecursive);
                         }
                     default:
                         throw new NotSupportedException();
+                }
+            }
+
+            private (int? min, int? max) GetMinMaxCardinality(RuleMatch minMaxCardinality)
+            {
+                var type = minMaxCardinality.Fragments.First().Tag;
+                var cardinality = minMaxCardinality.Fragments.First().Match;
+
+                switch (type)
+                {
+                    case "minmax":
+                        {
+                            var minText = cardinality.Fragments[0].Match.Text;
+                            var maxText = cardinality.Fragments[1].Match.Text;
+                            var min = int.Parse(minText.ToString());
+                            var max = int.Parse(maxText.ToString());
+
+                            return (min, max);
+                        }
+                    case "min":
+                        {
+                            var minText = cardinality.Fragments[0].Match.Text;
+                            var min = int.Parse(minText.ToString());
+
+                            return (min, null);
+                        }
+                    case "max":
+                        {
+                            var maxText = cardinality.Fragments[0].Match.Text;
+                            var max = int.Parse(maxText.ToString());
+
+                            return (null, max);
+                        }
+                    default:
+                        throw new NotImplementedException($"Cardinality:  '{type}'");
                 }
             }
 
@@ -585,15 +604,34 @@ namespace PasLib
                     new TaggedRule("n", number),
                     new TaggedRule(null, new LiteralRule(null, "}"))
                 });
-            var minMaxCardinality = new SequenceRule("minMaxCardinality", new[]
+            var minMaxCardinality = new DisjunctionRule("minMaxCardinality", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "{")),
-                new TaggedRule("min", number),
-                new TaggedRule(null, new LiteralRule(null, ",")),
-                new TaggedRule("max", number),
-                new TaggedRule(null, new LiteralRule(null, "}"))
-            },
-            isRecursive: false);
+                new TaggedRule("minmax", new SequenceRule("#minmax", new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "{")),
+                    new TaggedRule("min", number),
+                    new TaggedRule(null, new LiteralRule(null, ",")),
+                    new TaggedRule("max", number),
+                    new TaggedRule(null, new LiteralRule(null, "}"))
+                },
+                isRecursive: false)),
+                new TaggedRule("min", new SequenceRule("#minmax", new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "{")),
+                    new TaggedRule("min", number),
+                    new TaggedRule(null, new LiteralRule(null, ",")),
+                    new TaggedRule(null, new LiteralRule(null, "}"))
+                },
+                isRecursive: false)),
+                new TaggedRule("max", new SequenceRule("#minmax", new[]
+                {
+                    new TaggedRule(null, new LiteralRule(null, "{")),
+                    new TaggedRule(null, new LiteralRule(null, ",")),
+                    new TaggedRule("max", number),
+                    new TaggedRule(null, new LiteralRule(null, "}"))
+                },
+                isRecursive: false))
+            });
             var cardinality = new DisjunctionRule("cardinality", new[]
             {
                 new TaggedRule("star", new LiteralRule(null, "*")),
