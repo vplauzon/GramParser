@@ -45,7 +45,7 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| sequence:sequence;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
-rule boolean = true | false;
+rule boolean = true:"true" | false:"false";
 rule parameterAssignation = id:identifier "=" value:boolean;
 rule parameterAssignationList = "(" head:parameterAssignation
 	tail:("," pa:parameterAssignation)* ")";
