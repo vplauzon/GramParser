@@ -2,7 +2,7 @@
 
 Parser as a Service (PAS) is a grammar-based parser running as a REST service.  It allows you to implement Domain Specific Languages (DSLs).
 
-A [Quickstart is available here](README.md).
+A [Quickstart is available here](../README.md).
 
 ## PAS Grammar
 
