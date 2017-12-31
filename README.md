@@ -420,12 +420,47 @@ postal-code =
 
 We see that we didn't need to define an end-of-line such as a ';' (as in C# / Java / C++).  We could have if we thought it would bring clarity.
 
+###  Using the API
+
+In order to integrate with PAS directly, we can use the public API.  For queries similar to the ones performed by the workbench, we can use the API at https://pas-api.azurewebsites.net/v1/anonymous-analysis.
+
+The protocol is pretty straightforward.  We do an HTTP POST on that URL with a JSON payload including the grammar and the text to parse.  We then receive the analysis we see in the workbench (i.e. JSON-based) as returned payload.
+
+For instance, the following request
+
+```
+POST https://pas-api.azurewebsites.net/v1/anonymous-analysis HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Host: pas-api-dev.azurewebsites.net
+Content-Length: 66
+
+{
+  "grammar":"rule main = (\"a\"..\"z\")*;",
+  "text":"test"
+}
+```
+
+should return something similar to
+
+```
+HTTP/1.1 200 OK
+Date: ----
+Content-Type: application/json
+Server: Kestrel
+Content-Length: 141
+
+{"apiVersion":"0.0.92.77","ruleMatch":{"rule":"main","text":"test","repeats":[{"text":"t"},{"text":"e"},{"text":"s"},{"text":"t"}]}}
+```
+
+This is a public API, available without firewall and without authentication.
+
 ###  Next steps
 
 We did a quick tour of the features of PAS.  We didn't look at everything though.
 
 There are a few more nuances in the grammar language, for instance recursivity wasn't covered here.
 
-Also, we didn't cover how to use the API, although it is quite simple.
+Similarly the API has other forms not explored here.
 
 We suggest to go through the [online documentation](documentation/README.md) to learn more about PAS.
