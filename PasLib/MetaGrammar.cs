@@ -842,25 +842,17 @@ namespace PasLib
         private static IRule GetCharacterRule()
         {
             var any = new MatchAnyCharacterRule(null);
-            var noQuote = new SubstractRule(
+            var normal = new SubstractRule(
                 null,
                 new TaggedRule(null, any),
-                new LiteralRule(null, "\""),
-                false);
-            var noR = new SubstractRule(
-                null,
-                new TaggedRule(null, noQuote),
-                new LiteralRule(null, "\r"),
-                false);
-            var noN = new SubstractRule(
-                null,
-                new TaggedRule(null, noR),
-                new LiteralRule(null, "\n"),
-                false);
-            var noBackSlash = new SubstractRule(
-                null,
-                new TaggedRule(null, noN),
-                new LiteralRule(null, "\\"),
+                new DisjunctionRule(null, TaggedRule.FromRules(new[]
+                {
+                    new LiteralRule(null, "\""),
+                    new LiteralRule(null, "\r"),
+                    new LiteralRule(null, "\n"),
+                    new LiteralRule(null, "\\"),
+                }), false, false),
+                false,
                 false);
             var escapeQuote = new LiteralRule(null, "\\\"");
             var escapeBackslash = new LiteralRule(null, "\\\\");
@@ -896,7 +888,7 @@ namespace PasLib
             }, false, false);
             var character = new DisjunctionRule("character", new[]
             {
-                new TaggedRule("normal", noBackSlash, true),
+                new TaggedRule("normal", normal, true),
                 new TaggedRule("escapeQuote", escapeQuote, true),
                 new TaggedRule("escapeBackslash", escapeBackslash, true),
                 new TaggedRule("escapeLetter", escapeLetter, true),
