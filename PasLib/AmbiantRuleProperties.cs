@@ -12,16 +12,19 @@ namespace PasLib
             HasInterleave = true;
             IsRecursive = false;
             IsTerminalRule = false;
+            HasChildrenDetails = true;
         }
 
         private AmbiantRuleProperties(
             bool hasInterleave,
             bool isRecursive,
-            bool isTerminalRule)
+            bool isTerminalRule,
+            bool hasChildrenDetails)
         {
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
+            HasChildrenDetails = hasChildrenDetails;
         }
 
         public bool HasInterleave { get; }
@@ -30,12 +33,15 @@ namespace PasLib
 
         public bool IsTerminalRule { get; }
 
+        public bool HasChildrenDetails { get; }
+
         public AmbiantRuleProperties Merge(IRuleProperties properties)
         {
             return new AmbiantRuleProperties(
                 Merge(HasInterleave, properties.HasInterleave),
                 Merge(IsRecursive, properties.IsRecursive),
-                Merge(IsTerminalRule, properties.IsTerminalRule));
+                Merge(IsTerminalRule, properties.IsTerminalRule),
+                Merge(HasChildrenDetails, properties.HasChildrenDetails));
         }
 
         private bool Merge(bool currentProperty, bool? newProperty)

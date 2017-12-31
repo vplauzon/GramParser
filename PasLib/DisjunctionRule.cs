@@ -13,8 +13,9 @@ namespace PasLib
             string ruleName,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
-            : base(ruleName, hasInterleave, isRecursive, false)
+            bool? isRecursive = null,
+            bool? hasChildrenDetails = null)
+            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
         {
             if (rules == null || rules.Count() == 0)
             {

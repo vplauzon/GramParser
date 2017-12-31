@@ -20,12 +20,15 @@ namespace PasLib
 
                 public bool? IsRecursive { get; set; }
 
+                public bool? HasChildrenDetails { get; set; }
+
                 public bool IsDefault
                 {
                     get
                     {
                         return !HasInterleave.HasValue
-                            && !IsRecursive.HasValue;
+                            && !IsRecursive.HasValue
+                            && !HasChildrenDetails.HasValue;
                     }
                 }
             }
@@ -199,6 +202,9 @@ namespace PasLib
                             case "recursive":
                                 AssignRecursiveToBag(bag, value);
                                 break;
+                            case "children":
+                                AssignChildrenToBag(bag, value);
+                                break;
                             default:
                                 throw new ParsingException(
                                     $"Parameter '{id}' isn't supported");
@@ -238,6 +244,22 @@ namespace PasLib
                     default:
                         throw new ParsingException(
                             $"Value '{value}' isn't supported for recursive parameter");
+                }
+            }
+
+            private static void AssignChildrenToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.HasChildrenDetails = true;
+                        break;
+                    case "false":
+                        bag.HasChildrenDetails = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for children parameter");
                 }
             }
 

@@ -15,8 +15,9 @@ namespace PasLib
             TaggedRule primary,
             IRule excluded,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
-            : base(ruleName, hasInterleave, isRecursive, false)
+            bool? isRecursive = null,
+            bool? hasChildrenDetails = null)
+            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
