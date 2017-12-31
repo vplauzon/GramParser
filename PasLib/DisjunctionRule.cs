@@ -34,7 +34,7 @@ namespace PasLib
                 foreach (var m in matches)
                 {
                     var fragments =
-                        rule.AddFragment(ImmutableList<TaggedRuleMatch>.Empty, m);
+                        rule.AddFragment(ImmutableList<NamedRuleMatch>.Empty, m);
 
                     yield return new RuleMatch(this, m.Text, fragments);
                 }

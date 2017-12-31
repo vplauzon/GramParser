@@ -5,19 +5,19 @@ using System.Text;
 
 namespace PasFunction.AnonymousAnalysis
 {
-    internal class TaggedRuleMatchModel
+    internal class NamedRuleMatchModel
     {
-        public TaggedRuleMatchModel(TaggedRuleMatch taggedRuleMatch)
+        public NamedRuleMatchModel(NamedRuleMatch namedRuleMatch)
         {
-            if (taggedRuleMatch == null)
+            if (namedRuleMatch == null)
             {
-                throw new ArgumentNullException(nameof(taggedRuleMatch));
+                throw new ArgumentNullException(nameof(namedRuleMatch));
             }
-            Tag = taggedRuleMatch.Tag;
-            Match = new RuleMatchModel(taggedRuleMatch.Match);
+            Name = namedRuleMatch.Name;
+            Match = new RuleMatchModel(namedRuleMatch.Match);
         }
 
-        public string Tag { get; }
+        public string Name { get; }
 
         public RuleMatchModel Match { get; }
     }

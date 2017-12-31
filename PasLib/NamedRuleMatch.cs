@@ -5,19 +5,19 @@ using System.Text;
 
 namespace PasLib
 {
-    public class TaggedRuleMatch
+    public class NamedRuleMatch
     {
-        public TaggedRuleMatch(string tag, RuleMatch match)
+        public NamedRuleMatch(string name, RuleMatch match)
         {
-            if (string.IsNullOrWhiteSpace(tag))
+            if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException(nameof(tag));
+                throw new ArgumentNullException(nameof(name));
             }
-            Tag = tag;
+            Name = name;
             Match = match ?? throw new ArgumentNullException(nameof(match));
         }
 
-        public string Tag { get; }
+        public string Name { get; }
 
         public RuleMatch Match { get; }
     }

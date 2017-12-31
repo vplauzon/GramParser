@@ -45,13 +45,13 @@ namespace PasLib
 
         public bool DoIncludeChildren { get; }
 
-        public ImmutableList<TaggedRuleMatch> AddFragment(
-            ImmutableList<TaggedRuleMatch> fragments,
+        public ImmutableList<NamedRuleMatch> AddFragment(
+            ImmutableList<NamedRuleMatch> fragments,
             RuleMatch match)
         {
             return Tag == null
                 ? fragments
-                : fragments.Add(new TaggedRuleMatch(Tag, FormatMatch(match)));
+                : fragments.Add(new NamedRuleMatch(Tag, FormatMatch(match)));
         }
 
         public override string ToString()

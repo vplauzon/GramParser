@@ -33,7 +33,7 @@ namespace PasLib
                 context,
                 context.Text,
                 0,
-                ImmutableList<TaggedRuleMatch>.Empty);
+                ImmutableList<NamedRuleMatch>.Empty);
 
             return matches;
         }
@@ -56,7 +56,7 @@ namespace PasLib
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
-            ImmutableList<TaggedRuleMatch> fragments)
+            ImmutableList<NamedRuleMatch> fragments)
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);

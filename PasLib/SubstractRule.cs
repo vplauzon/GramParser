@@ -40,12 +40,12 @@ namespace PasLib
                 {
                     if (_primary.HasTag)
                     {
-                        var fragment = new TaggedRuleMatch(_primary.Tag, primaryMatch);
+                        var fragment = new NamedRuleMatch(_primary.Tag, primaryMatch);
 
                         yield return new RuleMatch(
                             this,
                             primaryMatch.Text,
-                            ImmutableList<TaggedRuleMatch>.Empty.Add(fragment));
+                            ImmutableList<NamedRuleMatch>.Empty.Add(fragment));
                     }
                     else
                     {
