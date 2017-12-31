@@ -432,7 +432,7 @@ For instance, the following request
 POST https://pas-api.azurewebsites.net/v1/anonymous-analysis HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-Host: pas-api-dev.azurewebsites.net
+Host: pas-api.azurewebsites.net
 Content-Length: 66
 
 {
