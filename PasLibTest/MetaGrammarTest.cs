@@ -289,6 +289,40 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Children
+        [TestMethod]
+        public void ChildrenRepeatWith()
+        {
+            var grammarText = GetResource("Children.Repeat.txt");
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
+
+            foreach (var rule in new[] { "with", "unspecified" })
+            {
+                var text = "aaaa";
+                var match = grammar.Match(rule, text);
+
+                Assert.IsNotNull(match, "Match - " + rule);
+                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsNotNull(match.Children, "Children - " + rule);
+                Assert.AreEqual(text.Length, match.Children.Count(), "#Children - " + rule);
+            }
+        }
+
+        [TestMethod]
+        public void ChildrenRepeatWithout()
+        {
+            var grammarText = GetResource("Children.Repeat.txt");
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
+            var text = "aaaa";
+            var match = grammar.Match("without", text);
+
+            Assert.IsNotNull(match, "Match");
+            Assert.IsNull(match.NamedChildren, "NamedChildren");
+            Assert.IsNotNull(match.Children, "Children");
+            Assert.AreEqual(0, match.Children.Count(), "#Children");
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;
@@ -307,14 +341,14 @@ namespace PasLibTest
             string grammarFile,
             (bool isSuccess, string ruleName, string text)[] samples)
         {
-            var grammar = GetResource(grammarFile);
-            var ruleSet = MetaGrammar.ParseGrammar(grammar);
+            var grammarText = GetResource(grammarFile);
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
 
-            Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
+            Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
             for (int i = 0; i != samples.Length; ++i)
             {
                 (var isSuccess, var ruleName, var text) = samples[i];
-                var match = ruleSet.Match(ruleName, text);
+                var match = grammar.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 

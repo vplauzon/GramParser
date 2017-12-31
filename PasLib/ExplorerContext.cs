@@ -114,7 +114,15 @@ namespace PasLib
 
                 foreach (var m in ruleMatches)
                 {
-                    yield return m.AddInterleaveLength(interleaveLength);
+                    if (newAmbiantRuleProperties.HasChildrenDetails == false)
+                    {
+                        yield return
+                            m.AddInterleaveLength(interleaveLength).RemoveChildren();
+                    }
+                    else
+                    {
+                        yield return m.AddInterleaveLength(interleaveLength);
+                    }
                 }
             }
             else

@@ -400,20 +400,44 @@ namespace PasLib
                 {
                     case "star":
                         return new RepeatRule(
-                            ruleID, rule, null, null, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            null,
+                            null,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "plus":
                         return new RepeatRule(
-                            ruleID, rule, 1, null, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            1,
+                            null,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "question":
                         return new RepeatRule(
-                            ruleID, rule, 0, 1, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            0,
+                            1,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "exact":
                         {
                             var exact = cardinality.NamedChildren.First().Match;
                             var n = int.Parse(exact.NamedChildren.First().Match.Text.ToString());
 
                             return new RepeatRule(
-                                ruleID, rule, n, n, bag.HasInterleave, bag.IsRecursive);
+                                ruleID,
+                                rule,
+                                n,
+                                n,
+                                bag.HasInterleave,
+                                bag.IsRecursive,
+                                bag.HasChildrenDetails);
                         }
                     case "minMax":
                         {
@@ -421,7 +445,13 @@ namespace PasLib
                             (var min, var max) = GetMinMaxCardinality(minMaxCardinality);
 
                             return new RepeatRule(
-                                ruleID, rule, min, max, bag.HasInterleave, bag.IsRecursive);
+                                ruleID,
+                                rule,
+                                min,
+                                max,
+                                bag.HasInterleave,
+                                bag.IsRecursive,
+                                bag.HasChildrenDetails);
                         }
                     default:
                         throw new NotSupportedException();
@@ -479,7 +509,8 @@ namespace PasLib
                                     tailTag, CreateRule(tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
 
-                return new DisjunctionRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
+                return new DisjunctionRule(
+                    ruleID, rules, bag.HasInterleave, bag.IsRecursive, bag.HasChildrenDetails);
             }
 
             private IRule CreateSequence(
@@ -493,7 +524,12 @@ namespace PasLib
                             let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
-                return new SequenceRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
+                return new SequenceRule(
+                    ruleID,
+                    rules,
+                    bag.HasInterleave,
+                    bag.IsRecursive,
+                    bag.HasChildrenDetails);
             }
 
             private IRule CreateSubstract(
@@ -508,7 +544,12 @@ namespace PasLib
                 var excludedRule = CreateRule(excluded);
 
                 return new SubstractRule(
-                    ruleID, primaryRule, excludedRule, bag.HasInterleave, bag.IsRecursive);
+                    ruleID,
+                    primaryRule,
+                    excludedRule,
+                    bag.HasInterleave,
+                    bag.IsRecursive,
+                    bag.HasChildrenDetails);
             }
 
             private IRule CreateBracket(

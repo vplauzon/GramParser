@@ -21,7 +21,7 @@ namespace PasLib
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
-            HasChildrenDetails = HasChildrenDetails;
+            HasChildrenDetails = hasChildrenDetails;
         }
 
         #region IRuleProperties
