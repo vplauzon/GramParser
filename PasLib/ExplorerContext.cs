@@ -7,7 +7,7 @@ namespace PasLib
 {
     public class ExplorerContext
     {
-        private const int DEFAULT_MAX_DEPTH = 50;
+        private const int DEFAULT_MAX_DEPTH = 40;
 
         private readonly SubString _text;
         private readonly IRule _interleaveRule;
