@@ -98,6 +98,16 @@ Here, in rule *disj*, we choose to see the child match of rule *a* and we name t
 
 Naming the children match is useful to avoid to rely on the order of match.  This can make the client code more robust to changes in the grammar.
 
+## Named and unnamed children
+
+We can't have both named and unnamed children rules.  For instance, the following is illegal:
+
+```Python
+rule seq = a:a ::b;
+```
+
+This is because named children matches and unnamed children matches are reporting in two different properties in the API return payload.  Those properties are mutually exclusive.
+
 ## Summary
 
 We've seen different ways to control the level of details on a rule match.
