@@ -1,6 +1,5 @@
 # Parser as a Service
 
-
 See the [following blog article](http://todefine.com) introducing it.
 
 Parser as a Service (PAS) is a grammar-based parser running as a REST service.  It allows you to implement Domain Specific Languages (DSLs).
