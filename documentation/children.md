@@ -54,14 +54,13 @@ rule(children=false) sub = a - "aa";
 
 ## Selecting children matches
 
-We could also select which sub-rule we want to get details on.  This is only possible for Disjunction, Sequence & Substraction rules since the Repeat rule, by its nature, doesn't allow that.  Selection is done by prepending the rule with a colon.
+We could also select which sub-rule we want to get details on.  This is only possible for Disjunction & Sequence rules.  Repeat rule, by its nature, doesn't allow that nor does the substration rule.  Selection is done by prepending the rule with a colon.
 
 ```Python
 rule a = "a"*;
 rule b = "b"*;
 rule disj = :a | b;
 rule seq = a :b;
-rule sub = :a - "aa";
 ```
 
 In the example, for rule *disj* we chose to only have details on rule *a*, for rule *seq* only *b* and for *sub*, only *a*.
@@ -77,7 +76,6 @@ rule a = "a"*;
 rule b = "b"*;
 rule disj = ::a | b;
 rule seq = a ::b;
-rule sub = ::a - "aa";
 ```
 
 Of course, if rule *a* already forced not to return its children details, having only one colon wouldn't bring back those grand-children.
@@ -91,7 +89,6 @@ rule a = "a"*;
 rule b = "b"*;
 rule disj = a:a | b;
 rule seq = a ::b;
-rule sub = a::a - "aa";
 ```
 
 Here, in rule *disj*, we choose to see the child match of rule *a* and we name that match *a*.  We proceeded similarly for *seq* and *sub* but this time we chose to ignore the grand children.
