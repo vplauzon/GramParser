@@ -16,7 +16,7 @@ namespace PasFunction.AnonymousAnalysis
     {
         [FunctionName("AnonymousAnalysisFunction")]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v0/analysis")]HttpRequest req,
             TraceWriter log)
         {
             try

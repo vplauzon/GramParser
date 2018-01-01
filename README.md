@@ -274,27 +274,27 @@ rule alpha = "a".."z" | "A".."Z";
 rule alphaNumeric = alpha | "0".."9" | "-";
 rule identifier = alpha alphaNumeric*;
 
-rule main = key:identifier "=" element:identifier
+rule main = key::identifier "=" element::identifier;
 ```
 
 With this grammar we can recognize texts such as ``location=Canada`` (without spaces):
 
 ```JSON
 200:  {
-  "apiVersion": "0.0.92.87",
+  "apiVersion": "0.0.95.87",
   "ruleMatch": {
     "rule": "main",
     "text": "location=Canada",
-    "fragments": [
+    "namedChildren": [
       {
-        "tag": "key",
+        "name": "key",
         "match": {
           "rule": "identifier",
           "text": "location"
         }
       },
       {
-        "tag": "element",
+        "name": "element",
         "match": {
           "rule": "identifier",
           "text": "Canada"
@@ -305,7 +305,7 @@ With this grammar we can recognize texts such as ``location=Canada`` (without sp
 }
 ```
 
-We see that we can nicely tease out the information we need, i.e. the key and the element.  We discard the "=" as a sub element by simply not tagging it, as it is of no interest.
+We nicely tease out the information we need, i.e. the key and the element, while we discard the "=" as a sub element by simply not tagging it, as it is of no interest.
 
 ### Interleaves
 
@@ -325,7 +325,7 @@ rule(interleave=false) alpha = "a".."z" | "A".."Z";
 rule(interleave=false) alphaNumeric = alpha | "0".."9" | "-";
 rule(interleave=false) identifier = alpha alphaNumeric*;
 
-rule main = key:identifier "=" element:identifier;
+rule main = key::identifier "=" element::identifier;
 ```
 
 Here we use the parameter *interleave* to say that the first three rules do not accept interleave.  Again, this is typical of *tokens*.
@@ -346,12 +346,12 @@ rule(interleave=false) alpha = "a".."z" | "A".."Z";
 rule(interleave=false) alphaNumeric = alpha | "0".."9" | "-";
 rule(interleave=false) identifier = alpha alphaNumeric*;
 
-rule main = key:identifier "=" element:identifier;
+rule main = key::identifier "=" element::identifier;
 ```
 
 The first rule defines a comment:  something starting with two forward slash followed by *anything* except return.
 
-*Anything* is marked as '.':  this matches any characters.
+*Anything* is marked as '.'.  This matches any characters.
 
 We then substract for the *anything* set, hence the '-'.
 
@@ -377,50 +377,50 @@ interleave = (" " | "\r" | "\n" | "\t") | comment;
 rule(interleave=false) alpha = "a".."z" | "A".."Z";
 rule(interleave=false) alphaNumeric = alpha | "0".."9" | "-";
 rule(interleave=false) identifier = alpha alphaNumeric*;
-rule identifierList = head:identifier tail:("," id:identifier)*;
+rule identifierList = head::identifier tail:("," id::identifier)*;
 
-rule main = key:identifier "=" elementList:identifierList;
+rule main = key::identifier "=" elementList:identifierList;
 ```
 
 We can then have the following text matched ``sizes = large, medium, small``:
 
 ```JSON
 200:  {
-  "apiVersion": "0.0.92.77",
+  "apiVersion": "0.0.95.79",
   "ruleMatch": {
     "rule": "main",
     "text": "sizes = large, medium, small",
-    "fragments": [
+    "namedChildren": [
       {
-        "tag": "key",
+        "name": "key",
         "match": {
           "rule": "identifier",
           "text": "sizes"
         }
       },
       {
-        "tag": "elementList",
+        "name": "elementList",
         "match": {
           "rule": "identifierList",
           "text": "large, medium, small",
-          "fragments": [
+          "namedChildren": [
             {
-              "tag": "head",
+              "name": "head",
               "match": {
                 "rule": "identifier",
                 "text": "large"
               }
             },
             {
-              "tag": "tail",
+              "name": "tail",
               "match": {
                 "text": ", medium, small",
-                "repeats": [
+                "children": [
                   {
                     "text": ", medium",
-                    "fragments": [
+                    "namedChildren": [
                       {
-                        "tag": "id",
+                        "name": "id",
                         "match": {
                           "rule": "identifier",
                           "text": "medium"
@@ -430,9 +430,9 @@ We can then have the following text matched ``sizes = large, medium, small``:
                   },
                   {
                     "text": ", small",
-                    "fragments": [
+                    "namedChildren": [
                       {
-                        "tag": "id",
+                        "name": "id",
                         "match": {
                           "rule": "identifier",
                           "text": "small"
@@ -473,30 +473,32 @@ rule main = configuration+;
 
 We can now match the following text:
 
-```CSharp
-location = Canada  // First line
-sizes = large, medium  // list
-nastier  // Configuration on multiple lines
-=
-elephant
-,
-prince
-postal-code =
- K1P1J9 lastConfig = onTheSameLine // config on the same line as the config-element from the last config
+```Python
+rule(interleave=false) comment = "//" (. - ("\r" | "\n"))*;
+interleave = (" " | "\r" | "\n" | "\t") | comment;
+
+rule(interleave=false) alpha = "a".."z" | "A".."Z";
+rule(interleave=false) alphaNumeric = alpha | "0".."9" | "-";
+rule(interleave=false) identifier = alpha alphaNumeric*;
+
+rule identifierList = head::identifier tail:("," id::identifier)*;
+rule configuration = key::identifier "=" elementList:identifierList;
+
+rule main = configuration+;
 ```
 
 We see that we didn't need to define an end-of-line such as a ';' (as in C# / Java / C++).  We could have if we thought it would bring clarity.
 
 ###  Using the API
 
-In order to integrate with PAS directly, we can use the public API.  For queries similar to the ones performed by the workbench, we can use the API at https://pas-api.azurewebsites.net/v1/anonymous-analysis.
+In order to integrate with PAS directly, we can use the public API.  For queries similar to the ones performed by the workbench, we can use the API at https://pas-api.azurewebsites.net/v0/analysis.
 
 The protocol is pretty straightforward.  We do an HTTP POST on that URL with a JSON payload including the grammar and the text to parse.  We then receive the analysis we see in the workbench (i.e. JSON-based) as returned payload.
 
 For instance, the following request
 
 ```
-POST https://pas-api.azurewebsites.net/v1/anonymous-analysis HTTP/1.1
+POST https://pas-api.azurewebsites.net/v0/analysis HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 Host: pas-api.azurewebsites.net
@@ -508,13 +510,12 @@ Content-Length: 66
 }
 ```
 
-should return something similar to
+should return something equivalent to
 
 ```
 HTTP/1.1 200 OK
 Date: ----
 Content-Type: application/json
-Server: Kestrel
 Content-Length: 141
 
 {"apiVersion":"0.0.92.77","ruleMatch":{"rule":"main","text":"test","repeats":[{"text":"t"},{"text":"e"},{"text":"s"},{"text":"t"}]}}
