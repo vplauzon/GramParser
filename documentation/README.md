@@ -15,6 +15,7 @@ Here are the primitives in PAS grammar:
 * [Disjunction](primitives/disjunction.md)
 * [Sequence](primitives/sequence.md)
 * [Substract](primitives/substract.md)
+* [Bracket](primitives/bracket.md)
 
 ### Grammar Concepts
 
@@ -23,6 +24,7 @@ Here are grammar concepts transversals to different rules:
 * [Interleaves](interleave.md)
 * [Referencing rules](referencing.md)
 * [Children details](children.md)
+* [Recursivity](recursivity.md)
 
 ## PAS API
 

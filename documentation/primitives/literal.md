@@ -24,3 +24,6 @@ Literal allow for escaping characters:
 |\v|Vertical tab|
 |\\\\|Backslash|
 |\xhh|ASCII character in heradecimal notation|
+
+---
+[Go back to online documentation](../README.md)
