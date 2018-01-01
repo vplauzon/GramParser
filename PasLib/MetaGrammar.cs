@@ -368,12 +368,6 @@ namespace PasLib
             {
                 switch (letter)
                 {
-                    case 'a':
-                        return '\a';
-                    case 'b':
-                        return '\b';
-                    case 'f':
-                        return '\f';
                     case 'n':
                         return '\n';
                     case 'r':
@@ -934,9 +928,6 @@ namespace PasLib
                 new TaggedRule(new LiteralRule(null, "\\")),
                 new TaggedRule("l", new DisjunctionRule(null, TaggedRule.FromRules(new[]
                 {
-                    new LiteralRule(null, "a"),
-                    new LiteralRule(null, "b"),
-                    new LiteralRule(null, "f"),
                     new LiteralRule(null, "n"),
                     new LiteralRule(null, "r"),
                     new LiteralRule(null, "t"),

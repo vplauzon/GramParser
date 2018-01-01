@@ -7,7 +7,7 @@ rule(interleave=false, children=false) identifier = ("a".."z" | "A".."Z" | "0"..
 rule(interleave=false, children=false) number = ("0".."9")+;
 rule(interleave=false) character = normal::(. - ("\"" | "\r" | "\n" | "\\"))
 	| escapeQuote::("\\" "\"") | escapeBackslash::"\\\\"
-	| escapeLetter:("\\" l::("a" | "b" | "f" | "n" | "r" | "t" | "v"))
+	| escapeLetter:("\\" l::("n" | "r" | "t" | "v"))
 	| escapeHexa:("\\x" h::("0".."9" | "a".."f" | "A".."F"){1,2});
 rule(interleave=false) quotedCharacter = "\"" c:character "\"";
 
