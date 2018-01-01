@@ -108,32 +108,36 @@ namespace PasLib
                         return new TaggedRule(rule);
                     case "noChildrenTag":
                         {
-                            var id = tagChild.Match.NamedChildren.First().Match;
+                            var id = tagChild.Match.NamedChildren;
 
-                            if (id.Children.Count() == 0)
+                            if (id.Count() == 0)
                             {
                                 return new TaggedRule(null, rule, false);
                             }
                             else
                             {
+                                var idText = id.First().Match.Text;
+
                                 return new TaggedRule(
-                                    id.Children.First().Text.ToString(),
+                                    idText.Length==0 ? null : idText.ToString(),
                                     rule,
                                     false);
                             }
                         }
                     case "withChildrenTag":
                         {
-                            var id = tagChild.Match.NamedChildren.First().Match;
+                            var id = tagChild.Match.NamedChildren;
 
-                            if (id.Children.Count() == 0)
+                            if (id.Count() == 0)
                             {
                                 return new TaggedRule(null, rule, true);
                             }
                             else
                             {
+                                var idText = id.First().Match.Text;
+
                                 return new TaggedRule(
-                                    id.Children.First().Text.ToString(),
+                                    idText.Length==0 ? null : idText.ToString(),
                                     rule,
                                     true);
                             }
