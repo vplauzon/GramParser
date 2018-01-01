@@ -27,6 +27,7 @@
     <None Remove="Meta\AdHoc\RepeatWithInterleaves.txt" />
     <None Remove="Meta\AdHoc\TwoRules.txt" />
     <None Remove="Meta\AnyGrammar.txt" />
+    <None Remove="Meta\SelectChildren\Disjunction.txt" />
     <None Remove="Meta\Children\Disjunction.txt" />
     <None Remove="Meta\Children\Sequence.txt" />
     <None Remove="Meta\Children\Substraction.txt" />
@@ -35,6 +36,7 @@
     <None Remove="Meta\OneLetterOneRuleGrammar.txt" />
     <None Remove="Meta\RangeGrammar.txt" />
     <None Remove="Meta\RepeatGrammar.txt" />
+    <None Remove="Meta\SelectChildren\Sequence.txt" />
     <None Remove="Meta\SequenceGrammar.txt" />
     <None Remove="Meta\Simple\AnyGrammar.txt" />
     <None Remove="Meta\Simple\Children.txt" />
@@ -55,6 +57,8 @@
     <EmbeddedResource Include="Meta\AdHoc\Interleave.txt" />
     <EmbeddedResource Include="Meta\AdHoc\RepeatWithInterleaves.txt" />
     <EmbeddedResource Include="Meta\AdHoc\TwoRules.txt" />
+    <EmbeddedResource Include="Meta\SelectChildren\Sequence.txt" />
+    <EmbeddedResource Include="Meta\SelectChildren\Disjunction.txt" />
     <EmbeddedResource Include="Meta\Children\Substraction.txt" />
     <EmbeddedResource Include="Meta\Children\Sequence.txt" />
     <EmbeddedResource Include="Meta\Children\Disjunction.txt" />

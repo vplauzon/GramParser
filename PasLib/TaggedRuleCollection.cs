@@ -118,7 +118,9 @@ namespace PasLib
 
         private RuleMatch FormatMatch(RuleMatch match, TaggedRule rule)
         {
-            return rule.DoIncludeChildren ? match : match.RemoveChildren();
+            return rule.MatchSelectionState== MatchSelection.ChildrenOnly
+                ? match.RemoveChildren()
+                : match;
         }
     }
 }

@@ -9,15 +9,12 @@ namespace PasLib
     internal class TaggedRule
     {
         public TaggedRule(IRule rule)
-            : this(null, rule)
         {
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
+            MatchSelectionState = MatchSelection.Unspecified;
         }
 
-        public TaggedRule(
-            string tag,
-            IRule rule,
-            bool doIncludeChildren = true,
-            MatchSelection matchSelectionState = MatchSelection.Unspecified)
+        public TaggedRule(string tag, IRule rule, bool doKeepGrandChildren)
         {
             if (tag == string.Empty)
             {
@@ -26,10 +23,9 @@ namespace PasLib
 
             Tag = tag;
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
-            DoIncludeChildren = doIncludeChildren;
-            MatchSelectionState = HasTag
+            MatchSelectionState = doKeepGrandChildren
                 ? MatchSelection.GrandChildren
-                : MatchSelection.Unspecified;
+                : MatchSelection.ChildrenOnly;
         }
 
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
@@ -51,18 +47,26 @@ namespace PasLib
 
         public IRule Rule { get; private set; }
 
-        public bool DoIncludeChildren { get; }
-
         public MatchSelection MatchSelectionState { get; }
 
         public override string ToString()
         {
-            var colons = DoIncludeChildren ? ":" : "::";
             var rule = string.IsNullOrWhiteSpace(Rule.RuleName)
                     ? Rule.ToString()
                     : Rule.RuleName;
 
-            return $"{Tag}{colons}({rule})";
+            if (MatchSelectionState == MatchSelection.Unspecified)
+            {
+                return $"({rule})";
+            }
+            else
+            {
+                var colons = MatchSelectionState == MatchSelection.GrandChildren
+                    ? ":"
+                    : "::";
+
+                return $"{Tag}{colons}({rule})";
+            }
         }
     }
 }

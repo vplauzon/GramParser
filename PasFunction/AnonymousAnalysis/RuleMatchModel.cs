@@ -18,17 +18,17 @@ namespace PasFunction.AnonymousAnalysis
             Text = match.Text.ToString();
             if (match.Children != null && match.Children.Count > 0)
             {
-                var repeats = from r in match.Children
-                              select new RuleMatchModel(r);
+                var children = from r in match.Children
+                               select new RuleMatchModel(r);
 
-                Repeats = repeats.ToArray();
+                Children = children.ToArray();
             }
             if (match.NamedChildren != null && match.NamedChildren.Count > 0)
             {
-                var fragments = from f in match.NamedChildren
-                                select new NamedRuleMatchModel(f);
+                var namedChildren = from f in match.NamedChildren
+                                    select new NamedRuleMatchModel(f);
 
-                Fragments = fragments.ToArray();
+                NamedChildren = namedChildren.ToArray();
             }
         }
 
@@ -36,8 +36,8 @@ namespace PasFunction.AnonymousAnalysis
 
         public string Text { get; }
 
-        public RuleMatchModel[] Repeats { get; }
+        public RuleMatchModel[] Children { get; }
 
-        public NamedRuleMatchModel[] Fragments { get; }
+        public NamedRuleMatchModel[] NamedChildren { get; }
     }
 }
