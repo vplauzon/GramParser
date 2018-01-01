@@ -41,7 +41,7 @@ Let's say we can describe sample texts (in English) as follow:
 
 Let's try to implement this with PAS.  Let's fire up the [Workbench](https://pasworkbench.azurewebsites.net/).
 
-![Starting state for the Workbench UI](documentation/images/Workbench-start.PNG "Workbench UI")
+![Starting state for the Workbench UI](documentation/images/Workbench-start.png "Workbench UI")
 
 The Workbench UI has three columns:  the grammar, the sample text and the analysis.  We defined the grammar in the first one, we input some sample text in the second and the third one gets populated automatically by applying the grammar on the sample text.
 
