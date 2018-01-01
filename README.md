@@ -61,11 +61,11 @@ and let's type ```test``` in the *Sample Text* area.  The *Analysis* should disp
 
 ```JSON
 200:  {
-  "apiVersion": "0.0.92.72",
+  "apiVersion": "0.0.95.72",
   "ruleMatch": {
     "rule": "main",
     "text": "test",
-    "repeats": [
+    "children": [
       {
         "text": "t"
       },
@@ -87,7 +87,7 @@ The sample ```test``` does match our grammar:  it is a repetition of letters.
 
 The **200** at the beginning of the analysis simply indicates the API HTTP status code.  **200** is HTTP for OK.
 
-The ``ruleMatch`` element contains parsing information.  It is a hierarchical representation of the match that occured.  At the first level, we see the rule ``main`` was the one doing the match on the text ``test``.  We then see via the element ``repeats`` each sub rule that was fired.  The sub rule doesn't have a name so we only see the text it matched, i.e. each letter.  The main rule was ``("a".."z")*``.  The sub rule was ``"a".."z"``.
+The ``ruleMatch`` element contains parsing information.  It is a hierarchical representation of the match that occured.  At the first level, we see the rule ``main`` was the one doing the match on the text ``test``.  We then see via the element ``children`` each sub rule that was fired.  Those sub rules do not have names so we only see the text it matched, i.e. each letter.  The main rule was ``("a".."z")*``.  The sub rule was ``"a".."z"``.
 
 Let's keep going.  If we change the *Sample Text* for ``TEST``, we'll see the *Analysis* turn red with the following message:
 
@@ -125,64 +125,102 @@ The main rule builds a *sequence*, i.e. different rules following each other:  f
 
 We can now match text such as ``test``, ``test2``, ``Test3-4`` but not ``6test`` (which starts with a numeric).
 
-We notice something interesting in the *Analysis* area:
-
-```JSON
-200:  {
-  "apiVersion": "0.0.92.75",
-  "ruleMatch": {
-    "rule": "main",
-    "text": "TEST-2"
-  }
-}
-```
+We notice the result get pretty verbose pretty quickly.  We are going to address that.
 
 ### Tagging
 
-We do not get the details of the sub rule.  That is because the main rule now is a sequence.
+By default, all children rules are shown.  This is useful to understand how the parsing occur, but it adds a lot of noise to the result.
 
-We can force the main rule to give us the breakdown by changing it to ``rule main = a:alpha an:alphaNumeric*;``.
+First, let's notice that we can name result elements by changing the main rule to ``rule main = a:alpha an:alphaNumeric*;``.
 
 This will give us the following *Analysis*:
 
 ```JSON
 200:  {
-  "apiVersion": "0.0.92.77",
+  "apiVersion": "0.0.95.BUILD_VALUE",
   "ruleMatch": {
     "rule": "main",
     "text": "TEST-2",
-    "fragments": [
+    "namedChildren": [
       {
-        "tag": "a",
+        "name": "a",
         "match": {
           "rule": "alpha",
-          "text": "T"
+          "text": "T",
+          "children": [
+            {
+              "text": "T"
+            }
+          ]
         }
       },
       {
-        "tag": "an",
+        "name": "an",
         "match": {
           "text": "EST-2",
-          "repeats": [
+          "children": [
             {
               "rule": "alphaNumeric",
-              "text": "E"
+              "text": "E",
+              "children": [
+                {
+                  "rule": "alpha",
+                  "text": "E",
+                  "children": [
+                    {
+                      "text": "E"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "rule": "alphaNumeric",
-              "text": "S"
+              "text": "S",
+              "children": [
+                {
+                  "rule": "alpha",
+                  "text": "S",
+                  "children": [
+                    {
+                      "text": "S"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "rule": "alphaNumeric",
-              "text": "T"
+              "text": "T",
+              "children": [
+                {
+                  "rule": "alpha",
+                  "text": "T",
+                  "children": [
+                    {
+                      "text": "T"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "rule": "alphaNumeric",
-              "text": "-"
+              "text": "-",
+              "children": [
+                {
+                  "text": "-"
+                }
+              ]
             },
             {
               "rule": "alphaNumeric",
-              "text": "2"
+              "text": "2",
+              "children": [
+                {
+                  "text": "2"
+                }
+              ]
             }
           ]
         }
@@ -194,7 +232,38 @@ This will give us the following *Analysis*:
 
 We used **tags**.  We tagged the rule, saying we were interested to get the content of the first rule match in a fragment named *a* (for *alpha*) and the content of the second rule match in a fragment named *an* (for *alpha numeric*).
 
-We can therefore control the verbosity of the analysis returned by the API.  Some parser will have special keywords for those, refering to *tokens* for the rules returning no details.  PAS threat them just as rules and we can define where we want details.  In general we want to breakdown where we need the sub information.  In this case, having each character individually is just noise.
+We could control the verbosity there, by pruning the result at those elements.  We do that by doubling the colons in the main rule:  ``rule main = a::alpha an::alphaNumeric*;``.
+
+This drastically reduce the result verbosity and hence size.
+
+```JSON
+200:  {
+  "apiVersion": "0.0.95.BUILD_VALUE",
+  "ruleMatch": {
+    "rule": "main",
+    "text": "TEST-2",
+    "namedChildren": [
+      {
+        "name": "a",
+        "match": {
+          "rule": "alpha",
+          "text": "T"
+        }
+      },
+      {
+        "name": "an",
+        "match": {
+          "text": "EST-2"
+        }
+      }
+    ]
+  }
+}
+```
+
+We can therefore control the verbosity of the analysis returned by the API.  Some parser have special keywords for those, refering to *tokens* for the rules returning no details.  PAS threats them just as rules and we can define where we want details.  In general we want to breakdown where we need the sub information.  In this case, having each character individually is just noise.
+
+For more information about controlling verbosity , see this [article about children details](documentation/children.md).
 
 ### Extracting information
 
