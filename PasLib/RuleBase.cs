@@ -10,7 +10,8 @@ namespace PasLib
             string ruleName,
             bool? hasInterleave,
             bool? isRecursive,
-            bool isTerminalRule)
+            bool isTerminalRule,
+            bool? hasChildrenDetails)
         {
             if (ruleName == string.Empty)
             {
@@ -20,6 +21,7 @@ namespace PasLib
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
+            HasChildrenDetails = hasChildrenDetails;
         }
 
         #region IRuleProperties
@@ -28,6 +30,8 @@ namespace PasLib
         public bool? IsRecursive { get; }
 
         public bool IsTerminalRule { get; }
+
+        public bool? HasChildrenDetails { get; }
         #endregion
 
         public string RuleName { get; private set; }

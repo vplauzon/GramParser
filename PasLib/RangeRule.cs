@@ -7,11 +7,8 @@ namespace PasLib
 {
     internal class RangeRule : RuleBase
     {
-        public RangeRule(string ruleName, char first, char last) : base(
-            ruleName,
-            false,
-            true,
-            true)
+        public RangeRule(string ruleName, char first, char last)
+            : base(ruleName, false, true, true, false)
         {
             if (last < first)
             {

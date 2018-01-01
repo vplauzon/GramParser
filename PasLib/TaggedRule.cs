@@ -8,11 +8,13 @@ namespace PasLib
 {
     internal class TaggedRule
     {
-        public TaggedRule(IRule rule) : this(null, rule, true)
+        public TaggedRule(IRule rule)
         {
+            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
+            MatchSelectionState = MatchSelection.Unspecified;
         }
 
-        public TaggedRule(string tag, IRule rule, bool doIncludeChildren = true)
+        public TaggedRule(string tag, IRule rule, bool doKeepGrandChildren)
         {
             if (tag == string.Empty)
             {
@@ -21,7 +23,9 @@ namespace PasLib
 
             Tag = tag;
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
-            DoIncludeChildren = doIncludeChildren;
+            MatchSelectionState = doKeepGrandChildren
+                ? MatchSelection.GrandChildren
+                : MatchSelection.ChildrenOnly;
         }
 
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
@@ -43,30 +47,26 @@ namespace PasLib
 
         public IRule Rule { get; private set; }
 
-        public bool DoIncludeChildren { get; }
-
-        public ImmutableList<TaggedRuleMatch> AddFragment(
-            ImmutableList<TaggedRuleMatch> fragments,
-            RuleMatch match)
-        {
-            return Tag == null
-                ? fragments
-                : fragments.Add(new TaggedRuleMatch(Tag, FormatMatch(match)));
-        }
+        public MatchSelection MatchSelectionState { get; }
 
         public override string ToString()
         {
-            var colons = DoIncludeChildren ? ":" : "::";
             var rule = string.IsNullOrWhiteSpace(Rule.RuleName)
                     ? Rule.ToString()
                     : Rule.RuleName;
 
-            return $"{Tag}{colons}({rule})";
-        }
+            if (MatchSelectionState == MatchSelection.Unspecified)
+            {
+                return $"({rule})";
+            }
+            else
+            {
+                var colons = MatchSelectionState == MatchSelection.GrandChildren
+                    ? ":"
+                    : "::";
 
-        private RuleMatch FormatMatch(RuleMatch match)
-        {
-            return DoIncludeChildren ? match : match.RemoveChildren();
+                return $"{Tag}{colons}({rule})";
+            }
         }
     }
 }

@@ -289,6 +289,109 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Children
+        [TestMethod]
+        public void ChildrenRepeat()
+        {
+            TestChildren("Children.Repeat.txt", "aaaa", 4);
+        }
+
+        [TestMethod]
+        public void ChildrenDisjunction()
+        {
+            TestChildren("Children.Disjunction.txt", "aaaa", 1);
+        }
+
+        [TestMethod]
+        public void ChildrenSequence()
+        {
+            TestChildren("Children.Sequence.txt", "aaaa", 2);
+        }
+
+        [TestMethod]
+        public void ChildrenSubstraction()
+        {
+            TestChildren("Children.Substraction.txt", "aaaa", 1);
+        }
+
+        private void TestChildren(string resourceName, string text, int expectedChildren)
+        {
+            var grammarText = GetResource(resourceName);
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
+
+            foreach (var rule in new[] { "with", "unspecified" })
+            {
+                var match = grammar.Match(rule, text);
+
+                Assert.IsNotNull(match, "Match - " + rule);
+                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsNotNull(match.Children, "Children - " + rule);
+                Assert.AreEqual(expectedChildren, match.Children.Count(), "#Children - " + rule);
+            }
+
+            {
+                var rule = "without";
+                var match = grammar.Match("without", text);
+
+                Assert.IsNotNull(match, "Match - " + rule);
+                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsNotNull(match.Children, "Children - " + rule);
+                Assert.AreEqual(0, match.Children.Count(), "#Children - " + rule);
+            }
+        }
+        #endregion
+
+        #region Select Children
+        [TestMethod]
+        public void SelectChildrenDisjunction()
+        {
+            var samples = new[]
+            {
+                ("both", "aaa", new []{ 3}),
+                ("both", "bbbb", new []{ 4}),
+                ("bothATruncated", "aaa", new []{ 0}),
+                ("bothBTruncated", "bbbbbbb", new []{ 0}),
+                ("a", "aaa", new []{ 3}),
+                ("a", "bbbbbbb", new int[]{ }),
+                ("aTruncated", "aaaa", new []{ 0}),
+                ("aTruncated", "bbbbbbb", new int[]{ }),
+                ("b", "aaa", new int[]{ }),
+                ("b", "bb", new []{ 2}),
+                ("bTruncated", "aaaa", new int[]{ }),
+                ("bTruncated", "bbbbbbb", new []{ 0})
+            };
+
+            TestSelectChildren("SelectChildren.Disjunction.txt", samples);
+        }
+
+        [TestMethod]
+        public void SelectChildrenSequence()
+        {
+            var samples = new[]
+            {
+                ("both", "aaabb", new []{ 3, 2}),
+                ("bothATruncated", "aaabb", new []{ 0, 2}),
+                ("bothBTruncated", "aaabb", new []{ 3, 0}),
+                ("a", "aaabb", new []{ 3}),
+                ("aTruncated", "aaabb", new []{ 0}),
+                ("b", "aaabb", new int[]{ 2}),
+                ("bTruncated", "aaabb", new []{ 0})
+            };
+
+            TestSelectChildren("SelectChildren.Sequence.txt", samples);
+        }
+
+        private void TestSelectChildren(
+            string resourceName,
+            (string ruleName, string text, int[] children)[] samples)
+        {
+            var grammarText = GetResource(resourceName);
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
+
+            Assert.IsNotNull(grammar, "Grammar");
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;
@@ -307,14 +410,14 @@ namespace PasLibTest
             string grammarFile,
             (bool isSuccess, string ruleName, string text)[] samples)
         {
-            var grammar = GetResource(grammarFile);
-            var ruleSet = MetaGrammar.ParseGrammar(grammar);
+            var grammarText = GetResource(grammarFile);
+            var grammar = MetaGrammar.ParseGrammar(grammarText);
 
-            Assert.IsNotNull(ruleSet, "Grammar couldn't get parsed");
+            Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
             for (int i = 0; i != samples.Length; ++i)
             {
                 (var isSuccess, var ruleName, var text) = samples[i];
-                var match = ruleSet.Match(ruleName, text);
+                var match = grammar.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 

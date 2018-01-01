@@ -7,35 +7,38 @@ namespace PasLib
 {
     internal class DisjunctionRule : RuleBase
     {
-        private readonly TaggedRule[] _rules;
+        private readonly TaggedRuleCollection _rules;
 
         public DisjunctionRule(
             string ruleName,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
-            : base(ruleName, hasInterleave, isRecursive, false)
+            bool? isRecursive = null,
+            bool? hasChildrenDetails = null)
+            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
         {
             if (rules == null || rules.Count() == 0)
             {
                 throw new ArgumentNullException(nameof(rules));
             }
 
-            _rules = rules.ToArray();
+            _rules = new TaggedRuleCollection(rules);
         }
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             foreach (var rule in _rules)
             {
-                var matches = context.InvokeRule(rule.Rule);
+                var potentials = context.InvokeRule(rule.Rule);
 
-                foreach (var m in matches)
+                foreach (var m in potentials)
                 {
-                    var fragments =
-                        rule.AddFragment(ImmutableList<TaggedRuleMatch>.Empty, m);
+                    var subMatches = _rules.AddMatch(
+                        ImmutableList<(TaggedRule, RuleMatch)>.Empty,
+                        rule,
+                        m);
 
-                    yield return new RuleMatch(this, m.Text, fragments);
+                    yield return _rules.CreateMatch(this, m.Text, subMatches);
                 }
             }
         }

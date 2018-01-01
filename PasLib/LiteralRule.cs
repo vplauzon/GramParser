@@ -10,7 +10,7 @@ namespace PasLib
         private readonly char[] _literal;
 
         public LiteralRule(string ruleName, IEnumerable<char> literal)
-            : base(ruleName, false, false, true)
+            : base(ruleName, false, false, true, false)
         {
             if (literal == null)
             {
@@ -21,7 +21,7 @@ namespace PasLib
         }
 
         public LiteralRule(string ruleName, string literal)
-            : base(ruleName, false, false, true)
+            : base(ruleName, false, false, true, false)
         {
             if (literal == null)
             {

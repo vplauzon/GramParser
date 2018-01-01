@@ -1,0 +1,3 @@
+﻿rule(children=true) with = "a"*;
+rule(children=false) without = "a"*;
+rule unspecified = "a"*;

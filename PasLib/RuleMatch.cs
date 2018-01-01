@@ -28,30 +28,30 @@ namespace PasLib
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            IEnumerable<RuleMatch> repeats)
+            IEnumerable<RuleMatch> children)
             : this(rule, text, lengthWithInterleaves)
         {
-            if (repeats == null)
+            if (children == null)
             {
-                throw new ArgumentNullException(nameof(repeats));
+                throw new ArgumentNullException(nameof(children));
             }
 
-            Repeats = ImmutableList<RuleMatch>.Empty.AddRange(repeats);
+            Children = ImmutableList<RuleMatch>.Empty.AddRange(children);
         }
 
         public RuleMatch(
             IRule rule,
             SubString text,
-            IEnumerable<RuleMatch> repeats)
-            : this(rule, text, text.Length, repeats)
+            IEnumerable<RuleMatch> children)
+            : this(rule, text, text.Length, children)
         {
         }
 
         public RuleMatch(
             IRule rule,
             SubString text,
-            IEnumerable<TaggedRuleMatch> fragments)
-            : this(rule, text, text.Length, fragments)
+            IEnumerable<NamedRuleMatch> namedChildren)
+            : this(rule, text, text.Length, namedChildren)
         {
         }
 
@@ -59,16 +59,16 @@ namespace PasLib
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            IEnumerable<TaggedRuleMatch> fragments)
+            IEnumerable<NamedRuleMatch> namedChildren)
             : this(rule, text, lengthWithInterleaves)
         {
-            if (fragments == null)
+            if (namedChildren == null)
             {
-                throw new ArgumentNullException(nameof(fragments));
+                throw new ArgumentNullException(nameof(namedChildren));
             }
 
-            Fragments = fragments.Any()
-                ? ImmutableList<TaggedRuleMatch>.Empty.AddRange(fragments)
+            NamedChildren = namedChildren.Any()
+                ? ImmutableList<NamedRuleMatch>.Empty.AddRange(namedChildren)
                 : null;
         }
 
@@ -80,24 +80,25 @@ namespace PasLib
 
         public int LengthWithInterleaves { get; }
 
-        public IImmutableList<RuleMatch> Repeats { get; } = ImmutableList<RuleMatch>.Empty;
+        public IImmutableList<RuleMatch> Children { get; }
+            = ImmutableList<RuleMatch>.Empty;
 
-        public IImmutableList<TaggedRuleMatch> Fragments { get; }
+        public IImmutableList<NamedRuleMatch> NamedChildren { get; }
 
-        public RuleMatch GetFragments(string tag)
+        public RuleMatch GetChild(string tag)
         {
             if (string.IsNullOrWhiteSpace(tag))
             {
                 throw new ArgumentNullException(nameof(tag));
             }
-            if (Fragments == null)
+            if (NamedChildren == null)
             {
                 throw new IndexOutOfRangeException("There are no fragments");
             }
 
-            foreach (var taggedMatch in Fragments)
+            foreach (var taggedMatch in NamedChildren)
             {
-                if (taggedMatch.Tag == tag)
+                if (taggedMatch.Name == tag)
                 {
                     return taggedMatch.Match;
                 }
@@ -119,9 +120,9 @@ namespace PasLib
             }
             else
             {
-                return Fragments == null
-                    ? new RuleMatch(rule, Text, LengthWithInterleaves, Repeats)
-                    : new RuleMatch(rule, Text, LengthWithInterleaves, Fragments);
+                return NamedChildren == null
+                    ? new RuleMatch(rule, Text, LengthWithInterleaves, Children)
+                    : new RuleMatch(rule, Text, LengthWithInterleaves, NamedChildren);
             }
         }
 
@@ -138,15 +139,15 @@ namespace PasLib
             }
             else
             {
-                return Fragments == null
-                    ? new RuleMatch(Rule, Text, LengthWithInterleaves + length, Repeats)
-                    : new RuleMatch(Rule, Text, LengthWithInterleaves + length, Fragments);
+                return NamedChildren == null
+                    ? new RuleMatch(Rule, Text, LengthWithInterleaves + length, Children)
+                    : new RuleMatch(Rule, Text, LengthWithInterleaves + length, NamedChildren);
             }
         }
 
         public RuleMatch RemoveChildren()
         {
-            return Fragments == null && !Repeats.Any()
+            return NamedChildren == null && !Children.Any()
                 ? this
                 : new RuleMatch(Rule, Text, LengthWithInterleaves);
         }

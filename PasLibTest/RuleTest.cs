@@ -120,7 +120,7 @@ namespace PasLibTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(0, match.Text.Length, "MatchLength");
-            Assert.AreEqual(0, match.Repeats.Count(), "Contents");
+            Assert.AreEqual(0, match.Children.Count(), "Contents");
         }
 
         [TestMethod]
@@ -133,7 +133,7 @@ namespace PasLibTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(5, match.Text.Length, "MatchLength");
-            Assert.AreEqual(5, match.Repeats.Count(), "Contents");
+            Assert.AreEqual(5, match.Children.Count(), "Contents");
         }
 
         [TestMethod]
@@ -173,7 +173,7 @@ namespace PasLibTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.IsFalse(match.Text.IsNull, $"Content - {i}");
-                    Assert.AreEqual(text.Length, match.Repeats.Count(), $"Contents - {i}");
+                    Assert.AreEqual(text.Length, match.Children.Count(), $"Contents - {i}");
                 }
             }
         }
@@ -184,8 +184,8 @@ namespace PasLibTest
             var interleave = new RepeatRule("interleave", new LiteralRule(null, " "), 0, null);
             var seq = new SequenceRule("seq", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "|")),
-                new TaggedRule("t", new LiteralRule(null, "a"))
+                new TaggedRule(new LiteralRule(null, "|")),
+                new TaggedRule("t", new LiteralRule(null, "a"), true)
             });
             var rule = new RepeatRule("rep", seq, 1, null);
             var text = "  |a  |a   |a;";
@@ -194,7 +194,7 @@ namespace PasLibTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(text.Length - 1, match.Text.Length, "MatchLength");
-            Assert.AreEqual(3, match.Repeats.Count(), "Contents");
+            Assert.AreEqual(3, match.Children.Count(), "Contents");
         }
         #endregion
 
@@ -212,9 +212,9 @@ namespace PasLibTest
             //  Alice | Bob | Charles
             var rule = new DisjunctionRule("Disjunction", new[]
             {
-                new TaggedRule(null, new LiteralRule("Alice", "Alice")),
-                new TaggedRule(null, new LiteralRule("Bob", "Bob")),
-                new TaggedRule(null, new LiteralRule("Charles", "Charles"))
+                new TaggedRule(new LiteralRule("Alice", "Alice")),
+                new TaggedRule(new LiteralRule("Bob", "Bob")),
+                new TaggedRule(new LiteralRule("Charles", "Charles"))
             });
 
             for (int i = 0; i != samples.Length; ++i)
@@ -233,8 +233,9 @@ namespace PasLibTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-                    Assert.IsNull(match.Fragments, $"Fragments - {i}");
-                    Assert.IsFalse(match.Repeats.Any(), $"Repeats - {i}");
+                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.IsNotNull(match.Children, $"Children - {i}");
+                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
             }
         }
@@ -255,17 +256,17 @@ namespace PasLibTest
             //  a:Alice | s1:(b:Bob | c:Charles) | s2::(d:Darwin | e:Ernest)
             var subRule1 = new DisjunctionRule("Disjunction", new[]
             {
-                new TaggedRule("b", new LiteralRule("Bob", "Bob")),
-                new TaggedRule("c", new LiteralRule("Charles", "Charles"))
+                new TaggedRule("b", new LiteralRule("Bob", "Bob"), true),
+                new TaggedRule("c", new LiteralRule("Charles", "Charles"), true)
             });
             var subRule2 = new DisjunctionRule("Disjunction", new[]
             {
-                new TaggedRule("d", new LiteralRule("Darwin", "Darwin")),
-                new TaggedRule("e", new LiteralRule("Ernest", "Ernest"))
+                new TaggedRule("d", new LiteralRule("Darwin", "Darwin"), true),
+                new TaggedRule("e", new LiteralRule("Ernest", "Ernest"), true)
             });
             var rule = new DisjunctionRule("Disjunction", new[]
             {
-                new TaggedRule("a", new LiteralRule("Alice", "Alice")),
+                new TaggedRule("a", new LiteralRule("Alice", "Alice"), true),
                 new TaggedRule("s1", subRule1, true),
                 new TaggedRule("s2", subRule2, false)
             });
@@ -284,18 +285,18 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.Fragments, $"Fragments - {i}");
-                    Assert.AreEqual(1, match.Fragments.Count, $"Fragments Count - {i}");
-                    if (match.Fragments.First().Tag == "s1")
+                    Assert.IsNotNull(match.NamedChildren, $"Fragments - {i}");
+                    Assert.AreEqual(1, match.NamedChildren.Count, $"Fragments Count - {i}");
+                    if (match.NamedChildren.First().Name == "s1")
                     {
                         Assert.IsNotNull(
-                            match.Fragments.First().Match.Fragments,
+                            match.NamedChildren.First().Match.NamedChildren,
                             $"Sub Fragments 1 - {i}");
                     }
-                    if (match.Fragments.First().Tag == "s2")
+                    if (match.NamedChildren.First().Name == "s2")
                     {
                         Assert.IsNull(
-                            match.Fragments.First().Match.Fragments,
+                            match.NamedChildren.First().Match.NamedChildren,
                             $"Sub Fragments 2 - {i}");
                     }
                 }
@@ -320,8 +321,8 @@ namespace PasLibTest
             var bRule = new RepeatRule("RepeatB", new LiteralRule("B", "b"), null, null);
             var disjunction = new DisjunctionRule("Disjunction", new[]
             {
-                new TaggedRule(null, aRule),
-                new TaggedRule(null, bRule)
+                new TaggedRule(aRule),
+                new TaggedRule(bRule)
             });
             var rule = new RepeatRule("MasterRepeat", disjunction, null, null);
 
@@ -342,7 +343,7 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.Repeats, $"Contents - {i}");
+                    Assert.IsNotNull(match.Children, $"Contents - {i}");
                 }
             }
         }
@@ -354,9 +355,9 @@ namespace PasLibTest
         {
             var rule = new SequenceRule("Seq", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "Hi")),
-                new TaggedRule(null, new LiteralRule(null, "Bob")),
-                new TaggedRule(null, new LiteralRule(null, "!"))
+                new TaggedRule(new LiteralRule(null, "Hi")),
+                new TaggedRule(new LiteralRule(null, "Bob")),
+                new TaggedRule(new LiteralRule(null, "!"))
             });
             var text = "HiBob!";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
@@ -365,7 +366,7 @@ namespace PasLibTest
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(text.ToString().TrimStart(), match.Text.ToString(), "Content");
-            Assert.IsNull(match.Fragments, "Fragments");
+            Assert.IsNull(match.NamedChildren, "Fragments");
         }
 
         [TestMethod]
@@ -373,9 +374,9 @@ namespace PasLibTest
         {
             var rule = new SequenceRule("Seq", new[]
             {
-                new TaggedRule("h", new LiteralRule(null, "Hi")),
-                new TaggedRule("b", new LiteralRule(null, "Bob")),
-                new TaggedRule(null, new LiteralRule(null, "!"))
+                new TaggedRule("h", new LiteralRule(null, "Hi"), true),
+                new TaggedRule("b", new LiteralRule(null, "Bob"), true),
+                new TaggedRule(new LiteralRule(null, "!"))
             });
             var text = "HiBob!";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
@@ -383,9 +384,9 @@ namespace PasLibTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
-            Assert.AreEqual(2, match.Fragments.Count(), "Fragments");
-            Assert.AreEqual("Hi", match.GetFragments("h").Text.ToString(), "Fragments - Hi");
-            Assert.AreEqual("Bob", match.GetFragments("b").Text.ToString(), "Fragments - Bob");
+            Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
+            Assert.AreEqual("Hi", match.GetChild("h").Text.ToString(), "Fragments - Hi");
+            Assert.AreEqual("Bob", match.GetChild("b").Text.ToString(), "Fragments - Bob");
         }
 
         [TestMethod]
@@ -402,15 +403,15 @@ namespace PasLibTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
-            Assert.AreEqual(2, match.Fragments.Count(), "Fragments");
+            Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
             Assert.AreEqual(
-                "aaaa", match.GetFragments("a").Text.ToString(), "Fragments text - a");
-            Assert.IsNotNull(match.GetFragments("a").Repeats, "Fragments - Repeats - a");
+                "aaaa", match.GetChild("a").Text.ToString(), "Fragments text - a");
+            Assert.IsNotNull(match.GetChild("a").Children, "Fragments - Repeats - a");
             Assert.AreEqual(
-                4, match.GetFragments("a").Repeats.Count(), "Fragments - Counts - a");
+                4, match.GetChild("a").Children.Count(), "Fragments - Counts - a");
             Assert.AreEqual(
-                "bb", match.GetFragments("b").Text.ToString(), "Fragments text - b");
-            Assert.IsNotNull(match.GetFragments("b").Repeats, "Fragments - Repeats - b");
+                "bb", match.GetChild("b").Text.ToString(), "Fragments text - b");
+            Assert.IsNotNull(match.GetChild("b").Children, "Fragments - Repeats - b");
         }
         #endregion
 
@@ -429,7 +430,7 @@ namespace PasLibTest
             };
             var range = new RangeRule(null, 'a', 'z');
             var exclusion = new RangeRule(null, 'f', 'h');
-            var rule = new SubstractRule("Substract", new TaggedRule(null, range), exclusion);
+            var rule = new SubstractRule("Substract", range, exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
             {
@@ -467,7 +468,7 @@ namespace PasLibTest
             var exclusion = new RangeRule(null, 'f', 'h');
             var rule = new SubstractRule(
                 "Substract",
-                new TaggedRule("mine", range),
+                range,
                 exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
@@ -485,8 +486,9 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.Fragments, $"Fragments - {i}");
-                    Assert.AreEqual(1, match.Fragments.Count, $"Fragments Count - {i}");
+                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.IsNotNull(match.Children, $"Children - {i}");
+                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
             }
         }

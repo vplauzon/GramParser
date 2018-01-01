@@ -2,11 +2,9 @@
 
 See the [following blog article](http://todefine.com) introducing it.
 
-Parser as a Service (PAS):  a grammar-based parser running as a REST service.  It allows you to implement
-Domain Specific Languages (DSLs).
+Parser as a Service (PAS) is a grammar-based parser running as a REST service.  It allows you to implement Domain Specific Languages (DSLs).
 
-A workbench is [available online](https://pasworkbench.azurewebsites.net/).  It allows us to experiment
-with the underlying API in an interactive manner.
+A workbench is [available online](https://pasworkbench.azurewebsites.net/).  It allows us to experiment with the underlying API in an interactive manner.
 
 Typically we would develop grammar using the workbench and then integrate application to PAS by using the API directly.
 

@@ -20,12 +20,15 @@ namespace PasLib
 
                 public bool? IsRecursive { get; set; }
 
+                public bool? HasChildrenDetails { get; set; }
+
                 public bool IsDefault
                 {
                     get
                     {
                         return !HasInterleave.HasValue
-                            && !IsRecursive.HasValue;
+                            && !IsRecursive.HasValue
+                            && !HasChildrenDetails.HasValue;
                     }
                 }
             }
@@ -40,23 +43,23 @@ namespace PasLib
             {
                 IRule interleave = null;
 
-                foreach (var ruleMatch in match.Repeats)
+                foreach (var ruleMatch in match.Children)
                 {
-                    var taggedMatch = ruleMatch.Fragments.First();
+                    var taggedMatch = ruleMatch.NamedChildren.First();
                     var subMatch = taggedMatch.Match;
 
-                    if (taggedMatch.Tag == "interleaveDeclaration")
+                    if (taggedMatch.Name == "interleaveDeclaration")
                     {
-                        var ruleBodyMatch = subMatch.Fragments.First().Match;
+                        var ruleBodyMatch = subMatch.NamedChildren.First().Match;
 
                         interleave = CreateRule(
                             "#interleave", PropertyBag.Default, ruleBodyMatch);
                     }
-                    else if (taggedMatch.Tag == "ruleDeclaration")
+                    else if (taggedMatch.Name == "ruleDeclaration")
                     {
-                        var ruleID = subMatch.GetFragments("id").Text.ToString();
-                        var parameterAssignationList = subMatch.GetFragments("params");
-                        var ruleBody = subMatch.GetFragments("body");
+                        var ruleID = subMatch.GetChild("id").Text.ToString();
+                        var parameterAssignationList = subMatch.GetChild("params");
+                        var ruleBody = subMatch.GetChild("body");
                         var rule = CreateRule(ruleID, parameterAssignationList, ruleBody);
 
                         _ruleMap[ruleID] = rule;
@@ -97,27 +100,51 @@ namespace PasLib
 
             private TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
             {
-                var fragment = tag.Fragments.First();
+                var tagChild = tag.NamedChildren.First();
 
-                switch (fragment.Tag)
+                switch (tagChild.Name)
                 {
                     case "noTag":
                         return new TaggedRule(rule);
-                    case "withChildrenTag":
-                        {
-                            var id = fragment.Match.Fragments.First().Match.Text.ToString();
-
-                            return new TaggedRule(id, rule, true);
-                        }
                     case "noChildrenTag":
                         {
-                            var id = fragment.Match.Fragments.First().Match.Text.ToString();
+                            var id = tagChild.Match.NamedChildren;
 
-                            return new TaggedRule(id, rule, false);
+                            if (id.Count() == 0)
+                            {
+                                return new TaggedRule(null, rule, false);
+                            }
+                            else
+                            {
+                                var idText = id.First().Match.Text;
+
+                                return new TaggedRule(
+                                    idText.Length==0 ? null : idText.ToString(),
+                                    rule,
+                                    false);
+                            }
+                        }
+                    case "withChildrenTag":
+                        {
+                            var id = tagChild.Match.NamedChildren;
+
+                            if (id.Count() == 0)
+                            {
+                                return new TaggedRule(null, rule, true);
+                            }
+                            else
+                            {
+                                var idText = id.First().Match.Text;
+
+                                return new TaggedRule(
+                                    idText.Length==0 ? null : idText.ToString(),
+                                    rule,
+                                    true);
+                            }
                         }
                     default:
                         throw new NotSupportedException(
-                            $"Tag of type {fragment.Tag} isn't supported");
+                            $"Tag of type {tagChild.Name} isn't supported");
                 }
             }
 
@@ -141,8 +168,8 @@ namespace PasLib
                 PropertyBag propertyBag,
                 RuleMatch ruleBodyMatch)
             {
-                var ruleBodyTag = ruleBodyMatch.Fragments.First().Tag;
-                var ruleBodyBody = ruleBodyMatch.Fragments.First().Match;
+                var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Name;
+                var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Match;
 
                 switch (ruleBodyTag)
                 {
@@ -172,24 +199,24 @@ namespace PasLib
             private PropertyBag CreatePropertyBag(RuleMatch parameterAssignationList)
             {
                 if (parameterAssignationList == null
-                    || parameterAssignationList.Repeats.Count == 0)
+                    || parameterAssignationList.Children.Count == 0)
                 {
                     return PropertyBag.Default;
                 }
                 else
                 {
-                    var list = parameterAssignationList.Repeats.First();
-                    var head = list.Fragments[0].Match;
-                    var tail = list.Fragments[1].Match;
-                    var tailParamAssignations = from t in tail.Repeats
-                                                select t.Fragments.First().Match;
+                    var list = parameterAssignationList.Children.First();
+                    var head = list.NamedChildren[0].Match;
+                    var tail = list.NamedChildren[1].Match;
+                    var tailParamAssignations = from t in tail.Children
+                                                select t.NamedChildren.First().Match;
                     var paramAssignations = tailParamAssignations.Append(head);
                     var bag = new PropertyBag();
 
                     foreach (var assignation in paramAssignations)
                     {
-                        var id = assignation.Fragments[0].Match.Text.ToString();
-                        var value = assignation.Fragments[1].Match.Text.ToString();
+                        var id = assignation.NamedChildren[0].Match.Text.ToString();
+                        var value = assignation.NamedChildren[1].Match.Text.ToString();
 
                         switch (id)
                         {
@@ -198,6 +225,9 @@ namespace PasLib
                                 break;
                             case "recursive":
                                 AssignRecursiveToBag(bag, value);
+                                break;
+                            case "children":
+                                AssignChildrenToBag(bag, value);
                                 break;
                             default:
                                 throw new ParsingException(
@@ -238,6 +268,22 @@ namespace PasLib
                     default:
                         throw new ParsingException(
                             $"Value '{value}' isn't supported for recursive parameter");
+                }
+            }
+
+            private static void AssignChildrenToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.HasChildrenDetails = true;
+                        break;
+                    case "false":
+                        bag.HasChildrenDetails = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for children parameter");
                 }
             }
 
@@ -284,8 +330,8 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag)
             {
-                var literal = ruleBodyBody.Fragments.First().Match;
-                var characters = from l in literal.Repeats
+                var literal = ruleBodyBody.NamedChildren.First().Match;
+                var characters = from l in literal.Children
                                  let c = GetCharacter(l)
                                  select c;
                 var rule = new LiteralRule(ruleID, characters);
@@ -295,26 +341,26 @@ namespace PasLib
 
             private char GetCharacter(RuleMatch character)
             {
-                var charFragment = character.Fragments.First();
+                var charFragment = character.NamedChildren.First();
                 var subMatch = charFragment.Match;
 
-                switch (charFragment.Tag)
+                switch (charFragment.Name)
                 {
                     case "normal":
                         return subMatch.Text.First;
                     case "escapeLetter":
-                        return GetEscapeLetter(subMatch.Fragments.First().Match.Text.First);
+                        return GetEscapeLetter(subMatch.NamedChildren.First().Match.Text.First);
                     case "escapeQuote":
                         return '\"';
                     case "escapeBackslash":
                         return '\\';
                     case "escapeHexa":
                         return (char)int.Parse(
-                            subMatch.Fragments.First().Match.Text.ToString(),
+                            subMatch.NamedChildren.First().Match.Text.ToString(),
                             NumberStyles.HexNumber);
                     default:
                         throw new NotSupportedException(
-                            $"Character tag not supported:  '{charFragment.Tag}'");
+                            $"Character tag not supported:  '{charFragment.Name}'");
                 }
             }
 
@@ -356,9 +402,9 @@ namespace PasLib
                 PropertyBag propertyBag)
             {
                 var lower =
-                            ruleBodyBody.GetFragments("lower").Fragments.First().Match;
+                            ruleBodyBody.GetChild("lower").NamedChildren.First().Match;
                 var upper =
-                    ruleBodyBody.GetFragments("upper").Fragments.First().Match;
+                    ruleBodyBody.GetChild("upper").NamedChildren.First().Match;
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
@@ -370,36 +416,66 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var subRuleBody = ruleBodyBody.GetFragments("rule");
+                var subRuleBody = ruleBodyBody.GetChild("rule");
                 var rule = CreateRule(subRuleBody);
-                var cardinality = ruleBodyBody.GetFragments("cardinality");
+                var cardinality = ruleBodyBody.GetChild("cardinality");
 
-                switch (cardinality.Fragments.First().Tag)
+                switch (cardinality.NamedChildren.First().Name)
                 {
                     case "star":
                         return new RepeatRule(
-                            ruleID, rule, null, null, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            null,
+                            null,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "plus":
                         return new RepeatRule(
-                            ruleID, rule, 1, null, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            1,
+                            null,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "question":
                         return new RepeatRule(
-                            ruleID, rule, 0, 1, bag.HasInterleave, bag.IsRecursive);
+                            ruleID,
+                            rule,
+                            0,
+                            1,
+                            bag.HasInterleave,
+                            bag.IsRecursive,
+                            bag.HasChildrenDetails);
                     case "exact":
                         {
-                            var exact = cardinality.Fragments.First().Match;
-                            var n = int.Parse(exact.Fragments.First().Match.Text.ToString());
+                            var exact = cardinality.NamedChildren.First().Match;
+                            var n = int.Parse(exact.NamedChildren.First().Match.Text.ToString());
 
                             return new RepeatRule(
-                                ruleID, rule, n, n, bag.HasInterleave, bag.IsRecursive);
+                                ruleID,
+                                rule,
+                                n,
+                                n,
+                                bag.HasInterleave,
+                                bag.IsRecursive,
+                                bag.HasChildrenDetails);
                         }
                     case "minMax":
                         {
-                            var minMaxCardinality = cardinality.Fragments.First().Match;
+                            var minMaxCardinality = cardinality.NamedChildren.First().Match;
                             (var min, var max) = GetMinMaxCardinality(minMaxCardinality);
 
                             return new RepeatRule(
-                                ruleID, rule, min, max, bag.HasInterleave, bag.IsRecursive);
+                                ruleID,
+                                rule,
+                                min,
+                                max,
+                                bag.HasInterleave,
+                                bag.IsRecursive,
+                                bag.HasChildrenDetails);
                         }
                     default:
                         throw new NotSupportedException();
@@ -408,15 +484,15 @@ namespace PasLib
 
             private (int? min, int? max) GetMinMaxCardinality(RuleMatch minMaxCardinality)
             {
-                var type = minMaxCardinality.Fragments.First().Tag;
-                var cardinality = minMaxCardinality.Fragments.First().Match;
+                var type = minMaxCardinality.NamedChildren.First().Name;
+                var cardinality = minMaxCardinality.NamedChildren.First().Match;
 
                 switch (type)
                 {
                     case "minmax":
                         {
-                            var minText = cardinality.Fragments[0].Match.Text;
-                            var maxText = cardinality.Fragments[1].Match.Text;
+                            var minText = cardinality.NamedChildren[0].Match.Text;
+                            var maxText = cardinality.NamedChildren[1].Match.Text;
                             var min = int.Parse(minText.ToString());
                             var max = int.Parse(maxText.ToString());
 
@@ -424,14 +500,14 @@ namespace PasLib
                         }
                     case "min":
                         {
-                            var minText = cardinality.Fragments[0].Match.Text;
+                            var minText = cardinality.NamedChildren[0].Match.Text;
                             var min = int.Parse(minText.ToString());
 
                             return (min, null);
                         }
                     case "max":
                         {
-                            var maxText = cardinality.Fragments[0].Match.Text;
+                            var maxText = cardinality.NamedChildren[0].Match.Text;
                             var max = int.Parse(maxText.ToString());
 
                             return (null, max);
@@ -446,18 +522,19 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var headTag = ruleBodyBody.GetFragments("t");
-                var head = ruleBodyBody.GetFragments("head");
-                var tail = ruleBodyBody.GetFragments("tail");
+                var headTag = ruleBodyBody.GetChild("t");
+                var head = ruleBodyBody.GetChild("head");
+                var tail = ruleBodyBody.GetChild("tail");
                 var headRule = CreateTaggedRule(headTag, CreateRule(head));
-                var tailRules = from c in tail.Repeats
-                                let tailTag = c.GetFragments("t")
-                                let tailDisjunctable = c.GetFragments("d")
+                var tailRules = from c in tail.Children
+                                let tailTag = c.GetChild("t")
+                                let tailDisjunctable = c.GetChild("d")
                                 select CreateTaggedRule(
                                     tailTag, CreateRule(tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
 
-                return new DisjunctionRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
+                return new DisjunctionRule(
+                    ruleID, rules, bag.HasInterleave, bag.IsRecursive, bag.HasChildrenDetails);
             }
 
             private IRule CreateSequence(
@@ -465,13 +542,18 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var rules = from tagRule in ruleBodyBody.Repeats
-                            let t = tagRule.GetFragments("t")
-                            let r = tagRule.GetFragments("r")
+                var rules = from tagRule in ruleBodyBody.Children
+                            let t = tagRule.GetChild("t")
+                            let r = tagRule.GetChild("r")
                             let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
-                return new SequenceRule(ruleID, rules, bag.HasInterleave, bag.IsRecursive);
+                return new SequenceRule(
+                    ruleID,
+                    rules,
+                    bag.HasInterleave,
+                    bag.IsRecursive,
+                    bag.HasChildrenDetails);
             }
 
             private IRule CreateSubstract(
@@ -479,14 +561,18 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var primary = ruleBodyBody.GetFragments("primary");
-                var excluded = ruleBodyBody.GetFragments("excluded");
-                var tag = ruleBodyBody.GetFragments("t");
-                var primaryRule = CreateTaggedRule(tag, CreateRule(primary));
+                var primary = ruleBodyBody.GetChild("primary");
+                var excluded = ruleBodyBody.GetChild("excluded");
+                var primaryRule = CreateRule(primary);
                 var excludedRule = CreateRule(excluded);
 
                 return new SubstractRule(
-                    ruleID, primaryRule, excludedRule, bag.HasInterleave, bag.IsRecursive);
+                    ruleID,
+                    primaryRule,
+                    excludedRule,
+                    bag.HasInterleave,
+                    bag.IsRecursive,
+                    bag.HasChildrenDetails);
             }
 
             private IRule CreateBracket(
@@ -494,7 +580,7 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var bracketted = ruleBodyBody.Fragments.First().Match;
+                var bracketted = ruleBodyBody.NamedChildren.First().Match;
                 var rule = CreateRule(null, bag, bracketted);
 
                 return rule;
@@ -530,7 +616,7 @@ namespace PasLib
                 new LiteralRule(null, "\r"),
                 new LiteralRule(null, "\n")), false, false);
             var commentContentChar = new SubstractRule("#commentContentChar",
-                new TaggedRule(new MatchAnyCharacterRule(null)),
+                new MatchAnyCharacterRule(null),
                 carriageReturn,
                 false);
             var commentContent =
@@ -554,156 +640,164 @@ namespace PasLib
                 identifierChar,
                 1,
                 null,
+                false,
+                false,
                 false);
             var number = new RepeatRule(
-                "identifier", new RangeRule(null, '0', '9'), 1, null, false);
+                "identifier", new RangeRule(null, '0', '9'), 1, null, false, false, false);
             var character = GetCharacterRule();
             var quotedCharacter = new SequenceRule("quotedCharacter", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "\"")),
+                new TaggedRule(new LiteralRule(null, "\"")),
                 new TaggedRule("l", character, true),
-                new TaggedRule(null, new LiteralRule(null, "\""))
+                new TaggedRule(new LiteralRule(null, "\""))
             }, false, false);
-            var literal = new SequenceRule("literal", new[]
-            {
-                new TaggedRule(null, new LiteralRule(null, "\"")),
-                new TaggedRule("l", new RepeatRule(null, character, null, null), true),
-                new TaggedRule(null, new LiteralRule(null, "\""))
-            }, false, false);
-            var any = new LiteralRule("any", ".");
             //  Rules
             var noChildrenTag = new SequenceRule("noChildrenTag", new[]
             {
-                new TaggedRule("id", identifier),
+                new TaggedRule(
+                    "id",
+                    new RepeatRule(null, identifier, 0, 1, false, false, false),
+                    true),
                 new TaggedRule(new LiteralRule(null, "::"))
             }, false, false);
             var withChildrenTag = new SequenceRule("withChildrenTag", new[]
             {
-                new TaggedRule("id", identifier),
+                new TaggedRule(
+                    "id",
+                    new RepeatRule(null, identifier, 0, 1, false, false, false),
+                    true),
                 new TaggedRule(new LiteralRule(null, ":"))
             }, false, false);
             var noTag = new LiteralRule("noTag", string.Empty);
             var tag = new DisjunctionRule("tag", new[]
             {
-                new TaggedRule("noChildrenTag", noChildrenTag),
-                new TaggedRule("withChildrenTag", withChildrenTag),
-                new TaggedRule("noTag", noTag)
+                new TaggedRule("noChildrenTag", noChildrenTag, true),
+                new TaggedRule("withChildrenTag", withChildrenTag, true),
+                new TaggedRule("noTag", noTag, true)
             }, false, false);
+            var literal = new SequenceRule("literal", new[]
+            {
+                new TaggedRule(new LiteralRule(null, "\"")),
+                new TaggedRule("l", new RepeatRule(null, character, null, null), true),
+                new TaggedRule(new LiteralRule(null, "\""))
+            }, false, false);
+            var any = new LiteralRule("any", ".");
             var ruleBodyProxy = new RuleProxy();
             var range = new SequenceRule("range", new[]
             {
-                new TaggedRule("lower", quotedCharacter),
-                new TaggedRule(null, new RepeatRule(null, new LiteralRule(null, "."),2,2)),
-                new TaggedRule("upper", quotedCharacter)
+                new TaggedRule("lower", quotedCharacter, true),
+                new TaggedRule(new RepeatRule(null, new LiteralRule(null, "."),2,2)),
+                new TaggedRule("upper", quotedCharacter, true)
             }, false, false);
             var exactCardinality = new SequenceRule(
                 "exactCardinality",
                 new[]
                 {
-                    new TaggedRule(null, new LiteralRule(null, "{")),
-                    new TaggedRule("n", number),
-                    new TaggedRule(null, new LiteralRule(null, "}"))
+                    new TaggedRule(new LiteralRule(null, "{")),
+                    new TaggedRule("n", number, true),
+                    new TaggedRule(new LiteralRule(null, "}"))
                 });
             var minMaxCardinality = new DisjunctionRule("minMaxCardinality", new[]
             {
                 new TaggedRule("minmax", new SequenceRule("#minmax", new[]
                 {
-                    new TaggedRule(null, new LiteralRule(null, "{")),
-                    new TaggedRule("min", number),
-                    new TaggedRule(null, new LiteralRule(null, ",")),
-                    new TaggedRule("max", number),
-                    new TaggedRule(null, new LiteralRule(null, "}"))
+                    new TaggedRule(new LiteralRule(null, "{")),
+                    new TaggedRule("min", number, true),
+                    new TaggedRule(new LiteralRule(null, ",")),
+                    new TaggedRule("max", number, true),
+                    new TaggedRule(new LiteralRule(null, "}"))
                 },
-                isRecursive: false)),
+                isRecursive: false), true),
                 new TaggedRule("min", new SequenceRule("#minmax", new[]
                 {
-                    new TaggedRule(null, new LiteralRule(null, "{")),
-                    new TaggedRule("min", number),
-                    new TaggedRule(null, new LiteralRule(null, ",")),
-                    new TaggedRule(null, new LiteralRule(null, "}"))
+                    new TaggedRule(new LiteralRule(null, "{")),
+                    new TaggedRule("min", number, true),
+                    new TaggedRule(new LiteralRule(null, ",")),
+                    new TaggedRule(new LiteralRule(null, "}"))
                 },
-                isRecursive: false)),
+                isRecursive: false), true),
                 new TaggedRule("max", new SequenceRule("#minmax", new[]
                 {
-                    new TaggedRule(null, new LiteralRule(null, "{")),
-                    new TaggedRule(null, new LiteralRule(null, ",")),
-                    new TaggedRule("max", number),
-                    new TaggedRule(null, new LiteralRule(null, "}"))
+                    new TaggedRule(new LiteralRule(null, "{")),
+                    new TaggedRule(new LiteralRule(null, ",")),
+                    new TaggedRule("max", number, true),
+                    new TaggedRule(new LiteralRule(null, "}"))
                 },
-                isRecursive: false))
+                isRecursive: false), true)
             });
             var cardinality = new DisjunctionRule("cardinality", new[]
             {
-                new TaggedRule("star", new LiteralRule(null, "*")),
-                new TaggedRule("plus", new LiteralRule(null, "+")),
-                new TaggedRule("question", new LiteralRule(null, "?")),
-                new TaggedRule("exact", exactCardinality),
-                new TaggedRule("minMax", minMaxCardinality)
+                new TaggedRule("star", new LiteralRule(null, "*"), true),
+                new TaggedRule("plus", new LiteralRule(null, "+"), true),
+                new TaggedRule("question", new LiteralRule(null, "?"), true),
+                new TaggedRule("exact", exactCardinality, true),
+                new TaggedRule("minMax", minMaxCardinality, true)
             },
             isRecursive: false);
             var bracket = new SequenceRule("bracket", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "(")),
-                new TaggedRule("r", ruleBodyProxy),
-                new TaggedRule(null, new LiteralRule(null, ")"))
+                new TaggedRule(new LiteralRule(null, "(")),
+                new TaggedRule("r", ruleBodyProxy, true),
+                new TaggedRule(new LiteralRule(null, ")"))
             },
             isRecursive: false);
             var repeatable = new DisjunctionRule("repeatable", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("any", any)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("any", any, true)
             },
             isRecursive: false);
             var repeat = new SequenceRule("repeat", new[]
             {
-                new TaggedRule("rule", repeatable),
-                new TaggedRule("cardinality", cardinality)
+                new TaggedRule("rule", repeatable, true),
+                new TaggedRule("cardinality", cardinality, true)
             },
             isRecursive: false);
             var disjunctionable = new DisjunctionRule("disjunctionable", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("range", range),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("any", any),
-                new TaggedRule("repeat", repeat)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("range", range, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("any", any, true),
+                new TaggedRule("repeat", repeat, true)
             },
             isRecursive: false);
             var disjunction = new SequenceRule("disjunction", new[]
             {
-                new TaggedRule("t", tag),
-                new TaggedRule("head", disjunctionable),
+                new TaggedRule("t", tag, true),
+                new TaggedRule("head", disjunctionable, true),
                 new TaggedRule("tail", new RepeatRule(
                     null,
                     new SequenceRule(
                         null,
                         new[]
                         {
-                            new TaggedRule(null, new LiteralRule(null, "|")),
-                            new TaggedRule("t", tag),
-                            new TaggedRule("d", disjunctionable)
+                            new TaggedRule(new LiteralRule(null, "|")),
+                            new TaggedRule("t", tag, true),
+                            new TaggedRule("d", disjunctionable, true)
                         }),
                     1,
-                    null))
+                    null), true)
             },
             isRecursive: false);
             var sequenceable = new DisjunctionRule("sequenceable", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("range", range),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("any", any),
-                new TaggedRule("repeat", repeat)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("range", range, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("any", any, true),
+                new TaggedRule("repeat", repeat, true)
             },
             isRecursive: false);
             var innerSequence = new SequenceRule("innerSequence", new[]
             {
-                new TaggedRule("t", tag),
-                new TaggedRule("r", sequenceable)
+                new TaggedRule("t", tag, true),
+                new TaggedRule("r", sequenceable, true)
             },
             isRecursive: false);
             var sequence = new RepeatRule(
@@ -714,50 +808,49 @@ namespace PasLib
                 isRecursive: false);
             var substractable = new DisjunctionRule("substractable", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("range", range),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("any", any),
-                new TaggedRule("repeat", repeat)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("range", range, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("any", any, true),
+                new TaggedRule("repeat", repeat, true)
             },
             isRecursive: false);
             var substracted = new DisjunctionRule("substracted", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("range", range),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("repeat", repeat)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("range", range, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("repeat", repeat, true)
             },
             isRecursive: false);
             var substract = new SequenceRule("substract", new[]
             {
-                new TaggedRule("t", tag),
-                new TaggedRule("primary", substractable),
-                new TaggedRule(null, new LiteralRule(null, "-")),
-                new TaggedRule("excluded", substracted)
+                new TaggedRule("primary", substractable, true),
+                new TaggedRule(new LiteralRule(null, "-")),
+                new TaggedRule("excluded", substracted, true)
             },
             isRecursive: false);
 
             var ruleBody = new DisjunctionRule("ruleBody", new[]
             {
-                new TaggedRule("ruleRef", identifier),
-                new TaggedRule("literal", literal),
-                new TaggedRule("range", range),
-                new TaggedRule("bracket", bracket),
-                new TaggedRule("any", any),
-                new TaggedRule("substract", substract),
-                new TaggedRule("disjunction", disjunction),
-                new TaggedRule("repeat", repeat),
-                new TaggedRule("sequence", sequence)
+                new TaggedRule("ruleRef", identifier, true),
+                new TaggedRule("literal", literal, true),
+                new TaggedRule("range", range, true),
+                new TaggedRule("bracket", bracket, true),
+                new TaggedRule("any", any, true),
+                new TaggedRule("substract", substract, true),
+                new TaggedRule("disjunction", disjunction, true),
+                new TaggedRule("repeat", repeat, true),
+                new TaggedRule("sequence", sequence, true)
             },
             isRecursive: true);
             var interleaveDeclaration = new SequenceRule("interleaveDeclaration", new[]
             {
                 new TaggedRule(new LiteralRule(null, "interleave")),
                 new TaggedRule(new LiteralRule(null, "=")),
-                new TaggedRule("body", ruleBodyProxy),
+                new TaggedRule("body", ruleBodyProxy, true),
                 new TaggedRule(new LiteralRule(null, ";"))
             },
             isRecursive: false);
@@ -769,42 +862,45 @@ namespace PasLib
             isRecursive: false);
             var parameterAssignation = new SequenceRule("parameterAssignation", new[]
             {
-                new TaggedRule("id", identifier),
+                new TaggedRule("id", identifier, true),
                 new TaggedRule(new LiteralRule(null, "=")),
-                new TaggedRule("value", boolean),
+                new TaggedRule("value", boolean, true),
             },
             isRecursive: false);
             var innerParameterAssignationList = new SequenceRule(null, new[]
             {
                 new TaggedRule(new LiteralRule(null, ",")),
-                new TaggedRule("pa", parameterAssignation)
+                new TaggedRule("pa", parameterAssignation, true)
             });
             var parameterAssignationList = new SequenceRule("parameterAssignationList", new[]
             {
                 new TaggedRule(new LiteralRule(null, "(")),
-                new TaggedRule("head", parameterAssignation),
+                new TaggedRule("head", parameterAssignation, true),
                 new TaggedRule("tail", new RepeatRule(
                     null,
                     innerParameterAssignationList,
                     null,
-                    null)),
+                    null), true),
                 new TaggedRule(new LiteralRule(null, ")"))
             },
             isRecursive: false);
             var ruleDeclaration = new SequenceRule("ruleDeclaration", new[]
             {
-                new TaggedRule(null, new LiteralRule(null, "rule")),
-                new TaggedRule("params", new RepeatRule(null, parameterAssignationList, 0, 1)),
-                new TaggedRule("id", identifier),
-                new TaggedRule(null, new LiteralRule(null, "=")),
-                new TaggedRule("body", ruleBody),
-                new TaggedRule(null, new LiteralRule(null, ";"))
+                new TaggedRule(new LiteralRule(null, "rule")),
+                new TaggedRule(
+                    "params",
+                    new RepeatRule(null, parameterAssignationList, 0, 1),
+                    true),
+                new TaggedRule("id", identifier, true),
+                new TaggedRule(new LiteralRule(null, "=")),
+                new TaggedRule("body", ruleBody, true),
+                new TaggedRule(new LiteralRule(null, ";"))
             },
             isRecursive: false);
             var declaration = new DisjunctionRule("declaration", new[]
             {
-                new TaggedRule("interleaveDeclaration", interleaveDeclaration),
-                new TaggedRule("ruleDeclaration", ruleDeclaration)
+                new TaggedRule("interleaveDeclaration", interleaveDeclaration, true),
+                new TaggedRule("ruleDeclaration", ruleDeclaration, true)
             },
             isRecursive: false);
             //  Main rule
@@ -819,10 +915,9 @@ namespace PasLib
 
         private static IRule GetCharacterRule()
         {
-            var any = new MatchAnyCharacterRule(null);
             var normal = new SubstractRule(
                 null,
-                new TaggedRule(null, any),
+                new MatchAnyCharacterRule(null),
                 new DisjunctionRule(null, TaggedRule.FromRules(new[]
                 {
                     new LiteralRule(null, "\""),
@@ -846,7 +941,7 @@ namespace PasLib
                     new LiteralRule(null, "r"),
                     new LiteralRule(null, "t"),
                     new LiteralRule(null, "v")
-                })))
+                })), true)
             }, false, false);
             var escapeHexa = new SequenceRule(null, new[]
             {
@@ -862,13 +957,13 @@ namespace PasLib
                     1,
                     2,
                     false,
-                    false))
+                    false), false)
             }, false, false);
             var character = new DisjunctionRule("character", new[]
             {
-                new TaggedRule("normal", normal, true),
-                new TaggedRule("escapeQuote", escapeQuote, true),
-                new TaggedRule("escapeBackslash", escapeBackslash, true),
+                new TaggedRule("normal", normal, false),
+                new TaggedRule("escapeQuote", escapeQuote, false),
+                new TaggedRule("escapeBackslash", escapeBackslash, false),
                 new TaggedRule("escapeLetter", escapeLetter, true),
                 new TaggedRule("escapeHexa", escapeHexa, true)
             }, false, false);

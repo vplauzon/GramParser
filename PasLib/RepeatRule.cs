@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace PasLib
 {
     internal class RepeatRule : RuleBase
     {
-        private static readonly RuleMatch[] EMPTY_CHILDREN = new RuleMatch[0];
-
         private readonly IRule _rule;
         private readonly int? _min;
         private readonly int? _max;
@@ -18,8 +17,9 @@ namespace PasLib
             int? min,
             int? max,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
-            : base(ruleName, hasInterleave, isRecursive, false)
+            bool? isRecursive = null,
+            bool? hasChildrenDetails = null)
+            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)
@@ -39,7 +39,7 @@ namespace PasLib
                 context.Text,
                 0,
                 0,
-                EMPTY_CHILDREN);
+                ImmutableStack<RuleMatch>.Empty);
         }
 
         public override string ToString()
@@ -57,7 +57,7 @@ namespace PasLib
             SubString originalText,
             int totalMatchLength,
             int iteration,
-            IEnumerable<RuleMatch> reverseChilden)
+            ImmutableStack<RuleMatch> childenStack)
         {
             var matches = context.InvokeRule(_rule);
             var nonEmptyMatches = from m in matches
@@ -67,9 +67,8 @@ namespace PasLib
 
             foreach (var match in nonEmptyMatches)
             {
-                var newReverseChildren = reverseChilden.Prepend(match);
-                var newTotalMatchLength = totalMatchLength
-                    + match.LengthWithInterleaves;
+                var newChildenStack = childenStack.Push(match);
+                var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
 
                 hasOneMatchSentinel = true;
                 if (!_max.HasValue || iteration + 1 < _max.Value)
@@ -81,7 +80,7 @@ namespace PasLib
                         originalText,
                         newTotalMatchLength,
                         iteration + 1,
-                        newReverseChildren);
+                        newChildenStack);
 
                     foreach (var m in downstreamMatches)
                     {
@@ -97,7 +96,7 @@ namespace PasLib
                     yield return new RuleMatch(
                         this,
                         content,
-                        newReverseChildren.Reverse().ToArray());
+                        newChildenStack.Reverse());
                 }
             }
             //  Repeat didn't work, but if we already reached our min, we're good
@@ -110,7 +109,7 @@ namespace PasLib
                 yield return new RuleMatch(
                     this,
                     content,
-                    reverseChilden.Reverse().ToArray());
+                    childenStack.Reverse());
             }
         }
     }
