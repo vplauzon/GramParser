@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "Storage Account Name": {
-      "value": "pasapiprodsto"
+      "value": "pasapilocalsto"
     },
     "App Suffix": {
-      "value": "pas-api-dev"
+      "value": "pas-api-local"
     },
     "App Insight Location": {
       "value": "eastus"

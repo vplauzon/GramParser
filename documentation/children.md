@@ -110,3 +110,6 @@ This is because named children matches and unnamed children matches are reportin
 We've seen different ways to control the level of details on a rule match.
 
 Mastering this allows us to optimize the returned payload from the parsing API.
+
+---
+[Go back to online documentation](../README.md)

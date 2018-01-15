@@ -5,11 +5,11 @@
     "Storage Account Name": {
       "value": "pasapidevsto"
     },
-    "Function App Name": {
-      "value": "pas-api-dev"
+    "App Suffix": {
+      "value": "pas-api-prod"
     },
-    "Plan Name": {
-      "value": "PasConsumptionPlan"
+    "App Insight Location": {
+      "value": "eastus"
     }
   }
 }

@@ -5,16 +5,26 @@
     "Storage Account Name": {
       "type": "string"
     },
-    "Plan Name": {
-      "type": "string",
-      "defaultValue": "PasConsumptionPlan"
-    },
-    "Function App Name": {
+    "App Suffix": {
       "type": "string"
+    },
+    "App Insight Location": {
+      "type": "string",
+      "allowedValues": [
+        "eastus",
+        "westus2",
+        "southcentralus",
+        "southeastasia",
+        "northeurope",
+        "westeurope"
+      ]
     }
   },
   "variables": {
-    "Storage Account Id": "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]"
+    "Storage Account Id": "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]",
+    "Insight Name": "[concat('AppInsight-', parameters('App Suffix'))]",
+    "Plan Name": "[concat('Plan-', parameters('App Suffix'))]",
+    "Function Name": "[concat('Function-', parameters('App Suffix'))]"
   },
   "resources": [
     {
@@ -35,10 +45,23 @@
       }
     },
     {
+      "apiVersion": "2015-05-01",
+      "type": "microsoft.insights/components",
+      "location": "[parameters('App Insight Location')]",
+      "dependsOn": [],
+      "name": "[variables('Insight Name')]",
+      "kind": "other",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "ApplicationId": "[variables('Insight Name')]"
+      }
+    },
+    {
       "apiVersion": "2016-09-01",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
-      "name": "[parameters('Plan Name')]",
+      "name": "[variables('Plan Name')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
@@ -55,19 +78,20 @@
       "apiVersion": "2016-08-01",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
-      "name": "[parameters('Function App Name')]",
+      "name": "[variables('Function Name')]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('Plan Name'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('Plan Name'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]",
+        "[resourceId('microsoft.insights/components', variables('Insight Name'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('Plan Name'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('Plan Name'))]",
         "siteConfig": {
           "appSettings": [
             {
-              "name": "AzureWebJobsDashboard",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('Storage Account Name'), ';AccountKey=', listKeys(variables('Storage Account Id'), '2017-10-01').keys[0].value)]"
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components', variables('Insight Name'))).InstrumentationKey]"
             },
             {
               "name": "AzureWebJobsStorage",
@@ -79,7 +103,7 @@
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(parameters('Function App Name'))]"
+              "value": "[toLower(variables('Function Name'))]"
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -94,5 +118,10 @@
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "my-output": {
+      "type": "string",
+      "value": "Everything good"
+    }
+  }
 }
