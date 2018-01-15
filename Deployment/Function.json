@@ -22,9 +22,9 @@
   },
   "variables": {
     "Storage Account Id": "[resourceId('Microsoft.Storage/storageAccounts', parameters('Storage Account Name'))]",
-    "Insight Name": "[concat('AppInsight-', parameters('App Suffix'))]",
-    "Plan Name": "[concat('Plan-', parameters('App Suffix'))]",
-    "Function Name": "[concat('Function-', parameters('App Suffix'))]"
+    "Insight Name": "[concat('pas-api-AppInsight', parameters('App Suffix'))]",
+    "Plan Name": "[concat('pas-api-Plan', parameters('App Suffix'))]",
+    "Function Name": "[concat('pas-api', parameters('App Suffix'))]"
   },
   "resources": [
     {
