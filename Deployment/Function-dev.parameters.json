@@ -6,7 +6,7 @@
       "value": "pasapidevsto"
     },
     "App Suffix": {
-      "value": "pas-api-prod"
+      "value": "-dev"
     },
     "App Insight Location": {
       "value": "eastus"
