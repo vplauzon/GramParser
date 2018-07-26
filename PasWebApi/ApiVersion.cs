@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PasFunction
+namespace PasWebApi
 {
     internal static class ApiVersion
     {

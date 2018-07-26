@@ -1,88 +1,68 @@
-using System.IO;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PasLib;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using PasLib;
+using PasWebApi.Models.AnonymousAnalysis;
 
-namespace PasFunction.AnonymousAnalysis
+namespace PasWebApi.Controllers
 {
-    public static class AnonymousAnalysisFunction
+    [Route("vnext")]
+    public class AnonymousAnalysisController : Controller
     {
-        [FunctionName("AnonymousAnalysisFunction")]
-        public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "v0/analysis")]HttpRequest req,
-            TraceWriter log)
+        [HttpPost]
+        public ActionResult Post([FromBody]AnonymousAnalysisInputModel body)
         {
             try
             {
-                var body =
-                    JsonSerializerHelper.Deserialize<AnonymousAnalysisInputModel>(req.Body);
-
-                try
+                if (string.IsNullOrWhiteSpace(body.Grammar))
                 {
-                    if (string.IsNullOrWhiteSpace(body.Grammar))
-                    {
-                        return new BadRequestObjectResult("JSON body should contain 'grammar'");
-                    }
-                    if (string.IsNullOrWhiteSpace(body.Text))
-                    {
-                        return new BadRequestObjectResult("JSON body should contain 'text'");
-                    }
-
-                    var grammar = GrammarCache.ParseGrammar(body.Grammar);
-
-                    if (grammar == null)
-                    {
-                        return new BadRequestObjectResult("Grammar cannot be parsed");
-                    }
-
-                    var match = grammar.Match(body.Rule, body.Text);
-
-                    if (match == null)
-                    {
-                        return new BadRequestObjectResult("Text cannot be matched by grammar");
-                    }
-
-                    var outputModel = new AnonymousAnalysisOutputModel(match);
-                    var output = JsonSerializerHelper.Serialize(outputModel);
-
-                    return new ContentResult
-                    {
-                        StatusCode = 200,
-                        ContentType = "application/json",
-                        Content = output
-                    };
+                    return new BadRequestObjectResult("JSON body should contain 'grammar'");
                 }
-                catch (ParsingException ex)
+                if (string.IsNullOrWhiteSpace(body.Text))
                 {
-                    return new BadRequestObjectResult(ex.Message);
+                    return new BadRequestObjectResult("JSON body should contain 'text'");
                 }
-                catch (Exception ex)
-                {
-                    log.Error($"Internal Error:  {ex.GetType().Name}, '{ex.Message}'");
-                    log.Info($"Grammar:  '{body.Grammar}'");
-                    log.Info($"Text:  '{body.Text}'");
-                    log.Info($"Rule:  '{body.Rule}'");
 
-                    return new ContentResult
-                    {
-                        StatusCode = 500,
-                        ContentType = "text/plain",
-                        Content = "Internal error:  please report"
-                    };
+                var grammar = GrammarCache.ParseGrammar(body.Grammar);
+
+                if (grammar == null)
+                {
+                    return new BadRequestObjectResult("Grammar cannot be parsed");
                 }
+
+                var match = grammar.Match(body.Rule, body.Text);
+
+                if (match == null)
+                {
+                    return new BadRequestObjectResult("Text cannot be matched by grammar");
+                }
+
+                var outputModel = new AnonymousAnalysisOutputModel(match);
+
+                return new ObjectResult(outputModel)
+                {
+                    StatusCode = 200
+                };
             }
-            catch (Exception ex)
+            catch (ParsingException ex)
             {
-                log.Error($"Body parsing error:  {ex.GetType().Name}, '{ex.Message}'");
+                return new BadRequestObjectResult(ex.Message);
+            }
+            catch (Exception)
+            {
+                //log.Error($"Internal Error:  {ex.GetType().Name}, '{ex.Message}'");
+                //log.Info($"Grammar:  '{body.Grammar}'");
+                //log.Info($"Text:  '{body.Text}'");
+                //log.Info($"Rule:  '{body.Rule}'");
 
-                return new BadRequestObjectResult("JSON body isn't conform");
+                return new ContentResult
+                {
+                    StatusCode = 500,
+                    ContentType = "text/plain",
+                    Content = "Internal error:  please report"
+                };
             }
         }
     }

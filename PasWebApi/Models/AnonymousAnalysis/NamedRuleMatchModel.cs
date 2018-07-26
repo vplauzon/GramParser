@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PasFunction.AnonymousAnalysis
+namespace PasWebApi.Models.AnonymousAnalysis
 {
     internal class NamedRuleMatchModel
     {

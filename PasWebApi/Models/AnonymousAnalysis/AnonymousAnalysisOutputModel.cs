@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PasFunction.AnonymousAnalysis
+namespace PasWebApi.Models.AnonymousAnalysis
 {
     internal class AnonymousAnalysisOutputModel
     {
@@ -11,7 +11,7 @@ namespace PasFunction.AnonymousAnalysis
             RuleMatch = new RuleMatchModel(match);
         }
 
-        public string ApiVersion { get { return PasFunction.ApiVersion.FullVersion; } }
+        public string ApiVersion { get { return PasWebApi.ApiVersion.FullVersion; } }
 
         public RuleMatchModel RuleMatch { get; }
     }

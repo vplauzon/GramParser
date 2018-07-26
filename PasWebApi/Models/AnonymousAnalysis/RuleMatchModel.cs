@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-namespace PasFunction.AnonymousAnalysis
+namespace PasWebApi.Models.AnonymousAnalysis
 {
     internal class RuleMatchModel
     {

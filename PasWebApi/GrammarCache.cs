@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PasFunction
+namespace PasWebApi
 {
     /// <summary>Caches the compute of a grammar.</summary>
     /// <remarks>

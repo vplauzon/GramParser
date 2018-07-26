@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PasFunction.AnonymousAnalysis
+namespace PasWebApi.Models.AnonymousAnalysis
 {
     public class AnonymousAnalysisInputModel
     {
