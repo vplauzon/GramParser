@@ -11,6 +11,6 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
 </Project>
