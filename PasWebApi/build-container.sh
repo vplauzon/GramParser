@@ -5,4 +5,6 @@ sudo docker build -t vplauzon/pas-web-api .
 #sudo docker push vplauzon/pas-web-api
 
 #	Test image
-#sudo docker run -it vplauzon/cosmos-db-target-config bash
+#sudo docker run vplauzon/pas-web-api -p 4000:80
+#curl localhost:4000
+#sudo docker run -it vplauzon/pas-web-api -p 4000:80 bash
