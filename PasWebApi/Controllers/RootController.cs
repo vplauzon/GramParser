@@ -17,6 +17,7 @@ namespace PasWebApi.Controllers
         {
             return new ObjectResult(new
             {
+                Version = ApiVersion.FullVersion,
                 Status = "Ready"
             });
         }
