@@ -29,4 +29,4 @@ EXPOSE 80
 ENV TODO ""
 
 #	Run console app
-CMD ["dotnet", "CosmosTargetConsole.dll"]
+CMD ["dotnet", "PasWebApi.dll"]
