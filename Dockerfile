@@ -8,7 +8,7 @@ WORKDIR /src
 COPY . .
 
 #	Publish the app into the app folder
-RUN dotnet publish . -c release -o app
+RUN dotnet publish PasWebApi -c release -o app
 
 ###########################################################
 #	Final container image
@@ -19,7 +19,7 @@ FROM microsoft/dotnet:2.1-aspnetcore-runtime AS final
 WORKDIR /work
 
 #	Copy package
-COPY --from=build /src/app .
+COPY --from=build /src/PasWebApi/app .
 
 # Make port 80 available to the world outside this container
 
