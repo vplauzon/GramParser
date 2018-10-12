@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35FE70C4-2825-420D-94F0-32A0002FFA4F}"
 	ProjectSection(SolutionItems) = preProject
 		build-container.sh = build-container.sh
+		deploy-pas-api.yaml = deploy-pas-api.yaml
 		Dockerfile = Dockerfile
 		inject-version.sh = inject-version.sh
 		README.md = README.md
