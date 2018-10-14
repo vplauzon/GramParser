@@ -39,7 +39,7 @@ else:
     print('Text content:')
     print(txtContent)
     print('First Character:')
-    print(ord(txtContent[0])
+    print(ord(txtContent[0]))
 
     fullVersion = txtContent + "." + buildNumber
 
