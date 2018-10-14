@@ -31,15 +31,13 @@ else:
     txtContent = readAll(versionPath).strip()
     
     # Filter out weird unicode characteres:
-    csContent = "".join([x for x in csContent if ord(x)<256])
-    txtContent = "".join([x for x in txtContent if ord(x)<256])
+    csContent = "".join([x for x in csContent if ord(x)<128])
+    txtContent = "".join([x for x in txtContent if ord(x)<128])
 
     print('C# content:')
     print(csContent)
     print('Text content:')
     print(txtContent)
-    print('First Character:')
-    print(ord(txtContent[0]))
 
     fullVersion = txtContent + "." + buildNumber
 
