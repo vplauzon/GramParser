@@ -1,0 +1,14 @@
+apiVersion: v1
+name: ParserAsServiceApi
+version: 0.1.0
+description: Chart deploying the API of Parser as a Service
+keywords:
+  - parser
+  - api
+home: https://github.com/vplauzon/ParserAsServiceApi
+sources:
+  - https://github.com/vplauzon/ParserAsServiceApi
+maintainers: # (optional)
+  - name: Vincent-Philippe Lauzon
+    email: NA
+    url: http://vincentlauzon.com/
