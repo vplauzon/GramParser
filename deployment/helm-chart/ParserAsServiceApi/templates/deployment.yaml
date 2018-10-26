@@ -11,11 +11,11 @@ spec:
       app: parser-api
   template:
       metadata:
-      labels:
-        app: parser-api
-    spec:
-      containers:
-      - name: myapi
-        image: vplauzon/pas-api:{{Chart.Version}}
-        ports:
-        - containerPort: 80
+        labels:
+          app: parser-api
+      spec:
+        containers:
+        - name: myapi
+          image: vplauzon/pas-api:{{.Chart.Version}}
+          ports:
+          - containerPort: 80
