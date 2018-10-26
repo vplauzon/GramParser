@@ -12,36 +12,25 @@ def writeAll(path, content):
     with open(path, 'w') as f:
         f.write(content)
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 3:
     print("There are %d arguments" % (len(sys.argv)-1))
     print("Arguments should be")
     print("1-ApiVersion.cs file path")
-    print("2-ApiVersion.txt file path")
-    print("3-Build number")
+    print("2-Full version")
 else:
     csPath = sys.argv[1]
-    versionPath = sys.argv[2]
-    buildNumber = sys.argv[3]
+    fullVersion = sys.argv[2]
 
     print ('C# file:  %s' % (csPath))
-    print ('Text file:  %s' % (versionPath))
-    print ('Build Number:  %s' % (buildNumber))
+    print('Full Version:  %s' % (fullVersion))
 
     csContent = readAll(csPath)
-    txtContent = readAll(versionPath).strip()
     
     # Filter out weird unicode characteres:
     csContent = "".join([x for x in csContent if ord(x)<128])
-    txtContent = "".join([x for x in txtContent if ord(x)<128])
 
     print('C# content:')
     print(csContent)
-    print('Text content:')
-    print(txtContent)
-
-    fullVersion = txtContent + "." + buildNumber
-
-    print('Full Version:  %s' % (fullVersion))
 
     csContent = csContent.replace('FULL_VERSION', fullVersion)
 
