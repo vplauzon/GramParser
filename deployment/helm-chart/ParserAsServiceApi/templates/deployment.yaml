@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: myapi
-        image: vplauzon/pas-api:{{.Chart.Version}}
+        image: vplauzon/pas-api:{{Chart.Version}}
         ports:
         - containerPort: 80

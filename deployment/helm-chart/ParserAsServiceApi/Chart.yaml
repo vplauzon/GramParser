@@ -1,7 +1,7 @@
 apiVersion: v1
 name: ParserAsServiceApi
 version: 0.1.42
-#appVersion:  container-0.1.12
+#appVersion:
 description: Chart deploying the API of Parser as a Service
 keywords:
   - parser
