@@ -22,9 +22,6 @@ else:
 
     txtContent = readAll(versionPath).strip()
     
-    # Filter out weird unicode characteres:
-    txtContent = "".join([x for x in txtContent if ord(x)<128])
-
     print('Text content:')
     print(txtContent)
 

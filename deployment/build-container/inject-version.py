@@ -26,9 +26,6 @@ else:
 
     csContent = readAll(csPath)
     
-    # Filter out weird unicode characteres:
-    csContent = "".join([x for x in csContent if ord(x)<128])
-
     print('C# content:')
     print(csContent)
 

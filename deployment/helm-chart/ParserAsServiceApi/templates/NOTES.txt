@@ -1,1 +1,1 @@
-No values are supported.  This is the most vanilla chart.
+Only number of replica is supported as configurable value.
