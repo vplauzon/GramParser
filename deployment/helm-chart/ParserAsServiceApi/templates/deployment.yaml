@@ -17,5 +17,11 @@ spec:
         containers:
         - name: myapi
           image: vplauzon/pas-api:{{.Chart.Version}}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 1
+            periodSeconds: 2
           ports:
           - containerPort: 80
