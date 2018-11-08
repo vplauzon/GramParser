@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 rg=$1
 ai=$2
 
