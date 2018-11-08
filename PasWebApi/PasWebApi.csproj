@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationInsightsResourceId>/subscriptions/867feb0a-8313-464d-ad48-b4904383f9bc/resourcegroups/shared-infra-dev/providers/microsoft.insights/components/central-insight-dev</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/867feb0a-8313-464d-ad48-b4904383f9bc/resourcegroups/shared-infra-dev/providers/microsoft.insights/components/central-insight-dev</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,11 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Connected Services\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.4" />
   </ItemGroup>
 
@@ -29,6 +32,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PasLib\PasLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>
