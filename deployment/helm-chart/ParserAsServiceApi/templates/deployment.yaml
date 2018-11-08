@@ -17,6 +17,9 @@ spec:
         containers:
         - name: myapi
           image: vplauzon/pas-api:{{.Chart.Version}}
+          env:
+          - name: ApplicationInsights__InstrumentationKey
+            value: {{.Values.applicationInsights.instrumentationKey}}
           livenessProbe:
             httpGet:
               path: /

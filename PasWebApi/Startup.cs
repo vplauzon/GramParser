@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,8 @@ namespace PasWebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            TelemetryConfiguration.Active.TelemetryInitializers.Add(new ProjectTelemetryInitializer());
         }
 
         public IConfiguration Configuration { get; }

@@ -1,1 +1,3 @@
 replicaCount:  2  # Number of pod replica
+applicationInsights:
+  instrumentationKey:  TO-BE-SET-AT-RELEASE
