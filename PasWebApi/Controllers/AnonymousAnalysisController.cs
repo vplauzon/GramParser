@@ -16,6 +16,10 @@ namespace PasWebApi.Controllers
         {
             try
             {
+                if (body == null)
+                {
+                    return new BadRequestObjectResult("No JSON body");
+                }
                 if (string.IsNullOrWhiteSpace(body.Grammar))
                 {
                     return new BadRequestObjectResult("JSON body should contain 'grammar'");

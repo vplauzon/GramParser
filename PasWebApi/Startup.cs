@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AppInsights.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,8 +18,6 @@ namespace PasWebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            TelemetryConfiguration.Active.TelemetryInitializers.Add(new ProjectTelemetryInitializer());
         }
 
         public IConfiguration Configuration { get; }
@@ -27,10 +26,14 @@ namespace PasWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<RequestBodyInitializer, RequestBodyInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            RequestBodyInitializer requestBodyInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -38,6 +41,9 @@ namespace PasWebApi
             }
 
             app.UseMvc();
+
+            TelemetryConfiguration.Active.TelemetryInitializers.Add(new RoleNameInitializer("PasApi"));
+            TelemetryConfiguration.Active.TelemetryInitializers.Add(requestBodyInitializer);
         }
     }
 }
