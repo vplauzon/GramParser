@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 #   Should be $(Release.EnvironmentName)
 environment=$1
@@ -11,11 +11,11 @@ tag="$environment"
 
 echo "appinsight:  '$appinsight'"
 echo "##vso[task.setvariable variable=appinsight;]$appinsight"
-echo "appinsight:  '$cluster'"
+echo "cluster:  '$cluster'"
 echo "##vso[task.setvariable variable=cluster;]$cluster"
-echo "appinsight:  '$group'"
+echo "group:  '$group'"
 echo "##vso[task.setvariable variable=group;]$group"
-echo "appinsight:  '$repo'"
+echo "repo:  '$repo'"
 echo "##vso[task.setvariable variable=repo;]$repo"
-echo "appinsight:  '$tag'"
+echo "tag:  '$tag'"
 echo "##vso[task.setvariable variable=tag;]$tag"
