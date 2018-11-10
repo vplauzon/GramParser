@@ -1,4 +1,6 @@
-﻿#	Build docker container
+﻿#   This script isn't used in CI / CD ; it is there for manual testing if needed
+
+#	Build docker container
 sudo docker build -t vplauzon/pas-web-api .
 
 #	Publish image
