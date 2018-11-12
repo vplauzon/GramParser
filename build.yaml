@@ -1,11 +1,9 @@
-resources:
-- repo: self
-queue:
-  name: Hosted Ubuntu 1604
+pool:
+  vmImage: 'Ubuntu 16.04'
 
 variables:
-  chart-path: chart-path
-  image-name:  image-name
+  chart-path: deployment/helm-chart/ParserAsServiceApi
+  image-name:  vplauzon/pas-api
 steps:
 - task: PythonScript@0
   displayName: 'Manage Version'
