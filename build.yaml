@@ -3,6 +3,8 @@ resources:
 queue:
   name: Hosted Ubuntu 1604
 variables:
+  chart-path: chart-path
+  image-name:  image-name
 steps:
 - task: PythonScript@0
   displayName: 'Manage Version'
