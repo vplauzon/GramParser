@@ -4,12 +4,14 @@ pool:
 variables:
   chart-path: deployment/helm-chart/ParserAsServiceApi
   image-name:  vplauzon/pas-api
+  app-version-txt-path:  deployment/ApiVersion.txt
+  app-version-cs-path:  PasWebApi/ApiVersion.cs
 steps:
 - task: PythonScript@0
   displayName: 'Manage Version'
   inputs:
     scriptPath: 'deployment/manage-version.py'
-    arguments: 'deployment/ApiVersion.txt PasWebApi/ApiVersion.cs $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
+    arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
 
 - task: Docker@1
   displayName: 'Build an image'
