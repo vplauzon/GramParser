@@ -1,0 +1,66 @@
+resources:
+- repo: self
+queue:
+  name: Hosted Ubuntu 1604
+variables:
+steps:
+- task: PythonScript@0
+  displayName: 'Manage Version'
+  inputs:
+    scriptPath: 'deployment/manage-version.py'
+
+    arguments: 'deployment/ApiVersion.txt PasWebApi/ApiVersion.cs $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
+
+
+- task: Docker@1
+  displayName: 'Build an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+
+    dockerRegistryEndpoint: 'vplauzon-docker-hub'
+
+    imageName: '$(image-name):$(full-version)'
+
+    includeLatestTag: true
+
+
+- task: Docker@1
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+
+    dockerRegistryEndpoint: 'vplauzon-docker-hub'
+
+    command: 'Push an image'
+
+    imageName: '$(image-name):$(full-version)'
+
+
+- task: HelmInstaller@0
+  displayName: 'Install Helm 2.11.0'
+  inputs:
+    helmVersion: 2.11.0
+
+
+- task: HelmDeploy@0
+  displayName: 'Helm package'
+  inputs:
+    azureSubscription: 'Windows Azure  MSDN - Visual Studio Premium (867feb0a-8313-464d-ad48-b4904383f9bc)'
+
+    command: package
+
+    chartPath: '$(chart-path)'
+
+    chartVersion: '$(full-version)'
+
+
+- task: CopyFiles@2
+  displayName: 'Copy Release scripts'
+  inputs:
+    SourceFolder: deployment
+
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
