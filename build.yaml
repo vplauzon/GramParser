@@ -1,7 +1,5 @@
-resources:
-- repo: self
-queue:
-  name: Hosted Ubuntu 1604
+pool:
+  vmImage: 'Ubuntu 16.04'
 variables:
   chart-path: chart-path
   image-name:  image-name
