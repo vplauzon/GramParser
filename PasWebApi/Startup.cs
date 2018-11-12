@@ -41,16 +41,20 @@ namespace PasWebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            //  Configure CORS so that any apps can call the API
+            //  Followed https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.1#enable-cors-with-cors-middleware
+            app.UseCors(builder =>
+            {
+                builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            });
+
             app.UseMvc();
 
             TelemetryConfiguration.Active.TelemetryInitializers.Add(new RoleNameInitializer("PasApi"));
             TelemetryConfiguration.Active.TelemetryInitializers.Add(requestBodyInitializer);
-
-            //  Configure CORS so that any apps can call the API
-            app.UseCors(builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
         }
     }
 }
