@@ -27,6 +27,7 @@ namespace PasWebApi
         {
             services.AddMvc();
             services.AddSingleton<RequestBodyInitializer, RequestBodyInitializer>();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +45,12 @@ namespace PasWebApi
 
             TelemetryConfiguration.Active.TelemetryInitializers.Add(new RoleNameInitializer("PasApi"));
             TelemetryConfiguration.Active.TelemetryInitializers.Add(requestBodyInitializer);
+
+            //  Configure CORS so that any apps can call the API
+            app.UseCors(builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
         }
     }
 }
