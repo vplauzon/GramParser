@@ -71,6 +71,7 @@ namespace PasWebApi.Controllers
 
         private static void TrackParsingEvent()
         {
+            //  Follow https://docs.microsoft.com/en-ca/azure/application-insights/app-insights-api-custom-events-metrics#trackevent
             var telemetry = new TelemetryClient();
 
             telemetry.TrackEvent("Parsing");
