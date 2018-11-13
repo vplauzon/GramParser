@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using PasLib;
 using PasWebApi.Models.AnonymousAnalysis;
@@ -44,6 +45,8 @@ namespace PasWebApi.Controllers
                     return new BadRequestObjectResult("Text cannot be matched by grammar");
                 }
 
+                TrackParsingEvent();
+
                 var outputModel = new AnonymousAnalysisOutputModel(match);
 
                 return new ObjectResult(outputModel)
@@ -57,11 +60,6 @@ namespace PasWebApi.Controllers
             }
             catch (Exception)
             {
-                //log.Error($"Internal Error:  {ex.GetType().Name}, '{ex.Message}'");
-                //log.Info($"Grammar:  '{body.Grammar}'");
-                //log.Info($"Text:  '{body.Text}'");
-                //log.Info($"Rule:  '{body.Rule}'");
-
                 return new ContentResult
                 {
                     StatusCode = 500,
@@ -69,6 +67,13 @@ namespace PasWebApi.Controllers
                     Content = "Internal error:  please report"
                 };
             }
+        }
+
+        private static void TrackParsingEvent()
+        {
+            var telemetry = new TelemetryClient();
+
+            telemetry.TrackEvent("Parsing");
         }
     }
 }
