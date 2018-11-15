@@ -11,10 +11,10 @@ namespace PasApiClient
         #region Constructors
         public static ParserClient Create()
         {
-            return CreateFromBaseUrl(DEFAULT_BASE_URI);
+            return CreateFromBaseUri(DEFAULT_BASE_URI);
         }
 
-        public static ParserClient CreateFromBaseUrl(Uri baseUri)
+        public static ParserClient CreateFromBaseUri(Uri baseUri)
         {
             return new ParserClient(baseUri);
         }
