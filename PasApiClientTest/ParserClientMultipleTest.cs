@@ -22,32 +22,33 @@ namespace PasApiClientTest
             Assert.AreEqual(3, result[0].RuleMatch.Children.Length, "Children");
         }
 
-        //[TestMethod]
-        //public async Task NoParsing()
-        //{
-        //    var client = CreateClient();
-        //    var grammar = "rule letter = \"a\"..\"z\" | \"A\"..\"Z\";rule main = letter*;";
-        //    var text = "123";
-        //    var result = await client.SingleParseAsync(grammar, text);
+        [TestMethod]
+        public async Task NoParsing()
+        {
+            var client = CreateClient();
+            var grammar = "rule letter = \"a\"..\"z\" | \"A\"..\"Z\";rule main = letter*;";
+            var texts = new[] { "123", "abc" };
+            var result = await client.MultipleParseAsync(grammar, texts);
 
-        //    Assert.IsFalse(result.IsMatch, "IsMatch");
-        //}
+            Assert.IsFalse(result[0].IsMatch, "0");
+            Assert.IsTrue(result[1].IsMatch, "1");
+        }
 
-        //[TestMethod]
-        //public async Task FailGrammar()
-        //{
-        //    try
-        //    {
-        //        var client = CreateClient();
-        //        var grammar = "Hello World";
-        //        var text = "123";
+        [TestMethod]
+        public async Task FailGrammar()
+        {
+            try
+            {
+                var client = CreateClient();
+                var grammar = "Hello World";
+                var texts = new[] { "123", "abc" };
 
-        //        await client.SingleParseAsync(grammar, text);
-        //    }
-        //    catch (ParsingException ex)
-        //    {
-        //        Assert.AreEqual(400, ex.StatusCode, "StatusCode");
-        //    }
-        //}
+                await client.MultipleParseAsync(grammar, texts);
+            }
+            catch (ParsingException ex)
+            {
+                Assert.AreEqual(400, ex.StatusCode, "StatusCode");
+            }
+        }
     }
 }
