@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -18,6 +20,15 @@ namespace PasApiClient
             public string Rule { get; set; }
 
             public string Text { get; set; }
+        }
+
+        private class MultipleParsingInput
+        {
+            public string Grammar { get; set; }
+
+            public string Rule { get; set; }
+
+            public string[] Texts { get; set; }
         }
         #endregion
 
@@ -67,6 +78,14 @@ namespace PasApiClient
         /// <returns>Parsing result of the text.</returns>
         public async Task<ParsingResult> SingleParseAsync(string grammar, string rule, string text)
         {
+            if (string.IsNullOrWhiteSpace(grammar))
+            {
+                throw new ArgumentNullException(nameof(grammar));
+            }
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
             using (var client = new HttpClient())
             {
                 var uri = new Uri(_baseUri, new Uri("v1/single", UriKind.Relative));
@@ -96,6 +115,57 @@ namespace PasApiClient
         #endregion
 
         #region Multiple
+        /// <summary>Parse a grammar and use that grammar to parse a multiple texts.</summary>
+        /// <param name="grammar">Grammar.</param>
+        /// <param name="texts">Texts to parse with the grammar.</param>
+        /// <returns>Parsing results of the texts:  one for each text.</returns>
+        public Task<ParsingResult[]> MultipleParseAsync(string grammar, IEnumerable<string> texts)
+        {
+            return MultipleParseAsync(grammar, null, texts);
+        }
+
+        /// <summary>Parse a grammar and use that grammar to parse a multiple texts.</summary>
+        /// <param name="grammar">Grammar.</param>
+        /// <param name="rule">Rule, within the grammar, to use to parse the text.</param>
+        /// <param name="texts">Texts to parse with the grammar.</param>
+        /// <returns>Parsing results of the texts:  one for each text.</returns>
+        public async Task<ParsingResult[]> MultipleParseAsync(string grammar, string rule, IEnumerable<string> texts)
+        {
+            if (string.IsNullOrWhiteSpace(grammar))
+            {
+                throw new ArgumentNullException(nameof(grammar));
+            }
+            if (texts == null || !texts.Any())
+            {
+                throw new ArgumentNullException(nameof(texts));
+            }
+
+            using (var client = new HttpClient())
+            {
+                var uri = new Uri(_baseUri, new Uri("v1/multiple", UriKind.Relative));
+                var input = new MultipleParsingInput
+                {
+                    Grammar = grammar,
+                    Rule = rule,
+                    Texts = texts.ToArray()
+                };
+                var inputString = JsonConvert.SerializeObject(input);
+                var content = new StringContent(inputString, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(uri, content);
+                var outputString = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var output = JsonConvert.DeserializeObject<ParsingResult[]>(outputString);
+
+                    return output;
+                }
+                else
+                {
+                    throw new ParsingException(outputString, (int)response.StatusCode);
+                }
+            }
+        }
         #endregion
     }
 }

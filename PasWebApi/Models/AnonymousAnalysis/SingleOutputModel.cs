@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace PasWebApi.Models.AnonymousAnalysis
 {
-    internal class AnonymousAnalysisOutputModel
+    internal class SingleOutputModel
     {
-        public AnonymousAnalysisOutputModel(RuleMatch match)
+        public SingleOutputModel(RuleMatch match)
         {
             IsMatch = match != null;
             if (match != null)

@@ -15,7 +15,7 @@ namespace PasWebApi.Controllers
         [Route("")]
         [Route("single")]
         [HttpPost]
-        public ActionResult SinglePost([FromBody]AnonymousAnalysisInputModel body)
+        public ActionResult SinglePost([FromBody]SingleInputModel body)
         {
             try
             {
@@ -41,11 +41,72 @@ namespace PasWebApi.Controllers
                 else
                 {
                     var match = grammar.Match(body.Rule, body.Text);
-                    var outputModel = new AnonymousAnalysisOutputModel(match);
+                    var outputModel = new SingleOutputModel(match);
 
                     TrackParsingEvent();
 
                     return new ObjectResult(outputModel)
+                    {
+                        StatusCode = 200
+                    };
+                }
+            }
+            catch (ParsingException ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+            catch (Exception)
+            {
+                return new ContentResult
+                {
+                    StatusCode = 500,
+                    ContentType = "text/plain",
+                    Content = "Internal error:  please report"
+                };
+            }
+        }
+
+        [Route("")]
+        [Route("multiple")]
+        [HttpPost]
+        public async Task<ActionResult> MultiplePostAsync([FromBody]MultipleInputModel body)
+        {
+            try
+            {
+                if (body == null)
+                {
+                    return new BadRequestObjectResult("No JSON body");
+                }
+                if (string.IsNullOrWhiteSpace(body.Grammar))
+                {
+                    return new BadRequestObjectResult("JSON body should contain 'grammar'");
+                }
+                if (body.Texts == null || !body.Texts.Any())
+                {
+                    return new BadRequestObjectResult("JSON body should contain 'texts' with at least one text");
+                }
+
+                var grammar = GrammarCache.ParseGrammar(body.Grammar);
+
+                if (grammar == null)
+                {
+                    return new BadRequestObjectResult("Grammar cannot be parsed");
+                }
+                else
+                {
+                    var tasks = (from text in body.Texts
+                                 let task = Task.Run(() => grammar.Match(body.Rule, text))
+                                 select task).ToArray();
+
+                    await Task.WhenAll(tasks);
+
+                    var outputs = from task in tasks
+                                  select new SingleOutputModel(task.Result);
+                    var outputModels = outputs.ToArray();
+
+                    TrackParsingEvent();
+
+                    return new ObjectResult(outputModels)
                     {
                         StatusCode = 200
                     };
