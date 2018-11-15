@@ -25,11 +25,20 @@ namespace PasApiClient
         private readonly Uri _baseUri;
 
         #region Constructors
+        /// <summary>Creates a client targetting default API URL.</summary>
+        /// <returns>Instance of a client.</returns>
         public static ParserClient Create()
         {
             return CreateFromBaseUri(DEFAULT_BASE_URI);
         }
 
+        /// <summary>Creates a client targetting a given API URL.</summary>
+        /// <remarks>
+        /// This method is useful to target different version of the API.
+        /// It is mostly used for internal development of this NUGET package.
+        /// </remarks>
+        /// <param name="baseUri">Location of the service.</param>
+        /// <returns>Instance of a client.</returns>
         public static ParserClient CreateFromBaseUri(Uri baseUri)
         {
             return new ParserClient(baseUri);
@@ -42,11 +51,20 @@ namespace PasApiClient
         #endregion
 
         #region Single
+        /// <summary>Parse a grammar and use that grammar to parse a text, using the default rule.</summary>
+        /// <param name="grammar">Grammar.</param>
+        /// <param name="text">Text to parse with the grammar.</param>
+        /// <returns>Parsing result of the text.</returns>
         public Task<ParsingResult> SingleParseAsync(string grammar, string text)
         {
             return SingleParseAsync(grammar, null, text);
         }
 
+        /// <summary>Parse a grammar and use that grammar to parse a text.</summary>
+        /// <param name="grammar">Grammar.</param>
+        /// <param name="rule">Rule, within the grammar, to use to parse the text.</param>
+        /// <param name="text">Text to parse with the grammar.</param>
+        /// <returns>Parsing result of the text.</returns>
         public async Task<ParsingResult> SingleParseAsync(string grammar, string rule, string text)
         {
             using (var client = new HttpClient())
