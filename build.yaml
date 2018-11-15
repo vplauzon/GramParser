@@ -14,16 +14,16 @@ steps:
     arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet test PasLibTest'
-  inputs:
-    command: test
-    projects: 'PasLibTest/*Test*.csproj'
-
-- task: DotNetCoreCLI@2
   displayName: Build projects
   inputs:
     projects: '**/*.csproj'
     arguments: '--configuration release'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test PasLibTest'
+  inputs:
+    command: test
+    projects: 'PasLibTest/*Test*.csproj'
 
 - task: CopyFiles@2
   displayName: 'Copy Nuget packages to staging'
