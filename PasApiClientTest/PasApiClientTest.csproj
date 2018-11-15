@@ -21,11 +21,4 @@
       <HintPath>System</HintPath>
     </Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="TestRunParameters-local.runsettings">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
