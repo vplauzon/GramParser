@@ -10,11 +10,12 @@ using PasWebApi.Models.AnonymousAnalysis;
 namespace PasWebApi.Controllers
 {
     [Route("v1")]
-    [Route("vnext")]
     public class AnonymousAnalysisController : Controller
     {
+        [Route("")]
+        [Route("single")]
         [HttpPost]
-        public ActionResult Post([FromBody]AnonymousAnalysisInputModel body)
+        public ActionResult SinglePost([FromBody]AnonymousAnalysisInputModel body)
         {
             try
             {
@@ -37,22 +38,18 @@ namespace PasWebApi.Controllers
                 {
                     return new BadRequestObjectResult("Grammar cannot be parsed");
                 }
-
-                var match = grammar.Match(body.Rule, body.Text);
-
-                if (match == null)
+                else
                 {
-                    return new BadRequestObjectResult("Text cannot be matched by grammar");
+                    var match = grammar.Match(body.Rule, body.Text);
+                    var outputModel = new AnonymousAnalysisOutputModel(match);
+
+                    TrackParsingEvent();
+
+                    return new ObjectResult(outputModel)
+                    {
+                        StatusCode = 200
+                    };
                 }
-
-                TrackParsingEvent();
-
-                var outputModel = new AnonymousAnalysisOutputModel(match);
-
-                return new ObjectResult(outputModel)
-                {
-                    StatusCode = 200
-                };
             }
             catch (ParsingException ex)
             {

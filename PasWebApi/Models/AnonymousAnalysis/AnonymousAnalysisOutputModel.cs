@@ -8,10 +8,16 @@ namespace PasWebApi.Models.AnonymousAnalysis
     {
         public AnonymousAnalysisOutputModel(RuleMatch match)
         {
-            RuleMatch = new RuleMatchModel(match);
+            IsMatch = match != null;
+            if (match != null)
+            {
+                RuleMatch = new RuleMatchModel(match);
+            }
         }
 
         public string ApiVersion { get { return PasWebApi.ApiVersion.FullVersion; } }
+
+        public bool IsMatch { get; set; }
 
         public RuleMatchModel RuleMatch { get; }
     }
