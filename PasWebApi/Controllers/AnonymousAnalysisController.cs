@@ -69,7 +69,7 @@ namespace PasWebApi.Controllers
         [Route("")]
         [Route("multiple")]
         [HttpPost]
-        public async Task<ActionResult> MultiplePostAsync([FromBody]MultipleInputModel body)
+        public ActionResult MultiplePostAsync([FromBody]MultipleInputModel body)
         {
             try
             {
@@ -94,14 +94,10 @@ namespace PasWebApi.Controllers
                 }
                 else
                 {
-                    var tasks = (from text in body.Texts
-                                 let task = Task.Run(() => grammar.Match(body.Rule, text))
-                                 select task).ToArray();
-
-                    await Task.WhenAll(tasks);
-
-                    var outputs = from task in tasks
-                                  select new SingleOutputModel(task.Result);
+                    var matches = from text in body.Texts
+                                  select grammar.Match(body.Rule, text);
+                    var outputs = from match in matches
+                                  select new SingleOutputModel(match);
                     var outputModels = outputs.ToArray();
 
                     TrackParsingEvent();
