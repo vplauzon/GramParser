@@ -40,21 +40,24 @@ steps:
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: nuget'
-  artifactName:  nuget
-  publishLocation: filePath
-  targetPath:  '$(build.artifactstagingdirectory)/nuget'
+  inputs:
+    artifactName:  nuget
+    publishLocation: filePath
+    targetPath:  '$(build.artifactstagingdirectory)/nuget'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: deployment'
-  artifactName:  deployment
-  publishLocation: filePath
-  targetPath:  '$(build.artifactstagingdirectory)/deployment'
+  inputs:
+    artifactName:  deployment
+    publishLocation: filePath
+    targetPath:  '$(build.artifactstagingdirectory)/deployment'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: deployment'
-  artifactName:  deployment
-  publishLocation: filePath
-  targetPath:  PasLibTest
+  inputs:
+    artifactName:  deployment
+    publishLocation: filePath
+    targetPath:  PasLibTest
 
 - task: Docker@1
   displayName: 'Build an image'
