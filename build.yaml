@@ -25,6 +25,19 @@ steps:
     projects: 'PasApiClient/*.csproj'
     arguments: '--configuration $(BuildConfiguration)'
 
+- task: CopyFiles@2
+  displayName: 'Copy Nuget packages to staging'
+  inputs:
+    SourceFolder: .
+    Contents: '**/*.nupkg'
+    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
+
+- task: CopyFiles@2
+  displayName: 'Copy deployment'
+  inputs:
+    SourceFolder: deployment
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: nuget'
   artifactName:  nuget
@@ -71,16 +84,3 @@ steps:
     command: package
     chartPath: '$(chart-path)'
     chartVersion: '$(full-version)'
-
-- task: CopyFiles@2
-  displayName: 'Copy Nuget packages to staging'
-  inputs:
-    SourceFolder: .
-    Contents: '**/*.nupkg'
-    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
-
-- task: CopyFiles@2
-  displayName: 'Copy deployment'
-  inputs:
-    SourceFolder: deployment
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'
