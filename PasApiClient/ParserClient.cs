@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,12 +62,18 @@ namespace PasApiClient
                 var content = new StringContent(inputString, Encoding.UTF8, "application/json");
                 var response = await client.PostAsync(uri, content);
                 var outputString = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<ParsingResult>(outputString);
 
-                return output;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var output = JsonConvert.DeserializeObject<ParsingResult>(outputString);
+
+                    return output;
+                }
+                else
+                {
+                    throw new ParsingException(outputString, (int)response.StatusCode);
+                }
             }
-
-            throw new NotImplementedException();
         }
         #endregion
 
