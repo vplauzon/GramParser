@@ -32,25 +32,12 @@ steps:
     Contents: '**/*.nupkg'
     TargetFolder: '$(build.artifactstagingdirectory)/nuget'
 
-- task: CopyFiles@2
-  displayName: 'Copy deployment'
-  inputs:
-    SourceFolder: deployment
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: nuget'
   inputs:
     artifactName:  nuget
     publishLocation: container
     pathtoPublish:  '$(build.artifactstagingdirectory)/nuget'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: deployment'
-  inputs:
-    artifactName:  deployment
-    publishLocation: container
-    pathtoPublish:  '$(build.artifactstagingdirectory)/deployment'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: PasLibTest'
@@ -87,3 +74,16 @@ steps:
     command: package
     chartPath: '$(chart-path)'
     chartVersion: '$(full-version)'
+
+- task: CopyFiles@2
+  displayName: 'Copy deployment'
+  inputs:
+    SourceFolder: deployment
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: deployment'
+  inputs:
+    artifactName:  deployment
+    publishLocation: container
+    pathtoPublish:  '$(build.artifactstagingdirectory)/deployment'
