@@ -13,6 +13,36 @@ steps:
     scriptPath: 'deployment/manage-version.py'
     arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
 
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test PasLibTest'
+  inputs:
+    command: test
+    projects: 'PasLibTest/*Test*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: Build PasApiClient Nuget
+  inputs:
+    projects: 'PasApiClient/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: nuget'
+  artifactName:  nuget
+  publishLocation: filePath
+  targetPath:  '$(build.artifactstagingdirectory)/nuget'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: deployment'
+  artifactName:  deployment
+  publishLocation: filePath
+  targetPath:  '$(build.artifactstagingdirectory)/deployment'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: deployment'
+  artifactName:  deployment
+  publishLocation: filePath
+  targetPath:  PasLibTest
+
 - task: Docker@1
   displayName: 'Build an image'
   inputs:
@@ -43,10 +73,14 @@ steps:
     chartVersion: '$(full-version)'
 
 - task: CopyFiles@2
-  displayName: 'Copy Release scripts'
+  displayName: 'Copy Nuget packages to staging'
+  inputs:
+    SourceFolder: .
+    Contents: '**/*.nupkg'
+    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
+
+- task: CopyFiles@2
+  displayName: 'Copy deployment'
   inputs:
     SourceFolder: deployment
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'

@@ -7,9 +7,6 @@ WORKDIR /src
 #	Copy source code into the source folder
 COPY . .
 
-#   Run tests before
-RUN dotnet test PasLibTest
-
 #	Publish the app into the app folder
 RUN dotnet publish PasWebApi -c release -o app
 
