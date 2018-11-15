@@ -10,11 +10,12 @@ using PasWebApi.Models.AnonymousAnalysis;
 namespace PasWebApi.Controllers
 {
     [Route("v1")]
-    [Route("vnext")]
     public class AnonymousAnalysisController : Controller
     {
+        [Route("")]
+        [Route("single")]
         [HttpPost]
-        public ActionResult Post([FromBody]AnonymousAnalysisInputModel body)
+        public ActionResult SinglePost([FromBody]SingleInputModel body)
         {
             try
             {
@@ -37,22 +38,75 @@ namespace PasWebApi.Controllers
                 {
                     return new BadRequestObjectResult("Grammar cannot be parsed");
                 }
-
-                var match = grammar.Match(body.Rule, body.Text);
-
-                if (match == null)
+                else
                 {
-                    return new BadRequestObjectResult("Text cannot be matched by grammar");
+                    var match = grammar.Match(body.Rule, body.Text);
+                    var outputModel = new SingleOutputModel(match);
+
+                    TrackParsingEvent();
+
+                    return new ObjectResult(outputModel)
+                    {
+                        StatusCode = 200
+                    };
+                }
+            }
+            catch (ParsingException ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+            catch (Exception)
+            {
+                return new ContentResult
+                {
+                    StatusCode = 500,
+                    ContentType = "text/plain",
+                    Content = "Internal error:  please report"
+                };
+            }
+        }
+
+        [Route("")]
+        [Route("multiple")]
+        [HttpPost]
+        public ActionResult MultiplePostAsync([FromBody]MultipleInputModel body)
+        {
+            try
+            {
+                if (body == null)
+                {
+                    return new BadRequestObjectResult("No JSON body");
+                }
+                if (string.IsNullOrWhiteSpace(body.Grammar))
+                {
+                    return new BadRequestObjectResult("JSON body should contain 'grammar'");
+                }
+                if (body.Texts == null || !body.Texts.Any())
+                {
+                    return new BadRequestObjectResult("JSON body should contain 'texts' with at least one text");
                 }
 
-                TrackParsingEvent();
+                var grammar = GrammarCache.ParseGrammar(body.Grammar);
 
-                var outputModel = new AnonymousAnalysisOutputModel(match);
-
-                return new ObjectResult(outputModel)
+                if (grammar == null)
                 {
-                    StatusCode = 200
-                };
+                    return new BadRequestObjectResult("Grammar cannot be parsed");
+                }
+                else
+                {
+                    var matches = from text in body.Texts
+                                  select grammar.Match(body.Rule, text);
+                    var outputs = from match in matches
+                                  select new SingleOutputModel(match);
+                    var outputModels = outputs.ToArray();
+
+                    TrackParsingEvent();
+
+                    return new ObjectResult(outputModels)
+                    {
+                        StatusCode = 200
+                    };
+                }
             }
             catch (ParsingException ex)
             {
