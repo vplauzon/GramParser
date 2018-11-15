@@ -53,9 +53,9 @@ steps:
     targetPath:  '$(build.artifactstagingdirectory)/deployment'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: deployment'
+  displayName: 'Publish Artifact: PasLibTest'
   inputs:
-    artifactName:  deployment
+    artifactName:  PasLibTest
     publishLocation: filePath
     targetPath:  PasLibTest
 
