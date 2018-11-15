@@ -9,6 +9,8 @@ group="shared-infra-$environment"
 repo="vplauzon/pas-api"
 tag="$environment"
 
+echo "appinsight:  '$environment'"
+echo "##vso[task.setvariable variable=environment;]$environment"
 echo "appinsight:  '$appinsight'"
 echo "##vso[task.setvariable variable=appinsight;]$appinsight"
 echo "cluster:  '$cluster'"

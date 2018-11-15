@@ -20,10 +20,10 @@ steps:
     projects: 'PasLibTest/*Test*.csproj'
 
 - task: DotNetCoreCLI@2
-  displayName: Build PasApiClient Nuget
+  displayName: Build projects
   inputs:
-    projects: 'PasApiClient/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
+    projects: '**/*.csproj'
+    arguments: '--configuration release'
 
 - task: CopyFiles@2
   displayName: 'Copy Nuget packages to staging'
