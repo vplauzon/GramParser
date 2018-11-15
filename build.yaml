@@ -59,31 +59,31 @@ steps:
     publishLocation: container
     pathtoPublish:  PasLibTest
 
-# - task: Docker@1
-#   displayName: 'Build an image'
-#   inputs:
-#     containerregistrytype: 'Container Registry'
-#     dockerRegistryEndpoint: 'vplauzon-docker-hub'
-#     imageName: '$(image-name):$(full-version)'
-#     includeLatestTag: true
+- task: Docker@1
+  displayName: 'Build an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'vplauzon-docker-hub'
+    imageName: '$(image-name):$(full-version)'
+    includeLatestTag: true
 
-# - task: Docker@1
-#   displayName: 'Push an image'
-#   inputs:
-#     containerregistrytype: 'Container Registry'
-#     dockerRegistryEndpoint: 'vplauzon-docker-hub'
-#     command: 'Push an image'
-#     imageName: '$(image-name):$(full-version)'
+- task: Docker@1
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'vplauzon-docker-hub'
+    command: 'Push an image'
+    imageName: '$(image-name):$(full-version)'
 
-# - task: HelmInstaller@0
-#   displayName: 'Install Helm 2.11.0'
-#   inputs:
-#     helmVersion: 2.11.0
+- task: HelmInstaller@0
+  displayName: 'Install Helm 2.11.0'
+  inputs:
+    helmVersion: 2.11.0
 
-# - task: HelmDeploy@0
-#   displayName: 'Helm package'
-#   inputs:
-#     azureSubscription: 'Windows Azure  MSDN - Visual Studio Premium (867feb0a-8313-464d-ad48-b4904383f9bc)'
-#     command: package
-#     chartPath: '$(chart-path)'
-#     chartVersion: '$(full-version)'
+- task: HelmDeploy@0
+  displayName: 'Helm package'
+  inputs:
+    azureSubscription: 'Windows Azure  MSDN - Visual Studio Premium (867feb0a-8313-464d-ad48-b4904383f9bc)'
+    command: package
+    chartPath: '$(chart-path)'
+    chartVersion: '$(full-version)'
