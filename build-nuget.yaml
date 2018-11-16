@@ -39,5 +39,5 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    artifactName:  test
-    pathtoPublish: '$(build.artifactstagingdirectory)/test'
+    artifactName:  source
+    pathtoPublish: '$(build.artifactstagingdirectory)/source'
