@@ -10,9 +10,13 @@ steps:
     scriptPath: deployment/patch-nuget-version.py
     arguments: 'PasApiClient/PasApiClient.csproj $(Build.BuildId)'
 - task: Bash@3
+  displayName: 'Diagnose'
+  inputs:
+    script:  'pwd && ls'
+- task: Bash@3
   displayName: 'Copy Alpha project'
   inputs:
-    script:  'pwd && ls && cp PasApiClient/alpha-nuget.csproj PasApiClient/PasApiClient.csproj'
+    script:  'cp PasApiClient/alpha-nuget.csproj PasApiClient/PasApiClient.csproj'
 - task: DotNetCoreCLI@2
   displayName: Build Alpha Nuget
   inputs:
