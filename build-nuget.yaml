@@ -12,7 +12,7 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: Build Nugets
   inputs:
-    projects: 'PasApiClient/*nuget*.csproj'
+    projects: 'PasApiClient/*nuget.csproj'
     arguments: '--configuration release'
 - task: DotNetCoreCLI@2
   displayName: Build Nuget tests
