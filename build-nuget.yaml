@@ -9,21 +9,15 @@ steps:
   inputs:
     scriptPath: deployment/patch-nuget-version.py
     arguments: 'PasApiClient/PasApiClient.csproj $(Build.BuildId)'
-- bash: 'pwd && ls'
-  displayName: 'Diagnose'
-- task: Bash@3
+- bash: 'cp PasApiClient/alpha-nuget.csproj PasApiClient/PasApiClient.csproj'
   displayName: 'Copy Alpha project'
-  inputs:
-    script:  'cp PasApiClient/alpha-nuget.csproj PasApiClient/PasApiClient.csproj'
 - task: DotNetCoreCLI@2
   displayName: Build Alpha Nuget
   inputs:
     projects: 'PasApiClient/PasApiClient.csproj'
     arguments: '--configuration release'
-- task: Bash@3
+- bash: 'cp PasApiClient/gold-nuget.csproj PasApiClient/PasApiClient.csproj'
   displayName: 'Copy Gold project'
-  inputs:
-    script:  'cp PasApiClient/gold-nuget.csproj PasApiClient/PasApiClient.csproj'
 - task: DotNetCoreCLI@2
   displayName: Build Gold Nuget
   inputs:
