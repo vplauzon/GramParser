@@ -33,9 +33,9 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Nuget Tests'
   inputs:
-    SourceFolder: PasApiClientTest
+    SourceFolder: .
     Contents: '**'
-    TargetFolder: '$(build.artifactstagingdirectory)/test'
+    TargetFolder: '$(build.artifactstagingdirectory)/source'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
