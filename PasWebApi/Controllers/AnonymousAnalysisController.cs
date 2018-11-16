@@ -12,7 +12,6 @@ namespace PasWebApi.Controllers
     [Route("v1")]
     public class AnonymousAnalysisController : Controller
     {
-        [Route("")]
         [Route("single")]
         [HttpPost]
         public ActionResult SinglePost([FromBody]SingleInputModel body)

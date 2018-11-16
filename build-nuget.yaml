@@ -2,88 +2,25 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-  chart-path: deployment/helm-chart/ParserAsServiceApi
-  image-name:  vplauzon/pas-api
-  app-version-txt-path:  deployment/ApiVersion.txt
-  app-version-cs-path:  PasWebApi/ApiVersion.cs
+  dummy:  42
 steps:
 - task: PythonScript@0
-  displayName: 'Manage Version'
+  displayName: 'Inject build number'
   inputs:
-    scriptPath: 'deployment/manage-version.py'
-    arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
-
+    scriptPath: deployment/patch-nuget-version.py
+    arguments: 'PasApiClient/PasApiClient.csproj $(Build.BuildId)'
 - task: DotNetCoreCLI@2
-  displayName: Build projects
+  displayName: Build
   inputs:
-    projects: '**/*.csproj'
+    projects: 'PasApiClient/*nuget*.csproj'
     arguments: '--configuration release'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet test PasLibTest'
-  inputs:
-    command: test
-    projects: 'PasLibTest/*Test*.csproj'
-
 - task: CopyFiles@2
   displayName: 'Copy Nuget packages to staging'
   inputs:
     SourceFolder: .
     Contents: '**/*.nupkg'
-    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
-
+    TargetFolder: '$(build.artifactstagingdirectory)'
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: nuget'
+  displayName: 'Publish Artifact'
   inputs:
-    artifactName:  nuget
-    publishLocation: container
-    pathtoPublish:  '$(build.artifactstagingdirectory)/nuget'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: PasLibTest'
-  inputs:
-    artifactName:  PasLibTest
-    publishLocation: container
-    pathtoPublish:  PasLibTest
-
-- task: Docker@1
-  displayName: 'Build an image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'vplauzon-docker-hub'
-    imageName: '$(image-name):$(full-version)'
-    includeLatestTag: true
-
-- task: Docker@1
-  displayName: 'Push an image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'vplauzon-docker-hub'
-    command: 'Push an image'
-    imageName: '$(image-name):$(full-version)'
-
-- task: HelmInstaller@0
-  displayName: 'Install Helm 2.11.0'
-  inputs:
-    helmVersion: 2.11.0
-
-- task: HelmDeploy@0
-  displayName: 'Helm package'
-  inputs:
-    azureSubscription: 'Windows Azure  MSDN - Visual Studio Premium (867feb0a-8313-464d-ad48-b4904383f9bc)'
-    command: package
-    chartPath: '$(chart-path)'
-    chartVersion: '$(full-version)'
-
-- task: CopyFiles@2
-  displayName: 'Copy deployment'
-  inputs:
-    SourceFolder: deployment
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/deployment'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: deployment'
-  inputs:
-    artifactName:  deployment
-    publishLocation: container
-    pathtoPublish:  '$(build.artifactstagingdirectory)/deployment'
+    PathtoPublish: '$(build.artifactstagingdirectory)'
