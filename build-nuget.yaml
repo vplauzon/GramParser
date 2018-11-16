@@ -9,10 +9,8 @@ steps:
   inputs:
     scriptPath: deployment/patch-nuget-version.py
     arguments: 'PasApiClient/PasApiClient.csproj $(Build.BuildId)'
-- task: Bash@3
+- bash: 'pwd && ls'
   displayName: 'Diagnose'
-  inputs:
-    script:  'pwd && ls'
 - task: Bash@3
   displayName: 'Copy Alpha project'
   inputs:
