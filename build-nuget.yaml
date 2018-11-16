@@ -23,28 +23,18 @@ steps:
   inputs:
     projects: 'PasApiClient/PasApiClient.csproj'
     arguments: '--configuration release'
-- task: DotNetCoreCLI@2
-  displayName: Build Nuget tests
-  inputs:
-    projects: 'PasApiClientTest/*.csproj'
-    arguments: '--configuration release'
-- task: CopyFiles@2
+- bash: |
+    mkdir $(build.artifactstagingdirectory)/nuget
+    mkdir $(build.artifactstagingdirectory)/nuget/alpha
+    mkdir $(build.artifactstagingdirectory)/nuget/gold
+    cp PasApiClient/bin/release/*-alpha.nupkg $(build.artifactstagingdirectory)/nuget/alpha
+    cp PasApiClient/bin/release/*$(Build.BuildId).nupkg $(build.artifactstagingdirectory)/nuget/gold
   displayName: 'Copy Nuget packages'
-  inputs:
-    SourceFolder: .
-    Contents: '**/*.nupkg'
-    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
     artifactName:  nuget
     pathtoPublish: '$(build.artifactstagingdirectory)/nuget'
-- task: CopyFiles@2
-  displayName: 'Copy Nuget Tests'
-  inputs:
-    SourceFolder: .
-    Contents: '**'
-    TargetFolder: '$(build.artifactstagingdirectory)/source'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
