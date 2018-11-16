@@ -31,12 +31,12 @@ steps:
     cp PasApiClient/bin/release/*$(Build.BuildId).nupkg $(build.artifactstagingdirectory)/nuget/gold
   displayName: 'Copy Nuget packages'
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
+  displayName: 'Publish Artifact Nuget'
   inputs:
     artifactName:  nuget
     pathtoPublish: '$(build.artifactstagingdirectory)/nuget'
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
+  displayName: 'Publish Artifact Sources'
   inputs:
     artifactName:  source
-    pathtoPublish: '$(build.artifactstagingdirectory)/source'
+    pathtoPublish: .
