@@ -10,17 +10,34 @@ steps:
     scriptPath: deployment/patch-nuget-version.py
     arguments: 'PasApiClient/PasApiClient.csproj $(Build.BuildId)'
 - task: DotNetCoreCLI@2
-  displayName: Build
+  displayName: Build Nugets
   inputs:
     projects: 'PasApiClient/*nuget*.csproj'
     arguments: '--configuration release'
+- task: DotNetCoreCLI@2
+  displayName: Build Nuget tests
+  inputs:
+    projects: 'PasApiClientTest/*.csproj'
+    arguments: '--configuration release'
 - task: CopyFiles@2
-  displayName: 'Copy Nuget packages to staging'
+  displayName: 'Copy Nuget packages'
   inputs:
     SourceFolder: .
     Contents: '**/*.nupkg'
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    TargetFolder: '$(build.artifactstagingdirectory)/nuget'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
+    artifactName:  nuget
+    pathtoPublish: '$(build.artifactstagingdirectory)/nuget'
+- task: CopyFiles@2
+  displayName: 'Copy Nuget Tests'
+  inputs:
+    SourceFolder: PasApiClientTest
+    Contents: '**'
+    TargetFolder: '$(build.artifactstagingdirectory)/test'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    artifactName:  test
+    pathtoPublish: '$(build.artifactstagingdirectory)/test'
