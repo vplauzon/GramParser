@@ -50,7 +50,7 @@ namespace PasLib
         public RuleMatch(
             IRule rule,
             SubString text,
-            IEnumerable<NamedRuleMatch> namedChildren)
+            IImmutableDictionary<string, RuleMatch> namedChildren)
             : this(rule, text, text.Length, namedChildren)
         {
         }
@@ -59,17 +59,10 @@ namespace PasLib
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            IEnumerable<NamedRuleMatch> namedChildren)
+            IImmutableDictionary<string, RuleMatch> namedChildren)
             : this(rule, text, lengthWithInterleaves)
         {
-            if (namedChildren == null)
-            {
-                throw new ArgumentNullException(nameof(namedChildren));
-            }
-
-            NamedChildren = namedChildren.Any()
-                ? ImmutableList<NamedRuleMatch>.Empty.AddRange(namedChildren)
-                : null;
+            NamedChildren = namedChildren ?? throw new ArgumentNullException(nameof(namedChildren));
         }
 
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
@@ -83,29 +76,8 @@ namespace PasLib
         public IImmutableList<RuleMatch> Children { get; }
             = ImmutableList<RuleMatch>.Empty;
 
-        public IImmutableList<NamedRuleMatch> NamedChildren { get; }
-
-        public RuleMatch GetChild(string tag)
-        {
-            if (string.IsNullOrWhiteSpace(tag))
-            {
-                throw new ArgumentNullException(nameof(tag));
-            }
-            if (NamedChildren == null)
-            {
-                throw new IndexOutOfRangeException("There are no fragments");
-            }
-
-            foreach (var taggedMatch in NamedChildren)
-            {
-                if (taggedMatch.Name == tag)
-                {
-                    return taggedMatch.Match;
-                }
-            }
-
-            throw new IndexOutOfRangeException($"No fragment with tag '{tag}'");
-        }
+        public IImmutableDictionary<string, RuleMatch> NamedChildren { get; }
+            = ImmutableDictionary<string, RuleMatch>.Empty;
 
         public RuleMatch ChangeRule(IRule rule)
         {

@@ -96,11 +96,13 @@ namespace PasLib
                 if (_hasWithNames)
                 {
                     var namedMatches = from m in subMatches
-                                       select new NamedRuleMatch(
+                                       select new KeyValuePair<string, RuleMatch>(
                                            m.rule.Tag,
                                            FormatMatch(m.match, m.rule));
+                    var immutable =
+                        ImmutableDictionary<string, RuleMatch>.Empty.AddRange(namedMatches);
 
-                    return new RuleMatch(rule, text, namedMatches);
+                    return new RuleMatch(rule, text, immutable);
                 }
                 else
                 {
@@ -118,7 +120,7 @@ namespace PasLib
 
         private RuleMatch FormatMatch(RuleMatch match, TaggedRule rule)
         {
-            return rule.MatchSelectionState== MatchSelection.ChildrenOnly
+            return rule.MatchSelectionState == MatchSelection.ChildrenOnly
                 ? match.RemoveChildren()
                 : match;
         }

@@ -287,16 +287,18 @@ namespace PasLibTest
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.IsNotNull(match.NamedChildren, $"Fragments - {i}");
                     Assert.AreEqual(1, match.NamedChildren.Count, $"Fragments Count - {i}");
-                    if (match.NamedChildren.First().Name == "s1")
+                    if (match.NamedChildren.First().Key == "s1")
                     {
-                        Assert.IsNotNull(
-                            match.NamedChildren.First().Match.NamedChildren,
+                        Assert.AreNotEqual(
+                            0,
+                            match.NamedChildren["s1"].NamedChildren.Count,
                             $"Sub Fragments 1 - {i}");
                     }
-                    if (match.NamedChildren.First().Name == "s2")
+                    if (match.NamedChildren.First().Key == "s2")
                     {
-                        Assert.IsNull(
-                            match.NamedChildren.First().Match.NamedChildren,
+                        Assert.AreEqual(
+                            0,
+                            match.NamedChildren["s2"].NamedChildren.Count,
                             $"Sub Fragments 2 - {i}");
                     }
                 }
@@ -385,8 +387,8 @@ namespace PasLibTest
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
-            Assert.AreEqual("Hi", match.GetChild("h").Text.ToString(), "Fragments - Hi");
-            Assert.AreEqual("Bob", match.GetChild("b").Text.ToString(), "Fragments - Bob");
+            Assert.AreEqual("Hi", match.NamedChildren["h"].Text.ToString(), "Fragments - Hi");
+            Assert.AreEqual("Bob", match.NamedChildren["b"].Text.ToString(), "Fragments - Bob");
         }
 
         [TestMethod]
@@ -405,13 +407,13 @@ namespace PasLibTest
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
             Assert.AreEqual(
-                "aaaa", match.GetChild("a").Text.ToString(), "Fragments text - a");
-            Assert.IsNotNull(match.GetChild("a").Children, "Fragments - Repeats - a");
+                "aaaa", match.NamedChildren["a"].Text.ToString(), "Fragments text - a");
+            Assert.IsNotNull(match.NamedChildren["a"].Children, "Fragments - Repeats - a");
             Assert.AreEqual(
-                4, match.GetChild("a").Children.Count(), "Fragments - Counts - a");
+                4, match.NamedChildren["a"].Children.Count(), "Fragments - Counts - a");
             Assert.AreEqual(
-                "bb", match.GetChild("b").Text.ToString(), "Fragments text - b");
-            Assert.IsNotNull(match.GetChild("b").Children, "Fragments - Repeats - b");
+                "bb", match.NamedChildren["b"].Text.ToString(), "Fragments text - b");
+            Assert.IsNotNull(match.NamedChildren["b"].Children, "Fragments - Repeats - b");
         }
         #endregion
 

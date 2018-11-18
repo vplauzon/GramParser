@@ -45,28 +45,28 @@ namespace PasLib
 
                 foreach (var ruleMatch in match.Children)
                 {
-                    var taggedMatch = ruleMatch.NamedChildren.First();
-                    var subMatch = taggedMatch.Match;
+                    var tag = ruleMatch.NamedChildren.Keys.First();
+                    var subMatch = ruleMatch.NamedChildren.Values.First();
 
-                    if (taggedMatch.Name == "interleaveDeclaration")
+                    if (tag == "interleaveDeclaration")
                     {
-                        var ruleBodyMatch = subMatch.NamedChildren.First().Match;
+                        var ruleBodyMatch = subMatch.NamedChildren.First().Value;
 
                         interleave = CreateRule(
                             "#interleave", PropertyBag.Default, ruleBodyMatch);
                     }
-                    else if (taggedMatch.Name == "ruleDeclaration")
+                    else if (tag == "ruleDeclaration")
                     {
-                        var ruleID = subMatch.GetChild("id").Text.ToString();
-                        var parameterAssignationList = subMatch.GetChild("params");
-                        var ruleBody = subMatch.GetChild("body");
+                        var ruleID = subMatch.NamedChildren["id"].Text.ToString();
+                        var parameterAssignationList = subMatch.NamedChildren["params"];
+                        var ruleBody = subMatch.NamedChildren["body"];
                         var rule = CreateRule(ruleID, parameterAssignationList, ruleBody);
 
                         _ruleMap[ruleID] = rule;
                     }
                     else
                     {
-                        throw new NotSupportedException($"Tag '{taggedMatch}' for declaration");
+                        throw new NotSupportedException($"Tag '{tag}' for declaration");
                     }
                 }
 
@@ -102,13 +102,13 @@ namespace PasLib
             {
                 var tagChild = tag.NamedChildren.First();
 
-                switch (tagChild.Name)
+                switch (tagChild.Key)
                 {
                     case "noTag":
                         return new TaggedRule(rule);
                     case "noChildrenTag":
                         {
-                            var id = tagChild.Match.NamedChildren;
+                            var id = tagChild.Value.NamedChildren;
 
                             if (id.Count() == 0)
                             {
@@ -116,7 +116,7 @@ namespace PasLib
                             }
                             else
                             {
-                                var idText = id.First().Match.Text;
+                                var idText = id.First().Value.Text;
 
                                 return new TaggedRule(
                                     idText.Length==0 ? null : idText.ToString(),
@@ -126,7 +126,7 @@ namespace PasLib
                         }
                     case "withChildrenTag":
                         {
-                            var id = tagChild.Match.NamedChildren;
+                            var id = tagChild.Value.NamedChildren;
 
                             if (id.Count() == 0)
                             {
@@ -134,7 +134,7 @@ namespace PasLib
                             }
                             else
                             {
-                                var idText = id.First().Match.Text;
+                                var idText = id.First().Value.Text;
 
                                 return new TaggedRule(
                                     idText.Length==0 ? null : idText.ToString(),
@@ -144,7 +144,7 @@ namespace PasLib
                         }
                     default:
                         throw new NotSupportedException(
-                            $"Tag of type {tagChild.Name} isn't supported");
+                            $"Tag of type {tagChild.Key} isn't supported");
                 }
             }
 
@@ -168,8 +168,8 @@ namespace PasLib
                 PropertyBag propertyBag,
                 RuleMatch ruleBodyMatch)
             {
-                var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Name;
-                var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Match;
+                var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Key;
+                var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Value;
 
                 switch (ruleBodyTag)
                 {
@@ -206,17 +206,17 @@ namespace PasLib
                 else
                 {
                     var list = parameterAssignationList.Children.First();
-                    var head = list.NamedChildren[0].Match;
-                    var tail = list.NamedChildren[1].Match;
+                    var head = list.NamedChildren["h"];
+                    var tail = list.NamedChildren["t"];
                     var tailParamAssignations = from t in tail.Children
-                                                select t.NamedChildren.First().Match;
+                                                select t.NamedChildren.First().Value;
                     var paramAssignations = tailParamAssignations.Append(head);
                     var bag = new PropertyBag();
 
                     foreach (var assignation in paramAssignations)
                     {
-                        var id = assignation.NamedChildren[0].Match.Text.ToString();
-                        var value = assignation.NamedChildren[1].Match.Text.ToString();
+                        var id = assignation.NamedChildren["id"].Text.ToString();
+                        var value = assignation.NamedChildren["value"].Text.ToString();
 
                         switch (id)
                         {
@@ -330,7 +330,7 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag)
             {
-                var literal = ruleBodyBody.NamedChildren.First().Match;
+                var literal = ruleBodyBody.NamedChildren.First().Value;
                 var characters = from l in literal.Children
                                  let c = GetCharacter(l)
                                  select c;
@@ -342,25 +342,25 @@ namespace PasLib
             private char GetCharacter(RuleMatch character)
             {
                 var charFragment = character.NamedChildren.First();
-                var subMatch = charFragment.Match;
+                var subMatch = charFragment.Value;
 
-                switch (charFragment.Name)
+                switch (charFragment.Key)
                 {
                     case "normal":
                         return subMatch.Text.First;
                     case "escapeLetter":
-                        return GetEscapeLetter(subMatch.NamedChildren.First().Match.Text.First);
+                        return GetEscapeLetter(subMatch.NamedChildren.First().Value.Text.First);
                     case "escapeQuote":
                         return '\"';
                     case "escapeBackslash":
                         return '\\';
                     case "escapeHexa":
                         return (char)int.Parse(
-                            subMatch.NamedChildren.First().Match.Text.ToString(),
+                            subMatch.NamedChildren.First().Value.Text.ToString(),
                             NumberStyles.HexNumber);
                     default:
                         throw new NotSupportedException(
-                            $"Character tag not supported:  '{charFragment.Name}'");
+                            $"Character tag not supported:  '{charFragment.Key}'");
                 }
             }
 
@@ -396,9 +396,9 @@ namespace PasLib
                 PropertyBag propertyBag)
             {
                 var lower =
-                            ruleBodyBody.GetChild("lower").NamedChildren.First().Match;
+                            ruleBodyBody.NamedChildren["lower"].NamedChildren.First().Value;
                 var upper =
-                    ruleBodyBody.GetChild("upper").NamedChildren.First().Match;
+                    ruleBodyBody.NamedChildren["upper"].NamedChildren.First().Value;
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
@@ -410,11 +410,11 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var subRuleBody = ruleBodyBody.GetChild("rule");
+                var subRuleBody = ruleBodyBody.NamedChildren["rule"];
                 var rule = CreateRule(subRuleBody);
-                var cardinality = ruleBodyBody.GetChild("cardinality");
+                var cardinality = ruleBodyBody.NamedChildren["cardinality"];
 
-                switch (cardinality.NamedChildren.First().Name)
+                switch (cardinality.NamedChildren.First().Key)
                 {
                     case "star":
                         return new RepeatRule(
@@ -445,8 +445,8 @@ namespace PasLib
                             bag.HasChildrenDetails);
                     case "exact":
                         {
-                            var exact = cardinality.NamedChildren.First().Match;
-                            var n = int.Parse(exact.NamedChildren.First().Match.Text.ToString());
+                            var exact = cardinality.NamedChildren.First().Value;
+                            var n = int.Parse(exact.NamedChildren.First().Value.Text.ToString());
 
                             return new RepeatRule(
                                 ruleID,
@@ -459,7 +459,7 @@ namespace PasLib
                         }
                     case "minMax":
                         {
-                            var minMaxCardinality = cardinality.NamedChildren.First().Match;
+                            var minMaxCardinality = cardinality.NamedChildren.First().Value;
                             (var min, var max) = GetMinMaxCardinality(minMaxCardinality);
 
                             return new RepeatRule(
@@ -478,15 +478,15 @@ namespace PasLib
 
             private (int? min, int? max) GetMinMaxCardinality(RuleMatch minMaxCardinality)
             {
-                var type = minMaxCardinality.NamedChildren.First().Name;
-                var cardinality = minMaxCardinality.NamedChildren.First().Match;
+                var type = minMaxCardinality.NamedChildren.First().Key;
+                var cardinality = minMaxCardinality.NamedChildren.First().Value;
 
                 switch (type)
                 {
                     case "minmax":
                         {
-                            var minText = cardinality.NamedChildren[0].Match.Text;
-                            var maxText = cardinality.NamedChildren[1].Match.Text;
+                            var minText = cardinality.NamedChildren["min"].Text;
+                            var maxText = cardinality.NamedChildren["max"].Text;
                             var min = int.Parse(minText.ToString());
                             var max = int.Parse(maxText.ToString());
 
@@ -494,14 +494,14 @@ namespace PasLib
                         }
                     case "min":
                         {
-                            var minText = cardinality.NamedChildren[0].Match.Text;
+                            var minText = cardinality.NamedChildren["min"].Text;
                             var min = int.Parse(minText.ToString());
 
                             return (min, null);
                         }
                     case "max":
                         {
-                            var maxText = cardinality.NamedChildren[0].Match.Text;
+                            var maxText = cardinality.NamedChildren["max"].Text;
                             var max = int.Parse(maxText.ToString());
 
                             return (null, max);
@@ -516,13 +516,13 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var headTag = ruleBodyBody.GetChild("t");
-                var head = ruleBodyBody.GetChild("head");
-                var tail = ruleBodyBody.GetChild("tail");
+                var headTag = ruleBodyBody.NamedChildren["t"];
+                var head = ruleBodyBody.NamedChildren["head"];
+                var tail = ruleBodyBody.NamedChildren["tail"];
                 var headRule = CreateTaggedRule(headTag, CreateRule(head));
                 var tailRules = from c in tail.Children
-                                let tailTag = c.GetChild("t")
-                                let tailDisjunctable = c.GetChild("d")
+                                let tailTag = c.NamedChildren["t"]
+                                let tailDisjunctable = c.NamedChildren["d"]
                                 select CreateTaggedRule(
                                     tailTag, CreateRule(tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
@@ -537,8 +537,8 @@ namespace PasLib
                 PropertyBag bag)
             {
                 var rules = from tagRule in ruleBodyBody.Children
-                            let t = tagRule.GetChild("t")
-                            let r = tagRule.GetChild("r")
+                            let t = tagRule.NamedChildren["t"]
+                            let r = tagRule.NamedChildren["r"]
                             let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
@@ -555,8 +555,8 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var primary = ruleBodyBody.GetChild("primary");
-                var excluded = ruleBodyBody.GetChild("excluded");
+                var primary = ruleBodyBody.NamedChildren["primary"];
+                var excluded = ruleBodyBody.NamedChildren["excluded"];
                 var primaryRule = CreateRule(primary);
                 var excludedRule = CreateRule(excluded);
 
@@ -574,7 +574,7 @@ namespace PasLib
                 RuleMatch ruleBodyBody,
                 PropertyBag bag)
             {
-                var bracketted = ruleBodyBody.NamedChildren.First().Match;
+                var bracketted = ruleBodyBody.NamedChildren.First().Value;
                 var rule = CreateRule(null, bag, bracketted);
 
                 return rule;
