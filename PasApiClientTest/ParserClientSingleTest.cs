@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PasApiClient;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PasApiClientTest
@@ -19,6 +20,21 @@ namespace PasApiClientTest
             Assert.IsTrue(result.IsMatch, "IsMatch");
             Assert.AreEqual(text, result.RuleMatch.Text, "Text");
             Assert.AreEqual(3, result.RuleMatch.Children.Length, "Children");
+        }
+
+        [TestMethod]
+        public async Task NamedChildren()
+        {
+            var client = CreateClient();
+            var grammar = "rule letter = \"a\"..\"z\" | \"A\"..\"Z\";rule number=\"0\"..\"9\";rule main = n:number+ | l:letter*;";
+            var text = "abc";
+            var result = await client.SingleParseAsync(grammar, text);
+
+            Assert.IsTrue(result.IsMatch, "IsMatch");
+            Assert.AreEqual(text, result.RuleMatch.Text, "Text");
+            Assert.IsNull(result.RuleMatch.Children, "Children");
+            Assert.AreEqual(1, result.RuleMatch.NamedChildren.Count, "NamedChildren");
+            Assert.AreEqual("l", result.RuleMatch.NamedChildren.Keys.First(), "Name");
         }
 
         [TestMethod]

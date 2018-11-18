@@ -2,6 +2,6 @@
 <!--	dotnet test - -settings TestRunParameters.xml	-->
 <RunSettings>
 	<TestRunParameters>
-		<Parameter name="baseUri" value="http://localhost:61901/" />
+		<Parameter name="baseUri" value="http://localhost:63758/" />
 	</TestRunParameters>
 </RunSettings>

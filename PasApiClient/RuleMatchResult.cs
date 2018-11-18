@@ -17,6 +17,6 @@ namespace PasApiClient
         public RuleMatchResult[] Children { get; set; }
 
         /// <summary>Named children matches.</summary>
-        public NamedRuleMatchResult[] NamedChildren { get; set; }
+        public IDictionary<string, RuleMatchResult> NamedChildren { get; set; }
     }
 }
