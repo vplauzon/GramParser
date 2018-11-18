@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Collections.Immutable;
 
 namespace PasWebApi.Models.AnonymousAnalysis
 {
@@ -26,9 +27,12 @@ namespace PasWebApi.Models.AnonymousAnalysis
             if (match.NamedChildren != null && match.NamedChildren.Count > 0)
             {
                 var namedChildren = from f in match.NamedChildren
-                                    select new NamedRuleMatchModel(f);
+                                    select new KeyValuePair<string, RuleMatchModel>(
+                                        f.Name,
+                                        new RuleMatchModel(f.Match));
 
-                NamedChildren = namedChildren.ToArray();
+                NamedChildren = ImmutableDictionary<string, RuleMatchModel>.Empty.AddRange(
+                    namedChildren);
             }
         }
 
@@ -38,6 +42,6 @@ namespace PasWebApi.Models.AnonymousAnalysis
 
         public RuleMatchModel[] Children { get; }
 
-        public NamedRuleMatchModel[] NamedChildren { get; }
+        public IImmutableDictionary<string, RuleMatchModel> NamedChildren { get; }
     }
 }
