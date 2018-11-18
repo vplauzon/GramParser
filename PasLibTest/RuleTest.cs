@@ -233,7 +233,7 @@ namespace PasLibTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.AreEqual(0, match.NamedChildren.Count, $"NamedChildren - {i}");
                     Assert.IsNotNull(match.Children, $"Children - {i}");
                     Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
@@ -368,7 +368,7 @@ namespace PasLibTest
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(text.ToString().TrimStart(), match.Text.ToString(), "Content");
-            Assert.IsNull(match.NamedChildren, "Fragments");
+            Assert.AreEqual(0, match.NamedChildren.Count, "Fragments");
         }
 
         [TestMethod]
@@ -488,7 +488,7 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNull(match.NamedChildren, $"NamedChildren - {i}");
+                    Assert.AreEqual(0, match.NamedChildren.Count, $"NamedChildren - {i}");
                     Assert.IsNotNull(match.Children, $"Children - {i}");
                     Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
                 }
