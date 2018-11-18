@@ -28,8 +28,8 @@ namespace PasWebApi.Models.AnonymousAnalysis
             {
                 var namedChildren = from f in match.NamedChildren
                                     select new KeyValuePair<string, RuleMatchModel>(
-                                        f.Name,
-                                        new RuleMatchModel(f.Match));
+                                        f.Key,
+                                        new RuleMatchModel(f.Value));
 
                 NamedChildren = ImmutableDictionary<string, RuleMatchModel>.Empty.AddRange(
                     namedChildren);

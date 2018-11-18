@@ -324,7 +324,7 @@ namespace PasLibTest
                 var match = grammar.Match(rule, text);
 
                 Assert.IsNotNull(match, "Match - " + rule);
-                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsFalse(match.NamedChildren.Any(), "NamedChildren - " + rule);
                 Assert.IsNotNull(match.Children, "Children - " + rule);
                 Assert.AreEqual(expectedChildren, match.Children.Count(), "#Children - " + rule);
             }
@@ -334,7 +334,7 @@ namespace PasLibTest
                 var match = grammar.Match("without", text);
 
                 Assert.IsNotNull(match, "Match - " + rule);
-                Assert.IsNull(match.NamedChildren, "NamedChildren - " + rule);
+                Assert.IsFalse(match.NamedChildren.Any(), "NamedChildren - " + rule);
                 Assert.IsNotNull(match.Children, "Children - " + rule);
                 Assert.AreEqual(0, match.Children.Count(), "#Children - " + rule);
             }
