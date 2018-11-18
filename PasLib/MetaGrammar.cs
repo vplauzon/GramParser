@@ -206,8 +206,8 @@ namespace PasLib
                 else
                 {
                     var list = parameterAssignationList.Children.First();
-                    var head = list.NamedChildren["h"];
-                    var tail = list.NamedChildren["t"];
+                    var head = list.NamedChildren["head"];
+                    var tail = list.NamedChildren["tail"];
                     var tailParamAssignations = from t in tail.Children
                                                 select t.NamedChildren.First().Value;
                     var paramAssignations = tailParamAssignations.Append(head);

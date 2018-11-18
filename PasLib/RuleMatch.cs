@@ -92,7 +92,7 @@ namespace PasLib
             }
             else
             {
-                return NamedChildren == null
+                return !NamedChildren.Any()
                     ? new RuleMatch(rule, Text, LengthWithInterleaves, Children)
                     : new RuleMatch(rule, Text, LengthWithInterleaves, NamedChildren);
             }
@@ -111,7 +111,7 @@ namespace PasLib
             }
             else
             {
-                return NamedChildren == null
+                return !NamedChildren.Any()
                     ? new RuleMatch(Rule, Text, LengthWithInterleaves + length, Children)
                     : new RuleMatch(Rule, Text, LengthWithInterleaves + length, NamedChildren);
             }
@@ -119,7 +119,7 @@ namespace PasLib
 
         public RuleMatch RemoveChildren()
         {
-            return NamedChildren == null && !Children.Any()
+            return !NamedChildren.Any() && !Children.Any()
                 ? this
                 : new RuleMatch(Rule, Text, LengthWithInterleaves);
         }
