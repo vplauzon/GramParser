@@ -29,7 +29,7 @@ namespace PasWebApi
             services
                 .AddMvcCore()
                 .AddJsonFormatters(settings => settings.NullValueHandling = NullValueHandling.Ignore);
-            services.AddSingleton<RequestBodyInitializer, RequestBodyInitializer>();
+            services.AddTransient<RequestBodyInitializer, RequestBodyInitializer>();
             services.AddCors();
         }
 
