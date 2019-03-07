@@ -19,16 +19,14 @@ steps:
 - script: dotnet publish PasWebApi -c release -o app
   displayName: 'Build / Publish API'
 
-- task: DotNetCoreCLI@2
+- task: Docker@1
   displayName: 'Build Docker image'
   inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'vplauzon-docker-hub'
     imageName: '$(image-name):$(full-version)'
-    includeLatestTag: true
+    includeLatestTag: false
 
 - task: Docker@1
-  displayName: 'Push an image'
+  displayName: 'Push Docker image'
   inputs:
     containerregistrytype: 'Container Registry'
     dockerRegistryEndpoint: 'vplauzon-docker-hub'
