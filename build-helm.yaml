@@ -17,12 +17,13 @@ steps:
   displayName: 'Build'
   inputs:
     command:  build
-    projects:  PasLibTest
+    arguments:  -c release
 
 - task: DotNetCoreCLI@2
   displayName: 'Test'
   inputs:
     command:  test
+    arguments:  -c release
     projects:  PasLibTest
 
 - task: DotNetCoreCLI@2
@@ -30,6 +31,7 @@ steps:
   inputs:
     command:  publish
     projects:  PasWebApi
+    arguments:  -c release -o app
 
 - task: DotNetCoreCLI@2
   displayName: 'Build an image'
