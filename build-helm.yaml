@@ -20,6 +20,12 @@ steps:
     projects:  PasLibTest
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build / Publish API'
+  inputs:
+    command:  publish
+    projects:  PasWebApi
+
+- task: DotNetCoreCLI@2
   displayName: 'Build an image'
   inputs:
     containerregistrytype: 'Container Registry'
