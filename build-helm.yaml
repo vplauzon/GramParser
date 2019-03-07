@@ -20,12 +20,12 @@ steps:
 #     arguments:  -c release
 #     projects:  PasLibTest
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build / Publish API'
-  inputs:
-    command:  publish
-    projects:  PasWebApi
-    arguments:  -c release -o app
+# - task: DotNetCoreCLI@2
+#   displayName: 'Build / Publish API'
+#   inputs:
+#     command:  publish
+#     projects:  PasWebApi
+#     arguments:  -c release -o app
 
 - task: DotNetCoreCLI@2
   displayName: 'Build an image'
