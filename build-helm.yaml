@@ -13,12 +13,12 @@ steps:
     scriptPath: 'deployment/manage-version.py'
     arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test'
-  inputs:
-    command:  test
-    arguments:  -c release
-    projects:  PasLibTest
+# - task: DotNetCoreCLI@2
+#   displayName: 'Test'
+#   inputs:
+#     command:  test
+#     arguments:  -c release
+#     projects:  PasLibTest
 
 - task: DotNetCoreCLI@2
   displayName: 'Build / Publish API'
