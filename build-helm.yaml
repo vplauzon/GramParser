@@ -20,7 +20,7 @@ steps:
   displayName: 'Build / Publish API'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build an image'
+  displayName: 'Build Docker image'
   inputs:
     containerregistrytype: 'Container Registry'
     dockerRegistryEndpoint: 'vplauzon-docker-hub'
