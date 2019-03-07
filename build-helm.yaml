@@ -25,7 +25,7 @@ steps:
   inputs:
     command:  publish
     projects:  PasWebApi
-    arguments:  -c release -o app
+    arguments:  "-c release -o app"
 
 - task: DotNetCoreCLI@2
   displayName: 'Build an image'
