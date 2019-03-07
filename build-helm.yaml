@@ -13,7 +13,12 @@ steps:
     scriptPath: 'deployment/manage-version.py'
     arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
 
-- task: Docker@1
+- task: DotNetCoreCLI@2
+  displayName: 'Test'
+  inputs:
+    command:  test
+
+- task: DotNetCoreCLI@2
   displayName: 'Build an image'
   inputs:
     containerregistrytype: 'Container Registry'
