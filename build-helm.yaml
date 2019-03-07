@@ -17,6 +17,7 @@ steps:
   displayName: 'Test'
   inputs:
     command:  test
+    projects:  PasLibTest
 
 - task: DotNetCoreCLI@2
   displayName: 'Build an image'
