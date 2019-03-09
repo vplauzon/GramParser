@@ -34,9 +34,9 @@ steps:
     imageName: '$(image-name):$(full-version)'
 
 - task: HelmInstaller@0
-  displayName: 'Install Helm 2.11.0'
+  displayName: 'Install Helm 2.13.0'
   inputs:
-    helmVersion: 2.11.0
+    helmVersion: 2.13.0
 
 - task: HelmDeploy@0
   displayName: 'Helm package'

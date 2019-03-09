@@ -1,11 +1,20 @@
-rg=$1
-ai=$2
+#!/bin/bash
 
-echo "Resource Group:  $rg"
+###################################################################################################
+### Fetch Instrumentation key
+###
+### Outputs:
+###     instrumentation:  key for instrumentation
+
+ssrg=$1
+
+ai="central-insight-$ssrg"
+
+echo "Shared State Resource Group:  $ssrg"
 echo "App Insight:  $ai"
 
-key=$(az resource show -g $rg -n $ai --resource-type "microsoft.insights/components" --query properties.InstrumentationKey -o tsv)
+key=$(az resource show -g $ssrg -n $ai --resource-type "microsoft.insights/components" --query properties.InstrumentationKey -o tsv)
 
 echo "Instrumentation Key:  $key"
 
-echo "##vso[task.setvariable variable=instrumentationKey;]$key"
+echo "##vso[task.setvariable variable=instrumentationKey;]$instrumentation"
