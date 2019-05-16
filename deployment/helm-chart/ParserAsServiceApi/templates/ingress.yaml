@@ -14,3 +14,9 @@ spec:
         - backend:
             serviceName: parser-api-svc
             servicePort: 80
+    - host: {{.Values.host2}}
+      http:
+        paths:
+        - backend:
+            serviceName: parser-api-svc
+            servicePort: 80
