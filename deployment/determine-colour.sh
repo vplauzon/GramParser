@@ -25,14 +25,14 @@ echo "Colour Request:  $colourRequest"
 env="$stageName"
 if [[ $env == 'prod' ]]
 then
+    echo "Fetch DNS recort set..."
+
+    dns=$(az network dns record-set cname show -g vpl-dns -z vplauzon.com -n main-ip --query "cnameRecord.cname" -o tsv)
+
+    echo "DNS:  $dns"
+
     if [[ $colourRequest == 'default' ]]
     then
-        echo "Fetch DNS recort set..."
-
-        dns=$(az network dns record-set cname show -g vpl-dns -z vplauzon.com -n main-ip --query "cnameRecord.cname" -o tsv)
-
-        echo "DNS:  $dns"
-
         if [[ $dns == *"blue"* ]]
         then
             colour='blue'
@@ -46,7 +46,18 @@ then
             fi
         fi
     else
-        colour=$colourRequest
+        if [[ $dns == *"blue"* ]]
+        then
+            colour='green'
+        else
+            if [[ $dns == *"green"* ]]
+            then
+                colour='blue'
+            else
+                echo "DNS entry doesn't match a colour:  $dns" 1>&2
+                exit 42
+            fi
+        fi
     fi
 
     sirg="shared-stateless-$env-$colour"
