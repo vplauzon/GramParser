@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: pas-api.dev.vplauzon.com
+    - host: {{.Values.host1}}
       http:
         paths:
         - backend:
