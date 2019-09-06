@@ -74,6 +74,10 @@ interleave:
 
 	interleave = (" " | "\r" | "\n" | "\t")+
 
-exclude interleave:
+bypass interleave:
 
-	token myToken = ...
+	rule(interleave=false) comment = "#" (. - ("\r" | "\n"))*;
+
+not list children:
+
+	rule(interleave=false, children=false) integer = ("0".."9")+;
