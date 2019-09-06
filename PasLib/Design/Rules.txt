@@ -81,3 +81,21 @@ bypass interleave:
 not list children:
 
 	rule(interleave=false, children=false) integer = ("0".."9")+;
+
+Output Definition (cf https://en.wikipedia.org/wiki/JSON#Data_types_and_syntax):
+
+	samples:
+		rule myRule = a*b* => this
+		rule myRule = n:a*b* c*d* => n
+		rule myRule = n:a*b* m:c*d* => { "name" : n, "mail" : number(m) }
+		rule myRule = subRule* => this
+		rule myRule = a:subRule b:subRule* => concat([a], b)
+
+	rules:
+
+		1. rule id = identifier
+		2. rule func = identifier(thing, thing, ...)
+		3. rule string = "stuff"
+		4. rule array = [thing, thing, ...]
+		5. rule obj = { thing : thing, ...}
+		6. rule thing = id | func | string | array | obj
