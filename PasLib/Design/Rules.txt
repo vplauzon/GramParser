@@ -94,8 +94,8 @@ Output Definition (cf https://en.wikipedia.org/wiki/JSON#Data_types_and_syntax):
 	rules:
 
 		1. rule id = identifier
-		2. rule func = identifier(thing, thing, ...)
-		3. rule string = "stuff"
-		4. rule array = [thing, thing, ...]
+		2. rule string = "stuff"
+		3. rule array = [thing, thing, ...]
+		4. rule func = identifier(thing, thing, ...)
 		5. rule obj = { thing : thing, ...}
 		6. rule thing = id | func | string | array | obj
