@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasLib", "PasLib\PasLib.csproj", "{388655D2-4FAA-4A81-A592-E1DC69A3482B}"
 EndProject
@@ -14,9 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasWebApi", "PasWebApi\PasWebApi.csproj", "{A104A028-F718-449C-A7FF-C0CCED2B44B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasApiClient", "PasApiClient\PasApiClient.csproj", "{6E637848-4006-4794-B690-846A9B0D7F62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasApiClient", "PasApiClient\PasApiClient.csproj", "{6E637848-4006-4794-B690-846A9B0D7F62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasApiClientTest", "PasApiClientTest\PasApiClientTest.csproj", "{D6CC720E-64AD-4C7D-A5DA-2E84C4C2E3C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PasApiClientTest", "PasApiClientTest\PasApiClientTest.csproj", "{D6CC720E-64AD-4C7D-A5DA-2E84C4C2E3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
