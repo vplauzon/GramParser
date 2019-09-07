@@ -9,6 +9,7 @@ using PasWebApi.Models.AnonymousAnalysis;
 
 namespace PasWebApi.Controllers
 {
+    [ApiController]
     [Route("v1")]
     public class AnonymousAnalysisController : Controller
     {

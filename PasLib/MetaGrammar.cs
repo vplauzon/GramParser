@@ -347,9 +347,9 @@ namespace PasLib
                 switch (charFragment.Key)
                 {
                     case "normal":
-                        return subMatch.Text.First;
+                        return subMatch.Text.First();
                     case "escapeLetter":
-                        return GetEscapeLetter(subMatch.NamedChildren.First().Value.Text.First);
+                        return GetEscapeLetter(subMatch.NamedChildren.First().Value.Text.First());
                     case "escapeQuote":
                         return '\"';
                     case "escapeBackslash":

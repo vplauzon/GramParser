@@ -56,10 +56,6 @@ namespace PasLib
 
         public RuleMatch Match(string ruleName, SubString text, int? depth = null)
         {
-            if (text.IsNull)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
             if (string.IsNullOrWhiteSpace(ruleName))
             {
                 ruleName = DEFAULT_RULE_NAME;

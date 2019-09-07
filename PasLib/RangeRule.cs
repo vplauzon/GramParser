@@ -30,7 +30,7 @@ namespace PasLib
 
             if (text.HasContent)
             {
-                var peek = text.First;
+                var peek = text.First();
 
                 if (peek >= First && peek <= Last)
                 {

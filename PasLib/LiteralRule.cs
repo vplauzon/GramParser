@@ -37,7 +37,7 @@ namespace PasLib
 
             if (text.HasContent
                 && text.Length >= _literal.Length
-                && text.Enumerate().Take(_literal.Length).SequenceEqual(_literal))
+                && text.Take(_literal.Length).SequenceEqual(_literal))
             {
                 return new[] { new RuleMatch(this, text.Take(_literal.Length)) };
             }
