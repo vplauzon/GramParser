@@ -1,0 +1,2 @@
+﻿rule id = "abc" => this;
+rule literal = "ab"* => "constant";

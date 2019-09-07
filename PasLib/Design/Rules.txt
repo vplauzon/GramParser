@@ -1,79 +1,101 @@
 ﻿Composition rules:
 
-any (matches anything, one character long):
+	1. any (matches anything, one character long):
 
-	rule any = .
+		rule any = .
 
-literal:
+	2. literal:
 
-	rule lit = "Hi" -> { "rule" : "lit", "text" : "Hi" }
+		rule lit = "Hi" -> { "rule" : "lit", "text" : "Hi" }
 
-range:
+	3. range:
 
-	rule range = "a".."z" -> { "rule" : "range", "text" : "g" }
+		rule range = "a".."z" -> { "rule" : "range", "text" : "g" }
 
-repeat:
+	4. repeat:
 
-	rule rep = ruleX{a,b} -> { "rule" : "rep", "text" : "tototototo" }
-	rule rep = x::ruleX{a,b} ->	{
-									"rule" : "rep",
-									"fragments" :
-									{
-										"x" : 
+		rule rep = ruleX{a,b} -> { "rule" : "rep", "text" : "tototototo" }
+		rule rep = x::ruleX{a,b} ->	{
+										"rule" : "rep",
+										"fragments" :
 										{
-											"rule" : "ruleX",
-											"text" : "tototo"
+											"x" : 
+											{
+												"rule" : "ruleX",
+												"text" : "tototo"
+											}
 										}
 									}
-								}
-	rule rep = x:ruleX{a,b} ->	{
-									"rule" : "rep",
-									"fragments" :
-									{
-										"x" : 
+		rule rep = x:ruleX{a,b} ->	{
+										"rule" : "rep",
+										"fragments" :
 										{
-											"rule" : "",
-											"repeats" :
-											[
-												{
-													"rule" : "ruleX",
-													"text" : "to"
-												},
-												...
-											]
+											"x" : 
+											{
+												"rule" : "",
+												"repeats" :
+												[
+													{
+														"rule" : "ruleX",
+														"text" : "to"
+													},
+													...
+												]
+											}
 										}
 									}
-								}
 
-disjunction:
+	5. disjunction:
 
-	rule dis = ruleX | ruleY -> { "rule" : "dis", "text" : "Hi" }
-	rule dis = a:ruleX | b:ruleX -> { "rule" : "dis", "fragments": {"a" : {text:"Hi"}} }
+		rule dis = ruleX | ruleY -> { "rule" : "dis", "text" : "Hi" }
+		rule dis = a:ruleX | b:ruleX -> { "rule" : "dis", "fragments": {"a" : {text:"Hi"}} }
 
-sequence:
+	6. sequence:
 
-	rule seq = ruleX ruleY -> { "rule" : "seq", "text" : "Hi Bob" }
-	rule = a:ruleX b:ruleY -> { "rule" : "seq", "fragments": {"a" : {"text":"Hi"}, "b": {"text":"Bob"}} }
-	                       ->	{
-									"rule" : "seq",
-									"fragments" :
-									{
-										"a" : {"rule":"ruleX", "fragments":{"h":{...}, "vowel":{...}}},
-										"b" : {"rule":"ruleY", "text":"Bob"}
+		rule seq = ruleX ruleY -> { "rule" : "seq", "text" : "Hi Bob" }
+		rule = a:ruleX b:ruleY -> { "rule" : "seq", "fragments": {"a" : {"text":"Hi"}, "b": {"text":"Bob"}} }
+							   ->	{
+										"rule" : "seq",
+										"fragments" :
+										{
+											"a" : {"rule":"ruleX", "fragments":{"h":{...}, "vowel":{...}}},
+											"b" : {"rule":"ruleY", "text":"Bob"}
+										}
 									}
-								}
-substract:
+	7. substract:
 
-	rule sub = ruleX - ruleY -> { "rule" : "sub", "text" : "Hi Bob" }
-	rule sub = a:ruleX - ruleY ->	{
-										"rule" : "sub",
-										"fragments": {"a" : {"rule" :"ruleX", "text":"Hi Bob"}}
-									}
+		rule sub = ruleX - ruleY -> { "rule" : "sub", "text" : "Hi Bob" }
+		rule sub = a:ruleX - ruleY ->	{
+											"rule" : "sub",
+											"fragments": {"a" : {"rule" :"ruleX", "text":"Hi Bob"}}
+										}
 
 interleave:
 
 	interleave = (" " | "\r" | "\n" | "\t")+
 
-exclude interleave:
+bypass interleave:
 
-	token myToken = ...
+	rule(interleave=false) comment = "#" (. - ("\r" | "\n"))*;
+
+not list children:
+
+	rule(interleave=false, children=false) integer = ("0".."9")+;
+
+Output Definition (cf https://en.wikipedia.org/wiki/JSON#Data_types_and_syntax):
+
+	samples:
+		rule myRule = a*b* => this
+		rule myRule = n:a*b* c*d* => n
+		rule myRule = n:a*b* m:c*d* => { "name" : n, "mail" : number(m) }
+		rule myRule = subRule* => this
+		rule myRule = a:subRule b:subRule* => concat([a], b)
+
+	rules:
+
+		1. rule id = identifier
+		2. rule literal = "stuff"
+		3. rule array = [thing, thing, ...]
+		4. rule func = identifier(thing, thing, ...)
+		5. rule obj = { thing : thing, ...}
+		6. rule thing = id | func | string | array | obj

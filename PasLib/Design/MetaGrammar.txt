@@ -44,13 +44,16 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
+rule outputResolution = id:identifier | literal:literal;
+rule outputDeclaration = "=>" output:outputResolution;
+
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
 rule boolean = true:"true" | false:"false";
 rule parameterAssignation = id:identifier "=" value:boolean;
 rule parameterAssignationList = "(" head:parameterAssignation
 	tail:("," pa:parameterAssignation)* ")";
 rule ruleDeclaration = "rule" params:parameterAssignationList?
-	id:identifier "=" body:ruleBody ";";
+	id:identifier "=" body:ruleBody ";" output:outputDeclaration?;
 rule declaration = interleaveDeclaration:interleaveDeclaration
 	| ruleDeclaration:ruleDeclaration;
 
