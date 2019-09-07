@@ -1,2 +1,4 @@
-﻿rule id = "abc" => this;
-rule literal = "ab"* => "constant";
+﻿rule literal = "ab" => this;
+rule repeat = "ab"* => this;
+rule disjunction = "Hello" | "World" => this;
+rule sequence = "Hello" " " "World" => this;

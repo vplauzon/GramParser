@@ -71,6 +71,8 @@ namespace PasLib
 
         public SubString Text { get; }
 
+        public object Output { get; }
+
         public int LengthWithInterleaves { get; }
 
         public IImmutableList<RuleMatch> Children { get; }

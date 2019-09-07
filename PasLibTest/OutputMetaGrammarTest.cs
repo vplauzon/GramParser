@@ -11,19 +11,25 @@ namespace PasLibTest
     public class OutputMetaGrammarTest
     {
         #region Identifiers
-        //[TestMethod]
+        [TestMethod]
         public void This()
         {
             var samples = new[]
             {
-                (false, "main", "a"),
-                (false, "main", "V"),
-                (false, "main", "vvv"),
-                (true, "main", "v"),
-                (false, "main", "z"),
+                (false, "literal", "a", null),
+                (true, "literal", "ab", "ab"),
+                (false, "repeat", "a", null),
+                (true, "repeat", "", ""),
+                (true, "repeat", "ab", "ab"),
+                (true, "repeat", "abab", "abab"),
+                (false, "disjunction", "Hi", null),
+                (true, "disjunction", "Hello", "Hello"),
+                (true, "disjunction", "World", "World"),
+                (false, "sequence", "Hi", null),
+                (true, "sequence", "Hello World", "Hello World")
             };
 
-            Test("Simple.OneLetterOneRuleGrammar.txt", samples);
+            Test("Identifiers.This.txt", samples);
         }
         #endregion
 
@@ -43,7 +49,7 @@ namespace PasLibTest
 
         private void Test(
             string grammarFile,
-            (bool isSuccess, string ruleName, string text)[] samples)
+            (bool isSuccess, string ruleName, string text, string output)[] samples)
         {
             var grammarText = GetResource(grammarFile);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
@@ -51,7 +57,7 @@ namespace PasLibTest
             Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
             for (int i = 0; i != samples.Length; ++i)
             {
-                (var isSuccess, var ruleName, var text) = samples[i];
+                (var isSuccess, var ruleName, var text, var output) = samples[i];
                 var match = grammar.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
@@ -59,7 +65,8 @@ namespace PasLibTest
                 if (isSuccess)
                 {
                     Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
-                    Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
+                    Assert.AreEqual(text, match.Text.ToString(), $"Text - {i}");
+                    Assert.AreEqual(output, match.Output, $"Output - {i}");
                 }
             }
         }
