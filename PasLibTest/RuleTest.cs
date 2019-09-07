@@ -172,7 +172,6 @@ namespace PasLibTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsFalse(match.Text.IsNull, $"Content - {i}");
                     Assert.AreEqual(text.Length, match.Children.Count(), $"Contents - {i}");
                 }
             }
