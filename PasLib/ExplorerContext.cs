@@ -35,10 +35,6 @@ namespace PasLib
             ImmutableHashSet<IRule> ruleNameExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
         {
-            if (text.IsNull)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
             if (depth <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(depth));

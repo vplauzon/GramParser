@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -28,7 +29,7 @@ namespace PasWebApi
         {
             services
                 .AddMvcCore()
-                .AddJsonFormatters(settings => settings.NullValueHandling = NullValueHandling.Ignore);
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
             services.AddTransient<RequestBodyInitializer, RequestBodyInitializer>();
             services.AddCors();
         }
@@ -36,12 +37,17 @@ namespace PasWebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             RequestBodyInitializer requestBodyInitializer)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
             //  Configure CORS so that any apps can call the API
@@ -54,7 +60,11 @@ namespace PasWebApi
                 .AllowAnyMethod();
             });
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             TelemetryConfiguration.Active.TelemetryInitializers.Add(new RoleNameInitializer("PasApi"));
             TelemetryConfiguration.Active.TelemetryInitializers.Add(requestBodyInitializer);

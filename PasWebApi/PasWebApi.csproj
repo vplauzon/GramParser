@@ -1,40 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <ApplicationInsightsResourceId>/subscriptions/867feb0a-8313-464d-ad48-b4904383f9bc/resourcegroups/shared-infra-dev/providers/microsoft.insights/components/central-insight-dev</ApplicationInsightsResourceId>
-    <ApplicationInsightsAnnotationResourceId>/subscriptions/867feb0a-8313-464d-ad48-b4904383f9bc/resourcegroups/shared-infra-dev/providers/microsoft.insights/components/central-insight-dev</ApplicationInsightsAnnotationResourceId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Connected Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AppInsights.TelemetryInitializers" Version="0.1.282" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+    <PackageReference Include="AppInsights.TelemetryInitializers" Version="1.1.582" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PasLib\PasLib.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services" />
-  </ItemGroup>
-
 </Project>
