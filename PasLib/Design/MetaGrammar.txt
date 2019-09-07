@@ -10,7 +10,6 @@ rule(interleave=false) character = normal::(. - ("\"" | "\r" | "\n" | "\\"))
 	| escapeLetter:("\\" l::("n" | "r" | "t" | "v"))
 	| escapeHexa:("\\x" h::("0".."9" | "a".."f" | "A".."F"){1,2});
 rule(interleave=false) quotedCharacter = "\"" c:character "\"";
-rule(interleave=false) quotedString = "\"" c:character* "\"";
 
 #	rules
 rule(interleave=false) noChildrenTag = id:(identifier)? "::";
@@ -45,7 +44,7 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
-rule outputResolution = id:identifier | string:quotedString;
+rule outputResolution = id:identifier | literal:literal;
 rule outputDeclaration = "=>" output:outputResolution;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
