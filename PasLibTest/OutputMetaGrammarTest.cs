@@ -11,7 +11,7 @@ namespace PasLibTest
     public class OutputMetaGrammarTest
     {
         #region Identifiers
-        [TestMethod]
+        //[TestMethod]
         public void This()
         {
             var samples = new[]
