@@ -10,7 +10,7 @@ namespace PasLib
         public static IRule Instance { get { return _instance; } }
 
         private MatchNoneRule()
-            : base(null, false, false, true, false)
+            : base(null, null, false, false, true, false)
         {
         }
 

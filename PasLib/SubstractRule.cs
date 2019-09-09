@@ -12,12 +12,19 @@ namespace PasLib
 
         public SubstractRule(
             string ruleName,
+            IOutputExtractor outputExtractor,
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
-            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
+            : base(
+                  ruleName,
+                  outputExtractor,
+                  hasInterleave,
+                  isRecursive,
+                  false,
+                  hasChildrenDetails)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
@@ -38,7 +45,10 @@ namespace PasLib
 
                 if (!excludedExactLength.Any())
                 {
-                    var match = new RuleMatch(this, primaryText, new[] { primaryMatch });
+                    var match = new RuleMatch(
+                        this,
+                        primaryText,
+                        new[] { primaryMatch });
 
                     yield return match;
                 }

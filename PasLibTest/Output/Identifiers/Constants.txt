@@ -1,0 +1,7 @@
+﻿rule literal = "ab"* => "constant";
+rule true = "ab"* => true;
+rule false = "ab"* => false;
+rule null = "ab"* => null;
+rule integer = "ab"* => 1;
+rule negativeInteger = "ab"* => -56;
+rule double = "ab"* => -3.14;

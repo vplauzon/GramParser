@@ -21,7 +21,7 @@ namespace PasLibTest
         [TestMethod]
         public void EmptyAny()
         {
-            var rule = new MatchAnyCharacterRule(null) as IRule;
+            var rule = new MatchAnyCharacterRule(null, null) as IRule;
             var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNull(match);
@@ -32,7 +32,7 @@ namespace PasLibTest
         [TestMethod]
         public void Any()
         {
-            var rule = new MatchAnyCharacterRule("Any") as IRule;
+            var rule = new MatchAnyCharacterRule("Any", null) as IRule;
             var samples = new[]
             {
                 "g",
@@ -59,7 +59,7 @@ namespace PasLibTest
         [TestMethod]
         public void Literal()
         {
-            var rule = new LiteralRule("Lit", "great") as IRule;
+            var rule = new LiteralRule("Lit", null, "great") as IRule;
             var match = rule.Match(new ExplorerContext("great")).FirstOrDefault();
             var nomatch = rule.Match(new ExplorerContext("h")).FirstOrDefault();
 
@@ -91,7 +91,7 @@ namespace PasLibTest
                 var last = samples[i].Item2;
                 var test = samples[i].Item3;
                 var isSuccess = samples[i].Item4;
-                var rule = new RangeRule("Range", first, last) as IRule;
+                var rule = new RangeRule("Range", null, first, last) as IRule;
                 var match =
                     rule.Match(new ExplorerContext(test.ToString())).FirstOrDefault();
 
@@ -113,8 +113,8 @@ namespace PasLibTest
         [TestMethod]
         public void EmptyRepeat()
         {
-            var oneCharRule = new LiteralRule("oneChar", "g");
-            var rule = new RepeatRule("Repeat", oneCharRule, null, null) as IRule;
+            var oneCharRule = new LiteralRule("oneChar", null, "g");
+            var rule = new RepeatRule("Repeat", null, oneCharRule, null, null) as IRule;
             var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
@@ -126,8 +126,8 @@ namespace PasLibTest
         [TestMethod]
         public void RepeatOneCharacter()
         {
-            var oneCharRule = new LiteralRule("oneChar", "g");
-            var rule = new RepeatRule("Repeat", oneCharRule, null, null) as IRule;
+            var oneCharRule = new LiteralRule("oneChar", null, "g");
+            var rule = new RepeatRule("Repeat", null, oneCharRule, null, null) as IRule;
             var match = rule.Match(new ExplorerContext("ggggg")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
@@ -139,7 +139,7 @@ namespace PasLibTest
         [TestMethod]
         public void RepeatCharacterWithCardinality()
         {
-            var oneCharRule = new LiteralRule("oneChar", "g");
+            var oneCharRule = new LiteralRule("oneChar", null, "g");
             var testSet = new[]
             {
                 Tuple.Create<string, int?, int?, bool>("gg", 2, 2, true),
@@ -158,7 +158,7 @@ namespace PasLibTest
                 var min = testSet[i].Item2;
                 var max = testSet[i].Item3;
                 var isSuccess = testSet[i].Item4;
-                var rule = new RepeatRule("Repeat", oneCharRule, min, max) as IRule;
+                var rule = new RepeatRule("Repeat", null, oneCharRule, min, max) as IRule;
                 var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
                 if (!isSuccess)
@@ -180,13 +180,13 @@ namespace PasLibTest
         [TestMethod]
         public void RepeatWithSequenceAndInterleave()
         {
-            var interleave = new RepeatRule("interleave", new LiteralRule(null, " "), 0, null);
-            var seq = new SequenceRule("seq", new[]
+            var interleave = new RepeatRule("interleave", null, new LiteralRule(null, null, " "), 0, null);
+            var seq = new SequenceRule("seq", null, new[]
             {
-                new TaggedRule(new LiteralRule(null, "|")),
-                new TaggedRule("t", new LiteralRule(null, "a"), true)
+                new TaggedRule(new LiteralRule(null, null, "|")),
+                new TaggedRule("t", new LiteralRule(null, null, "a"), true)
             });
-            var rule = new RepeatRule("rep", seq, 1, null);
+            var rule = new RepeatRule("rep", null, seq, 1, null);
             var text = "  |a  |a   |a;";
             var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
 
@@ -209,11 +209,11 @@ namespace PasLibTest
                 Tuple.Create("Didier", false)
             };
             //  Alice | Bob | Charles
-            var rule = new DisjunctionRule("Disjunction", new[]
+            var rule = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule(new LiteralRule("Alice", "Alice")),
-                new TaggedRule(new LiteralRule("Bob", "Bob")),
-                new TaggedRule(new LiteralRule("Charles", "Charles"))
+                new TaggedRule(new LiteralRule("Alice", null, "Alice")),
+                new TaggedRule(new LiteralRule("Bob", null, "Bob")),
+                new TaggedRule(new LiteralRule("Charles", null, "Charles"))
             });
 
             for (int i = 0; i != samples.Length; ++i)
@@ -253,19 +253,19 @@ namespace PasLibTest
                 ("Ephreme", false)
             };
             //  a:Alice | s1:(b:Bob | c:Charles) | s2::(d:Darwin | e:Ernest)
-            var subRule1 = new DisjunctionRule("Disjunction", new[]
+            var subRule1 = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("b", new LiteralRule("Bob", "Bob"), true),
-                new TaggedRule("c", new LiteralRule("Charles", "Charles"), true)
+                new TaggedRule("b", new LiteralRule("Bob", null, "Bob"), true),
+                new TaggedRule("c", new LiteralRule("Charles", null, "Charles"), true)
             });
-            var subRule2 = new DisjunctionRule("Disjunction", new[]
+            var subRule2 = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("d", new LiteralRule("Darwin", "Darwin"), true),
-                new TaggedRule("e", new LiteralRule("Ernest", "Ernest"), true)
+                new TaggedRule("d", new LiteralRule("Darwin", null, "Darwin"), true),
+                new TaggedRule("e", new LiteralRule("Ernest", null, "Ernest"), true)
             });
-            var rule = new DisjunctionRule("Disjunction", new[]
+            var rule = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("a", new LiteralRule("Alice", "Alice"), true),
+                new TaggedRule("a", new LiteralRule("Alice", null, "Alice"), true),
                 new TaggedRule("s1", subRule1, true),
                 new TaggedRule("s2", subRule2, false)
             });
@@ -318,14 +318,14 @@ namespace PasLibTest
                 Tuple.Create("kaaaa", false)
             };
             //  ('a'* | 'b'*)*
-            var aRule = new RepeatRule("RepeatA", new LiteralRule("A", "a"), null, null);
-            var bRule = new RepeatRule("RepeatB", new LiteralRule("B", "b"), null, null);
-            var disjunction = new DisjunctionRule("Disjunction", new[]
+            var aRule = new RepeatRule("RepeatA", null, new LiteralRule("A", null, "a"), null, null);
+            var bRule = new RepeatRule("RepeatB", null, new LiteralRule("B", null, "b"), null, null);
+            var disjunction = new DisjunctionRule("Disjunction", null, new[]
             {
                 new TaggedRule(aRule),
                 new TaggedRule(bRule)
             });
-            var rule = new RepeatRule("MasterRepeat", disjunction, null, null);
+            var rule = new RepeatRule("MasterRepeat", null, disjunction, null, null);
 
             for (int i = 0; i != samples.Length; ++i)
             {
@@ -354,11 +354,11 @@ namespace PasLibTest
         [TestMethod]
         public void SequenceWithoutTags()
         {
-            var rule = new SequenceRule("Seq", new[]
+            var rule = new SequenceRule("Seq", null, new[]
             {
-                new TaggedRule(new LiteralRule(null, "Hi")),
-                new TaggedRule(new LiteralRule(null, "Bob")),
-                new TaggedRule(new LiteralRule(null, "!"))
+                new TaggedRule(new LiteralRule(null, null, "Hi")),
+                new TaggedRule(new LiteralRule(null, null, "Bob")),
+                new TaggedRule(new LiteralRule(null, null, "!"))
             });
             var text = "HiBob!";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
@@ -373,11 +373,11 @@ namespace PasLibTest
         [TestMethod]
         public void SequenceWithTags()
         {
-            var rule = new SequenceRule("Seq", new[]
+            var rule = new SequenceRule("Seq", null, new[]
             {
-                new TaggedRule("h", new LiteralRule(null, "Hi"), true),
-                new TaggedRule("b", new LiteralRule(null, "Bob"), true),
-                new TaggedRule(new LiteralRule(null, "!"))
+                new TaggedRule("h", new LiteralRule(null, null, "Hi"), true),
+                new TaggedRule("b", new LiteralRule(null, null, "Bob"), true),
+                new TaggedRule(new LiteralRule(null, null, "!"))
             });
             var text = "HiBob!";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
@@ -393,10 +393,10 @@ namespace PasLibTest
         [TestMethod]
         public void SequenceWithNoChildrenTags()
         {
-            var rule = new SequenceRule("Seq", new[]
+            var rule = new SequenceRule("Seq", null, new[]
             {
-                new TaggedRule("a", new RepeatRule(null, new LiteralRule(null, "a"), 1, null), true),
-                new TaggedRule("b", new RepeatRule(null, new LiteralRule(null, "b"), 1, null), false)
+                new TaggedRule("a", new RepeatRule(null, null, new LiteralRule(null, null, "a"), 1, null), true),
+                new TaggedRule("b", new RepeatRule(null, null, new LiteralRule(null, null, "b"), 1, null), false)
             });
             var text = "aaaabb";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
@@ -429,9 +429,9 @@ namespace PasLibTest
                 Tuple.Create('g', false),
                 Tuple.Create('h', false)
             };
-            var range = new RangeRule(null, 'a', 'z');
-            var exclusion = new RangeRule(null, 'f', 'h');
-            var rule = new SubstractRule("Substract", range, exclusion);
+            var range = new RangeRule(null, null, 'a', 'z');
+            var exclusion = new RangeRule(null, null, 'f', 'h');
+            var rule = new SubstractRule("Substract", null, range, exclusion);
 
             for (int i = 0; i != samples.Length; ++i)
             {
@@ -465,10 +465,11 @@ namespace PasLibTest
                 Tuple.Create('g', false),
                 Tuple.Create('h', false)
             };
-            var range = new RangeRule(null, 'a', 'z');
-            var exclusion = new RangeRule(null, 'f', 'h');
+            var range = new RangeRule(null, null, 'a', 'z');
+            var exclusion = new RangeRule(null, null, 'f', 'h');
             var rule = new SubstractRule(
                 "Substract",
+                null,
                 range,
                 exclusion);
 
@@ -504,14 +505,14 @@ namespace PasLibTest
             //  rule B = C "," C;
             //  rule C = A | B;
             //  Try to match "a" with C
-            var ruleA = new RangeRule("A", 'a', 'z');
+            var ruleA = new RangeRule("A", null, 'a', 'z');
             var proxyC = new RuleProxy();
-            var ruleB = new SequenceRule("B", new[]{
+            var ruleB = new SequenceRule("B", null, new[]{
                 new TaggedRule(proxyC),
-                new TaggedRule(new LiteralRule(null, ",")),
+                new TaggedRule(new LiteralRule(null, null, ",")),
                 new TaggedRule(proxyC)
             });
-            var ruleC = new DisjunctionRule("C", new[] {
+            var ruleC = new DisjunctionRule("C", null, new[] {
                 new TaggedRule(ruleA),
                 new TaggedRule(ruleB)
             });

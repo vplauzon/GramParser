@@ -53,6 +53,8 @@ namespace PasLib
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);
 
+        IOutputExtractor IRule.OutputExtractor => ReferencedRule.OutputExtractor;
+
         private bool HasNoRecursion(IRule value)
         {
             if (ReferenceEquals(this, value))

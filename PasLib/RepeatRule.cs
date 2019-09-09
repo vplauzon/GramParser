@@ -13,13 +13,20 @@ namespace PasLib
 
         public RepeatRule(
             string ruleName,
+            IOutputExtractor outputExtractor,
             IRule rule,
             int? min,
             int? max,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
-            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
+            : base(
+                  ruleName,
+                  outputExtractor,
+                  hasInterleave,
+                  isRecursive,
+                  false,
+                  hasChildrenDetails)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)

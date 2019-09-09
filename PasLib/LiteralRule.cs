@@ -9,8 +9,11 @@ namespace PasLib
     {
         private readonly char[] _literal;
 
-        public LiteralRule(string ruleName, IEnumerable<char> literal)
-            : base(ruleName, false, false, true, false)
+        public LiteralRule(
+            string ruleName,
+            IOutputExtractor outputExtractor,
+            IEnumerable<char> literal)
+            : base(ruleName, outputExtractor, false, false, true, false)
         {
             if (literal == null)
             {
@@ -20,8 +23,8 @@ namespace PasLib
             _literal = literal.ToArray();
         }
 
-        public LiteralRule(string ruleName, string literal)
-            : base(ruleName, false, false, true, false)
+        public LiteralRule(string ruleName, IOutputExtractor outputExtractor, string literal)
+            : base(ruleName, outputExtractor, false, false, true, false)
         {
             if (literal == null)
             {
@@ -39,7 +42,10 @@ namespace PasLib
                 && text.Length >= _literal.Length
                 && text.Take(_literal.Length).SequenceEqual(_literal))
             {
-                return new[] { new RuleMatch(this, text.Take(_literal.Length)) };
+                return new[]
+                {
+                    new RuleMatch(this, text.Take(_literal.Length))
+                };
             }
             else
             {

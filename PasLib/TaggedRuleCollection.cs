@@ -99,10 +99,10 @@ namespace PasLib
                                        select new KeyValuePair<string, RuleMatch>(
                                            m.rule.Tag,
                                            FormatMatch(m.match, m.rule));
-                    var immutable =
+                    var children =
                         ImmutableDictionary<string, RuleMatch>.Empty.AddRange(namedMatches);
 
-                    return new RuleMatch(rule, text, immutable);
+                    return new RuleMatch(rule, text, children);
                 }
                 else
                 {
