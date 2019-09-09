@@ -4,6 +4,7 @@ using PasLib;
 using System.Linq;
 using System.Reflection;
 using System.IO;
+using System.Text.Json;
 
 namespace PasLibTest
 {
@@ -52,6 +53,26 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Constants
+        [TestMethod]
+        public void ConstantArrays()
+        {
+            var samples = new[]
+            {
+                (true, "empty", "Hello", (object)new object[0])/*,
+                (true, "integers", "Hello", (object)new[]{1,2,3,4,5}),
+                (true, "doubles", "Hello", new[]{1.2,2.3,3.4,4.5,5.6}),
+                (true, "mixIntegerDoubles", "Hello", new[]{1,2,3.4,4,5.6}),
+                (true, "strings", "Hello", new[]{"Hi", "There"}),
+                (true, "booleans", "Hello", new[]{true, false}),
+                (true, "nulls", "Hello", new object[]{null, null}),
+                (true, "this", "Hello", new[]{"abab", "abab", "abab"})*/
+            };
+
+            Test("Identifiers.ConstantArrays.txt", samples);
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;
@@ -85,7 +106,18 @@ namespace PasLibTest
                 {
                     Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Text - {i}");
-                    Assert.AreEqual(output, match.Output, $"Output - {i}");
+
+                    if (match.Output == null)
+                    {
+                        Assert.AreEqual(output, match.Output, $"Output Null - {i}");
+                    }
+                    else
+                    {
+                        var outputText = JsonSerializer.Serialize(output);
+                        var matchOutputText = JsonSerializer.Serialize(match.Output);
+
+                        Assert.AreEqual(outputText, matchOutputText, $"Output JSON Compare - {i}");
+                    }
                 }
             }
         }

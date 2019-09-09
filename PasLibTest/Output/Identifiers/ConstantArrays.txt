@@ -1,0 +1,8 @@
+﻿rule empty = "Hello" => [];
+#rule integers = "Hello" => [1,2,3,4,5];
+#rule doubles = "Hello" => [1.2,2.3,3.4,4.5,5.6];
+#rule mixIntegerDoubles = "Hello" => [1,2,3.4,4,5.6];
+#rule strings = "Hello" => ["Hi", "There"];
+#rule booleans = "Hello" => [true, false];
+#rule nulls = "Hello" => [null, null];
+#rule this = "Hello" => [this, this, this];

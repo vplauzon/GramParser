@@ -274,8 +274,24 @@ namespace PasLib
                         return CreateOutputExtractorFromLiteral(tagValue);
                     case "number":
                         return CreateOutputExtractorFromNumber(tagValue.Text);
+                    case "array":
+                        return CreateOutputExtractorFromArray(tagValue);
                     default:
                         throw new NotSupportedException($"Tag {tagName} not supported for output body");
+                }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromArray(RuleMatch arrayMatch)
+            {
+                var listChildren = arrayMatch.NamedChildren["list"].Children;
+
+                if (listChildren.Count == 0)
+                {
+                    return new ConstantExtrator(new object[0]);
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
             }
 
@@ -1097,6 +1113,47 @@ namespace PasLib
                 },
                 isRecursive: false);
 
+            var outputBodyProxy = new RuleProxy();
+            var outputArrayList = new SequenceRule(
+                "outputArrayList",
+                null,
+                new[]
+                {
+                    new TaggedRule("head", outputBodyProxy, true),
+                    new TaggedRule(
+                        "tail",
+                        new RepeatRule(
+                            null,
+                            null,
+                            new SequenceRule(
+                                null,
+                                null,
+                                new []
+                                {
+                                    new TaggedRule(new LiteralRule(null, null, ",")),
+                                    new TaggedRule("element", outputBodyProxy, true)
+                                }),
+                            null,
+                            null),
+                        true)
+                });
+            var outputArray = new SequenceRule(
+                "outputArray",
+                null,
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, null, "[")),
+                    new TaggedRule(
+                        "list",
+                        new RepeatRule(
+                            null,
+                            null,
+                            outputArrayList,
+                            null,
+                            1),
+                        true),
+                    new TaggedRule(new LiteralRule(null, null, "]"))
+                });
             var outputBody = new DisjunctionRule(
                 "outputBody",
                 null,
@@ -1104,7 +1161,8 @@ namespace PasLib
                 {
                     new TaggedRule("id", identifier, false),
                     new TaggedRule("literal", literal, true),
-                    new TaggedRule("number", doubleRule, false)
+                    new TaggedRule("number", doubleRule, false),
+                    new TaggedRule("array", outputArray, true)
                 },
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(
@@ -1219,6 +1277,7 @@ namespace PasLib
             var main = new RepeatRule("main", null, declaration, 1, null, isRecursive: false);
 
             ruleBodyProxy.ReferencedRule = ruleBody;
+            outputBodyProxy.ReferencedRule = outputBody;
 
             return new Grammar(
                 new Dictionary<string, IRule>() { { main.RuleName, main } },

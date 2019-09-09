@@ -45,7 +45,13 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
-rule(recursive=true) outputBody = id::identifier | literal:literal | number::double;
+rule outputArrayList = head:outputBody tail:("," element:outputBody)*;
+rule outputArray = "[" list:outputArrayList? "]"
+rule(recursive=true) outputBody =
+	id::identifier
+	| literal:literal
+	| number::double
+	| array:outputArray;
 rule outputDeclaration = "=>" output:outputBody;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
