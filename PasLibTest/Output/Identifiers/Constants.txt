@@ -1,7 +1,7 @@
 ﻿rule literal = "ab"* => "constant";
 rule true = "ab"* => true;
 rule false = "ab"* => false;
-#rule literal = "ab"* => null;
+rule null = "ab"* => null;
 #rule literal = "ab"* => 1;
 #rule literal = "ab"* => -56;
 #rule literal = "ab"* => -3.14;

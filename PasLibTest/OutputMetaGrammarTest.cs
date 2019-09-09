@@ -41,7 +41,8 @@ namespace PasLibTest
             {
                 (true, "literal", "abab", (object)"constant"),
                 (true, "true", "abab", true),
-                (true, "false", "abab", false)
+                (true, "false", "abab", false),
+                (true, "null", "abab", null)
             };
 
             Test("Identifiers.Constants.txt", samples);
