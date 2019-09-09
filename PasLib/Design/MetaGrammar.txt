@@ -46,12 +46,17 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| sequence:sequence;
 
 rule outputArrayList = head:outputBody tail:("," element:outputBody)*;
-rule outputArray = "[" list:outputArrayList? "]"
+rule outputArray = "[" list:outputArrayList? "]";
+rule outputObjectFieldKey = id::identifier | literal:literal;
+rule outputObjectFieldPair = key:outputObjectFieldKey ":" value:outputBody;
+rule outputObjectFieldList = head:outputObjectFieldPair tail:("," element:outputObjectFieldPair)*;
+rule outputObject = "{" list:outputObjectFieldList? "}"
 rule(recursive=true) outputBody =
 	id::identifier
 	| literal:literal
 	| number::double
-	| array:outputArray;
+	| array:outputArray
+	| object:outputObject;
 rule outputDeclaration = "=>" output:outputBody;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";

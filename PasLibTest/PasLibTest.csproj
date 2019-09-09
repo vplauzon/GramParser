@@ -51,8 +51,10 @@
     <None Remove="Meta\Simple\SubstractGrammar.txt" />
     <None Remove="Meta\SubstractGrammar.txt" />
     <None Remove="Output\ConstantArrays.txt" />
+    <None Remove="Output\ConstantObjects.txt" />
     <None Remove="Output\Constants.txt" />
     <None Remove="Output\This.txt" />
+    <None Remove="Output\ThisArrays.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,6 +78,8 @@
     <EmbeddedResource Include="Meta\Simple\RepeatGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\SequenceGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\SubstractGrammar.txt" />
+    <EmbeddedResource Include="Output\ConstantObjects.txt" />
+    <EmbeddedResource Include="Output\ThisArrays.txt" />
     <EmbeddedResource Include="Output\ConstantArrays.txt" />
     <EmbeddedResource Include="Output\Constants.txt" />
     <EmbeddedResource Include="Output\This.txt" />

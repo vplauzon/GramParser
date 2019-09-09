@@ -65,11 +65,37 @@ namespace PasLibTest
                 (true, "mixIntegerDoubles", "Hello", new[]{1,2,3.4,4,5.6}),
                 (true, "strings", "Hello", new[]{"Hi", "There"}),
                 (true, "booleans", "Hello", new[]{true, false}),
-                (true, "nulls", "Hello", new object[]{null, null}),
-                (true, "this", "Hello", new[]{ "Hello", "Hello", "Hello"})
+                (true, "nulls", "Hello", new object[]{null, null})
             };
 
             Test("ConstantArrays.txt", samples);
+        }
+
+        [TestMethod]
+        public void ThisArrays()
+        {
+            var samples = new[]
+            {
+                (true, "this", "Hello", (object)new[]{ "Hello", "Hello", "Hello"})
+            };
+
+            Test("ThisArrays.txt", samples);
+        }
+        #endregion
+
+        #region Objects
+        [TestMethod]
+        public void ConstantObjects()
+        {
+            var samples = new[]
+            {
+                (true, "empty", "hi", new object()),
+                (true, "oneField", "hi", new { text="Hello" }),
+                (true, "twoFields", "hi", new { text="Hello", number=42 }),
+                (true, "threeFields", "hi", new { text="Hello", number=-42, boolean=true })
+            };
+
+            Test("ConstantObjects.txt", samples);
         }
         #endregion
 

@@ -1,0 +1,1 @@
+﻿rule this = "Hello" => [this, this, this];
