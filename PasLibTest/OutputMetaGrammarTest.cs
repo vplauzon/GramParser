@@ -30,7 +30,7 @@ namespace PasLibTest
                 (true, "sequence", "Hello World", "Hello World")
             };
 
-            Test("Identifiers.This.txt", samples);
+            Test("This.txt", samples);
         }
         #endregion
 
@@ -49,7 +49,7 @@ namespace PasLibTest
                 (true, "double", "abab", -3.14)
             };
 
-            Test("Identifiers.Constants.txt", samples);
+            Test("Constants.txt", samples);
         }
         #endregion
 
@@ -69,7 +69,7 @@ namespace PasLibTest
                 (true, "this", "Hello", new[]{ "Hello", "Hello", "Hello"})
             };
 
-            Test("Identifiers.ConstantArrays.txt", samples);
+            Test("ConstantArrays.txt", samples);
         }
         #endregion
 
