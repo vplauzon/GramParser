@@ -291,8 +291,22 @@ namespace PasLib
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    var outputBodies = ExtractOutputBodiesFromArray(listChildren.First());
+                    var extractors = from outputBody in outputBodies
+                                     select CreateOutputExtractorFromBody(outputBody);
+
+                    return new ArrayExtractor(extractors);
                 }
+            }
+
+            private IEnumerable<RuleMatch> ExtractOutputBodiesFromArray(RuleMatch list)
+            {
+                var head = list.NamedChildren["head"];
+                var tail = list.NamedChildren["tail"];
+                var tailElements = from e in tail.Children
+                                   select e.NamedChildren.First().Value;
+
+                return Enumerable.Prepend(tailElements, head);
             }
 
             private IOutputExtractor CreateOutputExtractorFromNumber(SubString text)

@@ -54,14 +54,8 @@ namespace PasLib
                 var output = rule.OutputExtractor != null
                     ? rule.OutputExtractor.ExtractOutput(text, null)
                     : null;
-                var stringLike = output as IEnumerable<char>;
 
-                if (stringLike != null && !(output is string))
-                {
-                    return new string(stringLike.ToArray());
-                }
-
-                return output;
+                return ExtractorHelper.CleanOutput(output);
             });
             LengthWithInterleaves = lengthWithInterleaves;
             Children = children != null

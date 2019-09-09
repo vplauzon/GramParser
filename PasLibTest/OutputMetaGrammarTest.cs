@@ -59,14 +59,14 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (true, "empty", "Hello", (object)new object[0])/*,
+                (true, "empty", "Hello", (object)new object[0]),
                 (true, "integers", "Hello", (object)new[]{1,2,3,4,5}),
                 (true, "doubles", "Hello", new[]{1.2,2.3,3.4,4.5,5.6}),
                 (true, "mixIntegerDoubles", "Hello", new[]{1,2,3.4,4,5.6}),
                 (true, "strings", "Hello", new[]{"Hi", "There"}),
                 (true, "booleans", "Hello", new[]{true, false}),
                 (true, "nulls", "Hello", new object[]{null, null}),
-                (true, "this", "Hello", new[]{"abab", "abab", "abab"})*/
+                (true, "this", "Hello", new[]{ "Hello", "Hello", "Hello"})
             };
 
             Test("Identifiers.ConstantArrays.txt", samples);
