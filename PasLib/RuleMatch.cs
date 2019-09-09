@@ -7,62 +7,63 @@ namespace PasLib
 {
     public class RuleMatch
     {
-        private RuleMatch(IRule rule, SubString text, int lengthWithInterleaves)
+        private readonly Lazy<object> _lazyOutput;
+
+        public RuleMatch(IRule rule, SubString text)
+            : this(rule, text, text.Length, null, null)
+        {
+        }
+
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            IEnumerable<RuleMatch> children)
+            : this(rule, text, text.Length, children, null)
+        {
+        }
+
+        public RuleMatch(
+            IRule rule,
+            SubString text,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+            : this(rule, text, text.Length, null, namedChildren)
+        {
+        }
+
+        private RuleMatch(
+            IRule rule,
+            SubString text,
+            int lengthWithInterleaves,
+            IEnumerable<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             if (lengthWithInterleaves < text.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(lengthWithInterleaves));
             }
+            if (children != null && namedChildren != null)
+            {
+                throw new ArgumentException(
+                    $"Both {nameof(children)} and {nameof(namedChildren)} can't be non-null");
+            }
 
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             Text = text;
-            LengthWithInterleaves = lengthWithInterleaves;
-        }
-
-        public RuleMatch(IRule rule, SubString text)
-            : this(rule, text, text.Length)
-        {
-        }
-
-        private RuleMatch(
-            IRule rule,
-            SubString text,
-            int lengthWithInterleaves,
-            IEnumerable<RuleMatch> children)
-            : this(rule, text, lengthWithInterleaves)
-        {
-            if (children == null)
+            _lazyOutput = new Lazy<object>(() =>
             {
-                throw new ArgumentNullException(nameof(children));
-            }
+                var output = rule.OutputExtractor != null
+                    ? rule.OutputExtractor.ExtractOutput(text, null)
+                    : null;
 
-            Children = ImmutableList<RuleMatch>.Empty.AddRange(children);
-        }
-
-        public RuleMatch(
-            IRule rule,
-            SubString text,
-            IEnumerable<RuleMatch> children)
-            : this(rule, text, text.Length, children)
-        {
-        }
-
-        public RuleMatch(
-            IRule rule,
-            SubString text,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-            : this(rule, text, text.Length, namedChildren)
-        {
-        }
-
-        private RuleMatch(
-            IRule rule,
-            SubString text,
-            int lengthWithInterleaves,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-            : this(rule, text, lengthWithInterleaves)
-        {
-            NamedChildren = namedChildren ?? throw new ArgumentNullException(nameof(namedChildren));
+                return output;
+            });
+            LengthWithInterleaves = lengthWithInterleaves;
+            Children = children != null
+                ? ImmutableList<RuleMatch>.Empty.AddRange(children)
+                : ImmutableList<RuleMatch>.Empty;
+            NamedChildren = namedChildren != null
+                ? namedChildren
+                : ImmutableDictionary<string, RuleMatch>.Empty;
         }
 
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
@@ -71,7 +72,7 @@ namespace PasLib
 
         public SubString Text { get; }
 
-        public object Output { get; }
+        public object Output => _lazyOutput.Value;
 
         public int LengthWithInterleaves { get; }
 
@@ -95,8 +96,18 @@ namespace PasLib
             else
             {
                 return !NamedChildren.Any()
-                    ? new RuleMatch(rule, Text, LengthWithInterleaves, Children)
-                    : new RuleMatch(rule, Text, LengthWithInterleaves, NamedChildren);
+                    ? new RuleMatch(
+                        rule,
+                        Text,
+                        LengthWithInterleaves,
+                        Children,
+                        null)
+                    : new RuleMatch(
+                        rule,
+                        Text,
+                        LengthWithInterleaves,
+                        null,
+                        NamedChildren);
             }
         }
 
@@ -114,8 +125,18 @@ namespace PasLib
             else
             {
                 return !NamedChildren.Any()
-                    ? new RuleMatch(Rule, Text, LengthWithInterleaves + length, Children)
-                    : new RuleMatch(Rule, Text, LengthWithInterleaves + length, NamedChildren);
+                    ? new RuleMatch(
+                        Rule,
+                        Text,
+                        LengthWithInterleaves + length,
+                        Children,
+                        null)
+                    : new RuleMatch(
+                        Rule,
+                        Text,
+                        LengthWithInterleaves + length,
+                        null,
+                        NamedChildren);
             }
         }
 
@@ -123,7 +144,7 @@ namespace PasLib
         {
             return !NamedChildren.Any() && !Children.Any()
                 ? this
-                : new RuleMatch(Rule, Text, LengthWithInterleaves);
+                : new RuleMatch(Rule, Text, LengthWithInterleaves, null, null);
         }
 
         #region object methods

@@ -8,6 +8,7 @@ namespace PasLib
     {
         protected RuleBase(
             string ruleName,
+            IOutputExtractor outputExtractor,
             bool? hasInterleave,
             bool? isRecursive,
             bool isTerminalRule,
@@ -18,6 +19,7 @@ namespace PasLib
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
+            OutputExtractor = outputExtractor;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
@@ -40,6 +42,8 @@ namespace PasLib
         {
             return OnMatch(context);
         }
+
+        public IOutputExtractor OutputExtractor { get; }
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
 

@@ -7,8 +7,12 @@ namespace PasLib
 {
     internal class RangeRule : RuleBase
     {
-        public RangeRule(string ruleName, char first, char last)
-            : base(ruleName, false, true, true, false)
+        public RangeRule(
+            string ruleName,
+            IOutputExtractor outputExtractor,
+            char first,
+            char last)
+            : base(ruleName, outputExtractor, false, true, true, false)
         {
             if (last < first)
             {

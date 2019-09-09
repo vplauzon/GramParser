@@ -10,5 +10,7 @@ namespace PasLib
         string RuleName { get; }
 
         IEnumerable<RuleMatch> Match(ExplorerContext context);
+
+        IOutputExtractor OutputExtractor { get; }
     }
 }

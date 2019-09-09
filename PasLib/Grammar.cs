@@ -23,7 +23,7 @@ namespace PasLib
             _ruleMap = ImmutableDictionary<string, IRule>.Empty.AddRange(ruleMap);
             _interleaveRule = interleaveRule == null
                 ? null
-                : new RepeatRule(null, interleaveRule, null, null, false, false);
+                : new RepeatRule(null, null, interleaveRule, null, null, false, false);
         }
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }

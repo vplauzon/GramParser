@@ -11,11 +11,18 @@ namespace PasLib
 
         public SequenceRule(
             string ruleName,
+            IOutputExtractor outputExtractor,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
-            : base(ruleName, hasInterleave, isRecursive, false, hasChildrenDetails)
+            : base(
+                  ruleName,
+                  outputExtractor,
+                  hasInterleave,
+                  isRecursive,
+                  false,
+                  hasChildrenDetails)
         {
             if (rules == null || !rules.Any())
             {
