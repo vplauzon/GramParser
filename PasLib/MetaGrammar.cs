@@ -248,14 +248,43 @@ namespace PasLib
 
             private IOutputExtractor CreateOutputExtractor(RuleMatch outputMatch)
             {
-                if (outputMatch.NamedChildren.Count == 0)
+                if (outputMatch.Children.Count == 0)
                 {
                     return null;
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    var outputBody = outputMatch.Children.First().NamedChildren.First().Value;
+
+                    return CreateOutputExtractorFromBody(outputBody);
                 }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromBody(RuleMatch outputBody)
+            {
+                var item = outputBody.NamedChildren.First();
+                var tagName = item.Key;
+                var tagValue = item.Value;
+
+                switch (tagName)
+                {
+                    case "id":
+                        return CreateOutputExtractorFromId(tagValue.Text);
+                    case "literal":
+                        throw new NotImplementedException();
+                    default:
+                        throw new NotSupportedException($"Tag {tagName} not supported for output body");
+                }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromId(SubString id)
+            {
+                if (id.Equals("this"))
+                {
+                    return new ThisExtractor();
+                }
+
+                throw new NotSupportedException($"Identifier {id} isn't supported");
             }
 
             private static void AssignInterleaveToBag(PropertyBag bag, string value)

@@ -57,6 +57,18 @@ namespace PasLib
                 : new SubString(_segment.Slice(offset));
         }
 
+        public bool Equals(string text)
+        {
+            if (text == null || text.Length != Length)
+            {
+                return false;
+            }
+            else
+            {
+                return Enumerable.SequenceEqual(text, this);
+            }
+        }
+
         #region object methods
         public override string ToString()
         {

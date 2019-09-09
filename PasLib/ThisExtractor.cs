@@ -9,7 +9,7 @@ namespace PasLib
     {
         object IOutputExtractor.ExtractOutput(SubString text, IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            return text;
+            return text.ToString();
         }
     }
 }
