@@ -290,6 +290,14 @@ namespace PasLib
                 {
                     return new ThisExtractor();
                 }
+                else if (id.Equals("true"))
+                {
+                    return new ConstantExtrator(true);
+                }
+                else if (id.Equals("false"))
+                {
+                    return new ConstantExtrator(false);
+                }
 
                 throw new NotSupportedException($"Identifier {id} isn't supported");
             }

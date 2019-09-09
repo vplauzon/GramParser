@@ -16,7 +16,7 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (false, "literal", "a", null),
+                (false, "literal", "a", (object)null),
                 (true, "literal", "ab", "ab"),
                 (false, "repeat", "a", null),
                 (true, "repeat", "", ""),
@@ -39,7 +39,9 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (true, "literal", "abab", "constant")
+                (true, "literal", "abab", (object)"constant"),
+                (true, "true", "abab", true),
+                (true, "false", "abab", false)
             };
 
             Test("Identifiers.Constants.txt", samples);
@@ -62,7 +64,7 @@ namespace PasLibTest
 
         private void Test(
             string grammarFile,
-            (bool isSuccess, string ruleName, string text, string output)[] samples)
+            (bool isSuccess, string ruleName, string text, object output)[] samples)
         {
             var grammarText = GetResource(grammarFile);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
