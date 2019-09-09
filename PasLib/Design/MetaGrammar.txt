@@ -3,8 +3,9 @@ rule(interleave=false) comment = "#" (. - ("\r" | "\n"))*;
 interleave = (" " | "\r" | "\n" | "\t") | comment;
 
 #	tokens
-rule(interleave=false, children=false) identifier = ("a".."z" | "A".."Z" | "0".."9")+;
+rule(interleave=false, children=false) identifier = ("a".."z" | "A".."Z") ("a".."z" | "A".."Z" | "0".."9")*;
 rule(interleave=false, children=false) number = ("0".."9")+;
+rule(interleave=false) double = "-"? number* ("." number+)?;
 rule(interleave=false) character = normal::(. - ("\"" | "\r" | "\n" | "\\"))
 	| escapeQuote::("\\" "\"") | escapeBackslash::"\\\\"
 	| escapeLetter:("\\" l::("n" | "r" | "t" | "v"))
@@ -44,7 +45,7 @@ rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:ran
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
-rule(recursive=true) outputBody = id:identifier | literal:literal;
+rule(recursive=true) outputBody = id::identifier | literal:literal | number::double;
 rule outputDeclaration = "=>" output:outputBody;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";

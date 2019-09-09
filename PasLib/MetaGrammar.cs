@@ -272,8 +272,28 @@ namespace PasLib
                         return CreateOutputExtractorFromId(tagValue.Text);
                     case "literal":
                         return CreateOutputExtractorFromLiteral(tagValue);
+                    case "number":
+                        return CreateOutputExtractorFromNumber(tagValue.Text);
                     default:
                         throw new NotSupportedException($"Tag {tagName} not supported for output body");
+                }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromNumber(SubString text)
+            {
+                var numberText = text.ToString();
+
+                if (!numberText.Contains('.'))
+                {
+                    var value = int.Parse(numberText);
+
+                    return new ConstantExtrator(value);
+                }
+                else
+                {
+                    var value = double.Parse(numberText);
+
+                    return new ConstantExtrator(value);
                 }
             }
 
@@ -724,7 +744,15 @@ namespace PasLib
                 false,
                 false);
             //  Tokens
-            var identifierChar = new DisjunctionRule(
+            var identifierPrefixChar = new DisjunctionRule(
+                null,
+                null,
+                TaggedRule.FromRules(
+                    new RangeRule(null, null, 'a', 'z'),
+                    new RangeRule(null, null, 'A', 'Z')),
+                false,
+                false);
+            var identifierSuffixChar = new DisjunctionRule(
                 null,
                 null,
                 TaggedRule.FromRules(
@@ -733,23 +761,65 @@ namespace PasLib
                     new RangeRule(null, null, '0', '9')),
                 false,
                 false);
-            var identifier = new RepeatRule(
+            var identifier = new SequenceRule(
                 "identifier",
                 null,
-                identifierChar,
-                1,
-                null,
+                new[]
+                {
+                    new TaggedRule(identifierPrefixChar),
+                    new TaggedRule(
+                        new RepeatRule(
+                            null,
+                            null,
+                            identifierSuffixChar,
+                            null,
+                            null,
+                            false,
+                            false,
+                            false))
+                },
                 false,
                 false,
                 false);
             var number = new RepeatRule(
-                "identifier",
+                "number",
                 null,
                 new RangeRule(null, null, '0', '9'),
                 1,
                 null,
                 false,
                 false,
+                false);
+            var doubleRule = new SequenceRule(
+                "double",
+                null,
+                new[]
+                {
+                    new TaggedRule(
+                        null,
+                        new RepeatRule(null, null, new LiteralRule(null, null, "-"), null, 1),
+                        false),
+                    new TaggedRule(
+                        null,
+                        new RepeatRule(null, null, number, null, null),
+                        false),
+                    new TaggedRule(
+                        null,
+                        new RepeatRule(
+                            null,
+                            null,
+                            new SequenceRule(
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new TaggedRule(new LiteralRule(null, null, ".")),
+                                    new TaggedRule(new RepeatRule(null, null, number, 1, null))
+                                }),
+                            0,
+                            1),
+                        false)
+                },
                 false);
             var character = GetCharacterRule();
             var quotedCharacter = new SequenceRule(
@@ -1033,7 +1103,8 @@ namespace PasLib
                 new[]
                 {
                     new TaggedRule("id", identifier, false),
-                    new TaggedRule("literal", literal, true)
+                    new TaggedRule("literal", literal, true),
+                    new TaggedRule("number", doubleRule, false)
                 },
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(

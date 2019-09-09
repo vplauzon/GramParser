@@ -2,6 +2,6 @@
 rule true = "ab"* => true;
 rule false = "ab"* => false;
 rule null = "ab"* => null;
-#rule literal = "ab"* => 1;
-#rule literal = "ab"* => -56;
-#rule literal = "ab"* => -3.14;
+rule integer = "ab"* => 1;
+rule negativeInteger = "ab"* => -56;
+rule double = "ab"* => -3.14;
