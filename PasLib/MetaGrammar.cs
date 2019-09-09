@@ -271,10 +271,17 @@ namespace PasLib
                     case "id":
                         return CreateOutputExtractorFromId(tagValue.Text);
                     case "literal":
-                        throw new NotImplementedException();
+                        return CreateOutputExtractorFromLiteral(tagValue);
                     default:
                         throw new NotSupportedException($"Tag {tagName} not supported for output body");
                 }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromLiteral(RuleMatch literal)
+            {
+                var text = literal.NamedChildren.First().Value.Text;
+
+                return new ConstantExtrator(text);
             }
 
             private IOutputExtractor CreateOutputExtractorFromId(SubString id)
@@ -1014,7 +1021,7 @@ namespace PasLib
                 new[]
                 {
                     new TaggedRule("id", identifier, false),
-                    new TaggedRule("literal", literal, false)
+                    new TaggedRule("literal", literal, true)
                 },
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(

@@ -1,4 +1,7 @@
 ﻿rule literal = "ab"* => "constant";
-rule literal = "ab"* => true;
-rule literal = "ab"* => false;
-rule literal = "ab"* => null;
+#rule literal = "ab"* => true;
+#rule literal = "ab"* => false;
+#rule literal = "ab"* => null;
+#rule literal = "ab"* => 1;
+#rule literal = "ab"* => -56;
+#rule literal = "ab"* => -3.14;

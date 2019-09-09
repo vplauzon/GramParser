@@ -33,6 +33,19 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Constants
+        [TestMethod]
+        public void Constants()
+        {
+            var samples = new[]
+            {
+                (true, "literal", "abab", "constant")
+            };
+
+            Test("Identifiers.Constants.txt", samples);
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;

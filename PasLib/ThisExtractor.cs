@@ -7,9 +7,11 @@ namespace PasLib
 {
     internal class ThisExtractor : IOutputExtractor
     {
-        object IOutputExtractor.ExtractOutput(SubString text, IImmutableDictionary<string, RuleMatch> namedChildren)
+        object IOutputExtractor.ExtractOutput(
+            SubString text,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            return text.ToString();
+            return text;
         }
     }
 }
