@@ -276,9 +276,45 @@ namespace PasLib
                         return CreateOutputExtractorFromNumber(tagValue.Text);
                     case "array":
                         return CreateOutputExtractorFromArray(tagValue);
+                    case "object":
+                        return CreateOutputExtractorFromObject(tagValue);
                     default:
                         throw new NotSupportedException($"Tag {tagName} not supported for output body");
                 }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromObject(RuleMatch objectMatch)
+            {
+                var listChildren = objectMatch.NamedChildren["list"].Children;
+
+                if (listChildren.Count == 0)
+                {
+                    return new ConstantExtrator(new object());
+                }
+                else
+                {
+                    var pairs = ExtractPairsFromPairList(listChildren.First());
+
+                    return new ObjectExtractor(pairs);
+                }
+            }
+
+            private IEnumerable<KeyValuePair<IOutputExtractor, IOutputExtractor>>
+                ExtractPairsFromPairList(RuleMatch list)
+            {
+                var head = list.NamedChildren["head"];
+                var tail = list.NamedChildren["tail"];
+                var tailElements = from e in tail.Children
+                                   select e.NamedChildren.First().Value;
+                var matchPairs = tailElements.Prepend(head);
+                var extractorPairs = from p in matchPairs
+                                     let keyMatch = p.NamedChildren["key"]
+                                     let valueMatch = p.NamedChildren["value"]
+                                     let key = CreateOutputExtractorFromBody(keyMatch)
+                                     let value = CreateOutputExtractorFromBody(valueMatch)
+                                     select KeyValuePair.Create(key, value);
+
+                return extractorPairs;
             }
 
             private IOutputExtractor CreateOutputExtractorFromArray(RuleMatch arrayMatch)
@@ -1168,6 +1204,63 @@ namespace PasLib
                         true),
                     new TaggedRule(new LiteralRule(null, null, "]"))
                 });
+            var outputObjectFieldKey = new DisjunctionRule(
+                "outputObjectFieldKey",
+                null,
+                new[]
+                {
+                    new TaggedRule("id", identifier, false),
+                    new TaggedRule("literal", literal, true)
+                });
+            var outputObjectFieldPair = new SequenceRule(
+                "outputObjectFieldPair",
+                null,
+                new[]
+                {
+                    new TaggedRule("key", outputObjectFieldKey, true),
+                    new TaggedRule(new LiteralRule(null, null, ":")),
+                    new TaggedRule("value", outputBodyProxy, true)
+                });
+            var outputObjectFieldList = new SequenceRule(
+                "outputObjectFieldList",
+                null,
+                new[]
+                {
+                    new TaggedRule("head", outputObjectFieldPair, true),
+                    new TaggedRule(
+                        "tail",
+                        new RepeatRule(
+                            null,
+                            null,
+                            new SequenceRule(
+                                null,
+                                null,
+                                new []
+                                {
+                                    new TaggedRule(new LiteralRule(null, null, ",")),
+                                    new TaggedRule("element", outputObjectFieldPair, true)
+                                }),
+                            null,
+                            null),
+                        true)
+                });
+            var outputObject = new SequenceRule(
+                "outputObject",
+                null,
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, null, "{")),
+                    new TaggedRule(
+                        "list",
+                        new RepeatRule(
+                            null,
+                            null,
+                            outputObjectFieldList,
+                            null,
+                            1),
+                        true),
+                    new TaggedRule(new LiteralRule(null, null, "}"))
+                });
             var outputBody = new DisjunctionRule(
                 "outputBody",
                 null,
@@ -1176,7 +1269,8 @@ namespace PasLib
                     new TaggedRule("id", identifier, false),
                     new TaggedRule("literal", literal, true),
                     new TaggedRule("number", doubleRule, false),
-                    new TaggedRule("array", outputArray, true)
+                    new TaggedRule("array", outputArray, true),
+                    new TaggedRule("object", outputObject, true)
                 },
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(

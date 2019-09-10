@@ -1,0 +1,13 @@
+﻿rule empty = "hi" => {};
+rule oneField = "hi" => {
+  "text" : "Hello"
+};
+rule twoFields = "hi" => {
+  "text" : "Hello",
+  "number" : 42
+};
+rule threeFields = "hi" => {
+  "text" : "Hello",
+  "number" : -42,
+  "boolean" : true
+};
