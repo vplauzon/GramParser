@@ -310,8 +310,8 @@ namespace PasLib
                 var extractorPairs = from p in matchPairs
                                      let keyMatch = p.NamedChildren["key"]
                                      let valueMatch = p.NamedChildren["value"]
-                                     let key = CreateOutputExtractor(keyMatch)
-                                     let value = CreateOutputExtractor(keyMatch)
+                                     let key = CreateOutputExtractorFromBody(keyMatch)
+                                     let value = CreateOutputExtractorFromBody(valueMatch)
                                      select KeyValuePair.Create(key, value);
 
                 return extractorPairs;

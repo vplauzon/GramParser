@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace PasLib
 {
@@ -21,7 +22,33 @@ namespace PasLib
             SubString text,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            throw new System.NotImplementedException();
+            var outputPairs = (from pair in _extractorPairs
+                               let rawKey = pair.Key.ExtractOutput(text, namedChildren)
+                               let key = ExtractorHelper.CleanOutput(rawKey) as string
+                               let rawValue = pair.Value.ExtractOutput(text, namedChildren)
+                               let value = ExtractorHelper.CleanOutput(rawValue)
+                               select new
+                               {
+                                   KeyExtractor = pair.Key,
+                                   Key = key,
+                                   ValueExtractor = pair.Value,
+                                   Value = value
+                               }).ToArray();
+            var firstNullKey = outputPairs.FirstOrDefault(p => p.Key == null);
+
+            if (firstNullKey != null)
+            {
+                throw new ParsingException(
+                    $"Object's key doesn't resolve to a string:  {firstNullKey.KeyExtractor}");
+            }
+            else
+            {
+                var keyValuePairs = from p in outputPairs
+                                    select KeyValuePair.Create(p.Key, p.Value);
+                var dictionary = ImmutableDictionary<string, object>.Empty.AddRange(keyValuePairs);
+
+                return dictionary;
+            }
         }
     }
 }
