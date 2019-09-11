@@ -279,7 +279,7 @@ namespace PasLib
                     case "object":
                         return CreateOutputExtractorFromObject(tagValue);
                     default:
-                        throw new NotSupportedException($"Tag {tagName} not supported for output body");
+                        throw new NotSupportedException($"Tag '{tagName}' not supported for output body");
                 }
             }
 
@@ -1261,6 +1261,16 @@ namespace PasLib
                         true),
                     new TaggedRule(new LiteralRule(null, null, "}"))
                 });
+            var outputFunction = new SequenceRule(
+                "outputFunction",
+                null,
+                new[]
+                {
+                    new TaggedRule("id", identifier, false),
+                    new TaggedRule(new LiteralRule(null, null, "(")),
+                    new TaggedRule("list", outputArrayList, true),
+                    new TaggedRule(new LiteralRule(null, null, ")"))
+                });
             var outputBody = new DisjunctionRule(
                 "outputBody",
                 null,
@@ -1270,7 +1280,8 @@ namespace PasLib
                     new TaggedRule("literal", literal, true),
                     new TaggedRule("number", doubleRule, false),
                     new TaggedRule("array", outputArray, true),
-                    new TaggedRule("object", outputObject, true)
+                    new TaggedRule("object", outputObject, true),
+                    new TaggedRule("function", outputFunction, true)
                 },
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(

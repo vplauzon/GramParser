@@ -99,6 +99,20 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Functions
+        [TestMethod]
+        public void ConstantFunctions()
+        {
+            var samples = new[]
+            {
+                (true, "oneParam", "Hello", (object)"42" ),
+                (true, "manyParams", "Hello", "HiMyNameIsMax")
+            };
+
+            Test("ConstantFunctions.txt", samples);
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;
