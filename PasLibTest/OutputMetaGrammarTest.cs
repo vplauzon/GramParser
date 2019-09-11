@@ -5,6 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Text.Json;
+using System.Collections;
+using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace PasLibTest
 {
@@ -91,8 +94,8 @@ namespace PasLibTest
             {
                 (true, "empty", "hi", new object()),
                 (true, "oneField", "hi", new { text="Hello" }),
-                (true, "twoFields", "hi", new { text="Hello", number=42 }),
-                (true, "threeFields", "hi", new { text="Hello", number=-42, boolean=true })
+                (true, "twoFields", "hi", ImmutableDictionary<string, object>.Empty.Add("text", "Hello").Add("number", 42)),
+                (true, "threeFields", "hi", ImmutableDictionary<string, object>.Empty.Add("text", "Hello").Add("number", -42).Add("boolean", true))
             };
 
             Test("ConstantObjects.txt", samples);
@@ -105,7 +108,7 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (true, "oneParam", "Hello", (object)"42" ),
+                (true, "oneParam", "Hello", (object)42 ),
                 (true, "manyParams", "Hello", "HiMyNameIsMax")
             };
 

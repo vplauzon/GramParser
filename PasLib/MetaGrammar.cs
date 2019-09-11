@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -278,8 +279,31 @@ namespace PasLib
                         return CreateOutputExtractorFromArray(tagValue);
                     case "object":
                         return CreateOutputExtractorFromObject(tagValue);
+                    case "function":
+                        return CreateOutputExtractorFromFunction(tagValue);
                     default:
                         throw new NotSupportedException($"Tag '{tagName}' not supported for output body");
+                }
+            }
+
+            private IOutputExtractor CreateOutputExtractorFromFunction(RuleMatch functionMatch)
+            {
+                var functionName = functionMatch.NamedChildren["id"].Text;
+                var listChildren = functionMatch.NamedChildren["list"].Children;
+
+                if (listChildren.Count == 0)
+                {
+                    return new FunctionExtractor(
+                        functionName.ToString(),
+                        ImmutableArray<IOutputExtractor>.Empty);
+                }
+                else
+                {
+                    var outputBodies = ExtractOutputBodiesFromArray(listChildren.First());
+                    var extractors = from outputBody in outputBodies
+                                     select CreateOutputExtractorFromBody(outputBody);
+
+                    return new FunctionExtractor(functionName.ToString(), extractors);
                 }
             }
 
@@ -1268,7 +1292,15 @@ namespace PasLib
                 {
                     new TaggedRule("id", identifier, false),
                     new TaggedRule(new LiteralRule(null, null, "(")),
-                    new TaggedRule("list", outputArrayList, true),
+                    new TaggedRule(
+                        "list",
+                        new RepeatRule(
+                            null,
+                            null,
+                            outputArrayList,
+                            null,
+                            1),
+                        true),
                     new TaggedRule(new LiteralRule(null, null, ")"))
                 });
             var outputBody = new DisjunctionRule(
