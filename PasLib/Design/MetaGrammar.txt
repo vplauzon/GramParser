@@ -51,12 +51,14 @@ rule outputObjectFieldKey = id::identifier | literal:literal;
 rule outputObjectFieldPair = key:outputObjectFieldKey ":" value:outputBody;
 rule outputObjectFieldList = head:outputObjectFieldPair tail:("," element:outputObjectFieldPair)*;
 rule outputObject = "{" list:outputObjectFieldList? "}"
+rule outputFunction = id::identifier "(" list::outputArrayList? ")";
 rule(recursive=true) outputBody =
 	id::identifier
 	| literal:literal
 	| number::double
 	| array:outputArray
-	| object:outputObject;
+	| object:outputObject
+	| function:outputFunction;
 rule outputDeclaration = "=>" output:outputBody;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
