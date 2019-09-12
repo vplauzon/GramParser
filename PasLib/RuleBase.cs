@@ -6,9 +6,11 @@ namespace PasLib
 {
     internal abstract class RuleBase : IRule
     {
+        private readonly Lazy<IOutputExtractor> _outputExtractorFactory;
+
         protected RuleBase(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            Func<IOutputExtractor> outputExtractorFactory,
             bool? hasInterleave,
             bool? isRecursive,
             bool isTerminalRule,
@@ -19,7 +21,10 @@ namespace PasLib
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            OutputExtractor = outputExtractor;
+            _outputExtractorFactory = new Lazy<IOutputExtractor>(
+                outputExtractorFactory == null
+                ? () => null
+                : outputExtractorFactory);
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
@@ -43,7 +48,7 @@ namespace PasLib
             return OnMatch(context);
         }
 
-        public IOutputExtractor OutputExtractor { get; }
+        public IOutputExtractor OutputExtractor => _outputExtractorFactory.Value;
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
 

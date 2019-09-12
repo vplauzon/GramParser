@@ -11,9 +11,9 @@ namespace PasLib
 
         public LiteralRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            Func<IOutputExtractor> outputExtractorFactory,
             IEnumerable<char> literal)
-            : base(ruleName, outputExtractor, false, false, true, false)
+            : base(ruleName, outputExtractorFactory, false, false, true, false)
         {
             if (literal == null)
             {
@@ -23,8 +23,11 @@ namespace PasLib
             _literal = literal.ToArray();
         }
 
-        public LiteralRule(string ruleName, IOutputExtractor outputExtractor, string literal)
-            : base(ruleName, outputExtractor, false, false, true, false)
+        public LiteralRule(
+            string ruleName,
+            Func<IOutputExtractor> outputExtractorFactory,
+            string literal)
+            : base(ruleName, outputExtractorFactory, false, false, true, false)
         {
             if (literal == null)
             {
