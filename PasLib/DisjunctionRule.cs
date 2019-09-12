@@ -11,14 +11,14 @@ namespace PasLib
 
         public DisjunctionRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            Func<IOutputExtractor> outputExtractorFactory,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  outputExtractorFactory,
                   hasInterleave,
                   isRecursive,
                   false,

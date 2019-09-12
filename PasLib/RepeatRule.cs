@@ -13,7 +13,7 @@ namespace PasLib
 
         public RepeatRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            Func<IOutputExtractor> outputExtractorFactory,
             IRule rule,
             int? min,
             int? max,
@@ -22,7 +22,7 @@ namespace PasLib
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  outputExtractorFactory,
                   hasInterleave,
                   isRecursive,
                   false,
