@@ -27,7 +27,7 @@ rule minMaxCardinality = minmax:("{" min:number "," max:number "}")
 	| max:("{" "," max:number "}");
 rule cardinality = star:"*" | plus:"+" | question:"?" | exact:exactCardinality
 	| minMax:minMaxCardinality;
-rule bracket = "(" r:ruleBody ")";
+rule bracket = "(" r:ruleBodyOutput ")";
 rule repeatable = ruleRef:identifier | literal:literal | bracket | any:any;
 rule repeat = rule:repeatable cardinality:cardinality;
 rule disjunctionable = ruleRef:identifier | literal:literal | range:range | bracket
@@ -41,7 +41,7 @@ rule substractable = ruleRef:identifier | literal:literal | range:range
 rule substracted = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | repeat:repeat;
 rule substract = primary:substractable "-" excluded:substracted;
-rule(recursive=true) ruleBody = ruleRef:identifier | literal:literal | range:range
+rule ruleBody = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
@@ -60,6 +60,7 @@ rule(recursive=true) outputBody =
 	| object:outputObject
 	| function:outputFunction;
 rule outputDeclaration = "=>" output:outputBody;
+rule ruleBodyOutput = ruleBody output:outputDeclaration?;
 
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
 rule boolean = true:"true" | false:"false";
@@ -67,7 +68,7 @@ rule parameterAssignation = id:identifier "=" value:boolean;
 rule parameterAssignationList = "(" head:parameterAssignation
 	tail:("," pa:parameterAssignation)* ")";
 rule ruleDeclaration = "rule" params:parameterAssignationList?
-	id:identifier "=" body:ruleBody output:outputDeclaration? ";";
+	id:identifier "=" rule:ruleBodyOutput ";";
 rule declaration = interleaveDeclaration:interleaveDeclaration
 	| ruleDeclaration:ruleDeclaration;
 
