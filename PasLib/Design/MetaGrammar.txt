@@ -45,6 +45,7 @@ rule ruleBody = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | any:any | substract:substract | disjunction:disjunction | repeat:repeat
 	| sequence:sequence;
 
+#	outputs
 rule outputArrayList = head:outputBody tail:("," element:outputBody)*;
 rule outputArray = "[" list:outputArrayList? "]";
 rule outputObjectFieldKey = id::identifier | literal:literal;
@@ -62,6 +63,7 @@ rule(recursive=true) outputBody =
 rule outputDeclaration = "=>" output:outputBody;
 rule ruleBodyOutput = ruleBody output:outputDeclaration?;
 
+#	rule declarations
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";
 rule boolean = true:"true" | false:"false";
 rule parameterAssignation = id:identifier "=" value:boolean;
