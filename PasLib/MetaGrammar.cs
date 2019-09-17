@@ -1424,7 +1424,8 @@ namespace PasLib
                         true),
                     new TaggedRule("id", identifier, true),
                     new TaggedRule(new LiteralRule(null, null, "=")),
-                    new TaggedRule("rule", ruleBodyOutput, true)
+                    new TaggedRule("rule", ruleBodyOutput, true),
+                    new TaggedRule(new LiteralRule(null, null, ";"))
                 });
             var declaration = new DisjunctionRule(
                 "declaration",
