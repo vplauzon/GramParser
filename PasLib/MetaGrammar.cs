@@ -781,8 +781,12 @@ namespace PasLib
                 PropertyBag bag,
                 Func<IOutputExtractor> outputExtractorFactory)
             {
-                var bracketted = ruleBodyBody.NamedChildren.First().Value;
-                var rule = CreateRule(null, bag, bracketted, outputExtractorFactory);
+                var ruleBodyOutput = ruleBodyBody.NamedChildren.First().Value;
+                var ruleBody = ruleBodyOutput.NamedChildren["body"];
+                var output = ruleBodyOutput.NamedChildren["output"];
+                Func<IOutputExtractor> innerOutputExtractorFactory =
+                    () => CreateOutputExtractor(output);
+                var rule = CreateRule(null, bag, ruleBody, innerOutputExtractorFactory);
 
                 return rule;
             }
