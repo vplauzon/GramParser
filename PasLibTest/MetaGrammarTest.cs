@@ -287,6 +287,18 @@ namespace PasLibTest
 
             Test("AdHoc.RepeatWithInterleaves.txt", samples);
         }
+
+        [TestMethod]
+        public void Backet()
+        {
+            Test(
+                "AdHoc.Bracket.txt",
+                new[]
+                {
+                    (true, "main", "a"),
+                    (true, "main", "b")
+                });
+        }
         #endregion
 
         #region Children

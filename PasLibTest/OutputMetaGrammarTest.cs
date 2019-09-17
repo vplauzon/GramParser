@@ -54,6 +54,18 @@ namespace PasLibTest
 
             Test("Constant.Constants.txt", samples);
         }
+
+        [TestMethod]
+        public void BracketSubstitution()
+        {
+            var samples = new[]
+            {
+                (true, "main", "a", (object)"d"),
+                (true, "main", "b", "d")
+            };
+
+            Test("Constant.BracketSubstitution.txt", samples);
+        }
         #endregion
 
         #region Arrays
