@@ -61,7 +61,7 @@ rule(recursive=true) outputBody =
 	| object:outputObject
 	| function:outputFunction;
 rule outputDeclaration = "=>" output:outputBody;
-rule ruleBodyOutput = ruleBody output:outputDeclaration?;
+rule ruleBodyOutput = body:ruleBody output:outputDeclaration?;
 
 #	rule declarations
 rule interleaveDeclaration = "interleave" "=" body:ruleBody ";";

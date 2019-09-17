@@ -63,8 +63,9 @@ namespace PasLib
                     {
                         var ruleID = subMatch.NamedChildren["id"].Text.ToString();
                         var parameterAssignationList = subMatch.NamedChildren["params"];
-                        var ruleBody = subMatch.NamedChildren["body"];
-                        var output = subMatch.NamedChildren["output"];
+                        var ruleBodyOutput = subMatch.NamedChildren["rule"];
+                        var ruleBody = ruleBodyOutput.NamedChildren["body"];
+                        var output = ruleBodyOutput.NamedChildren["output"];
                         var rule = CreateRule(ruleID, parameterAssignationList, ruleBody, output);
 
                         _ruleMap[ruleID] = rule;
