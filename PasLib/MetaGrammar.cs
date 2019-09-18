@@ -786,9 +786,16 @@ namespace PasLib
                 var output = ruleBodyOutput.NamedChildren["output"];
                 Func<IOutputExtractor> innerOutputExtractorFactory =
                     () => CreateOutputExtractor(output);
-                var rule = CreateRule(null, bag, ruleBody, innerOutputExtractorFactory);
+                var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractorFactory);
+                var outerRule = new SequenceRule(
+                    ruleID,
+                    outputExtractorFactory,
+                    new[] { new TaggedRule(innerRule)},
+                    bag.HasInterleave,
+                    bag.IsRecursive,
+                    bag.HasChildrenDetails);
 
-                return rule;
+                return outerRule;
             }
         }
         #endregion
