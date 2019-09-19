@@ -422,8 +422,10 @@ namespace PasLib
                 {
                     return new ConstantExtrator(null);
                 }
-
-                throw new NotSupportedException($"Identifier {id} isn't supported");
+                else
+                {
+                    return new ChildExtractor(id.ToString());
+                }
             }
 
             private static void AssignInterleaveToBag(PropertyBag bag, string value)

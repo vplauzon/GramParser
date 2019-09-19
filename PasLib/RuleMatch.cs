@@ -52,8 +52,8 @@ namespace PasLib
             _lazyOutput = new Lazy<object>(() =>
             {
                 var output = rule.OutputExtractor != null
-                    ? rule.OutputExtractor.ExtractOutput(text, null)
-                    : null;
+                    ? rule.OutputExtractor.ExtractOutput(text, namedChildren)
+                    : ExtractDefaultOutput(text, namedChildren);
 
                 return ExtractorHelper.CleanOutput(output);
             });
@@ -155,5 +155,24 @@ namespace PasLib
                 : $"<{Rule.RuleName}>{Text}";
         }
         #endregion
+
+        private static object ExtractDefaultOutput(
+            SubString text,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            if (namedChildren == null || namedChildren.Count == 0)
+            {
+                return text.ToString();
+            }
+            else
+            {
+                var components = from c in namedChildren
+                                 let output = c.Value.Output
+                                 select KeyValuePair.Create(c.Key, output);
+                var obj = ImmutableDictionary<string, object>.Empty.AddRange(components);
+
+                return obj;
+            }
+        }
     }
 }
