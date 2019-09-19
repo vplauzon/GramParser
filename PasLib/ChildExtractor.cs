@@ -17,7 +17,12 @@ namespace PasLib
         {
             RuleMatch child;
 
-            if (namedChildren.TryGetValue(_name, out child))
+            if (namedChildren == null)
+            {
+                throw new ParsingException(
+                    $"Rule has no children, so can't find child '{_name}'");
+            }
+            else if (namedChildren.TryGetValue(_name, out child))
             {
                 return child.Output;
             }

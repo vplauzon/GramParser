@@ -60,7 +60,9 @@
     <None Remove="Output\Constant\BracketSubstitution.txt" />
     <None Remove="Output\Constant\Constants.txt" />
     <None Remove="Output\Function\ConstantFunctions.txt" />
+    <None Remove="Output\Identifier\Children.txt" />
     <None Remove="Output\Identifier\This.txt" />
+    <None Remove="Output\Object\Children.txt" />
     <None Remove="Output\Object\ConstantObjects.txt" />
     <None Remove="Output\This.txt" />
     <None Remove="Output\ThisArrays.txt" />
@@ -93,7 +95,9 @@
     <EmbeddedResource Include="Output\Constant\BracketSubstitution.txt" />
     <EmbeddedResource Include="Output\Constant\Constants.txt" />
     <EmbeddedResource Include="Output\Function\ConstantFunctions.txt" />
+    <EmbeddedResource Include="Output\Identifier\Children.txt" />
     <EmbeddedResource Include="Output\Identifier\This.txt" />
+    <EmbeddedResource Include="Output\Object\Children.txt" />
     <EmbeddedResource Include="Output\Object\ConstantObjects.txt" />
   </ItemGroup>
 

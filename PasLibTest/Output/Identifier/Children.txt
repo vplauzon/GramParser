@@ -1,0 +1,2 @@
+﻿rule justA = a:"a"* b:"b"* => a;
+rule justB = a:"a"* b:"b"* => b;

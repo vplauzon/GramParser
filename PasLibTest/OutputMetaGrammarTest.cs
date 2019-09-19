@@ -35,6 +35,21 @@ namespace PasLibTest
 
             Test("Identifier.This.txt", samples);
         }
+
+        [TestMethod]
+        public void Children()
+        {
+            var samples = new[]
+            {
+                (true, "justA", "aaabbbb", (object)"aaa"),
+                (true, "justA", "aaa", "aaa"),
+                (true, "justA", "abbbb", "a"),
+                (true, "justA", "bbbb", ""),
+                (true, "justB", "aaabb", "bb")
+            };
+
+            Test("Identifier.Children.txt", samples);
+        }
         #endregion
 
         #region Constants
@@ -112,6 +127,19 @@ namespace PasLibTest
 
             Test("Object.ConstantObjects.txt", samples);
         }
+
+        [TestMethod]
+        public void ChildrenObject()
+        {
+            var samples = new[]
+            {
+                (true, "seq", "aaabb", (object)new{ a="aaa", b="bb"}),
+                (true, "dij", "aaa", (object)new{ a="aaa"}),
+                (true, "dij", "bbbb", (object)new{ b="bbbb"})
+            };
+
+            Test("Object.Children.txt", samples);
+        }
         #endregion
 
         #region Functions
@@ -168,12 +196,33 @@ namespace PasLibTest
                     }
                     else
                     {
-                        var outputText = JsonSerializer.Serialize(output);
-                        var matchOutputText = JsonSerializer.Serialize(match.Output);
+                        string outputText = StandardizeObject(output);
+                        var matchOutputText = StandardizeObject(match.Output);
 
                         Assert.AreEqual(outputText, matchOutputText, $"Output JSON Compare - {i}");
                     }
                 }
+            }
+        }
+
+        private static string StandardizeObject(object obj)
+        {
+            var serialized = JsonSerializer.Serialize(obj);
+
+            if (serialized.StartsWith("{"))
+            {
+                var map = JsonSerializer.Deserialize<IImmutableDictionary<string, object>>(
+                    serialized);
+                var sortedMap = from p in map
+                                orderby p.Key
+                                select p;
+                var text = JsonSerializer.Serialize(sortedMap);
+
+                return text;
+            }
+            else
+            {
+                return serialized;
             }
         }
     }
