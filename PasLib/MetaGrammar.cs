@@ -406,9 +406,9 @@ namespace PasLib
 
             private IOutputExtractor CreateOutputExtractorFromId(SubString id)
             {
-                if (id.Equals("this"))
+                if (id.Equals("text"))
                 {
-                    return new ThisExtractor();
+                    return new TextExtractor();
                 }
                 else if (id.Equals("true"))
                 {

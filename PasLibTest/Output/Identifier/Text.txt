@@ -1,4 +1,4 @@
-﻿rule literal = "ab" => this;
-rule repeat = "ab"* => this;
-rule disjunction = "Hello" | "World" => this;
-rule sequence = "Hello" " " "World" => this;
+﻿rule literal = "ab" => text;
+rule repeat = "ab"* => text;
+rule disjunction = "Hello" | "World" => text;
+rule sequence = "Hello" " " "World" => text;

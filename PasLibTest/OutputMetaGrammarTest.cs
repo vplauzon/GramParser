@@ -33,7 +33,7 @@ namespace PasLibTest
                 (true, "sequence", "Hello World", "Hello World")
             };
 
-            Test("Identifier.This.txt", samples);
+            Test("Identifier.Text.txt", samples);
         }
 
         [TestMethod]
@@ -106,10 +106,10 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (true, "this", "Hello", (object)new[]{ "Hello", "Hello", "Hello"})
+                (true, "text", "Hello", (object)new[]{ "Hello", "Hello", "Hello"})
             };
 
-            Test("Array.ThisArrays.txt", samples);
+            Test("Array.TextArrays.txt", samples);
         }
         #endregion
 
