@@ -52,6 +52,7 @@
     <None Remove="Meta\Simple\SubstractGrammar.txt" />
     <None Remove="Meta\SubstractGrammar.txt" />
     <None Remove="Output\Array\ConstantArrays.txt" />
+    <None Remove="Output\Array\TextArrays.txt" />
     <None Remove="Output\Array\ThisArrays.txt" />
     <None Remove="Output\ConstantArrays.txt" />
     <None Remove="Output\ConstantFunctions.txt" />
@@ -61,6 +62,7 @@
     <None Remove="Output\Constant\Constants.txt" />
     <None Remove="Output\Function\ConstantFunctions.txt" />
     <None Remove="Output\Identifier\Children.txt" />
+    <None Remove="Output\Identifier\Text.txt" />
     <None Remove="Output\Identifier\This.txt" />
     <None Remove="Output\Object\Children.txt" />
     <None Remove="Output\Object\ConstantObjects.txt" />
@@ -91,12 +93,12 @@
     <EmbeddedResource Include="Meta\Simple\SequenceGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\SubstractGrammar.txt" />
     <EmbeddedResource Include="Output\Array\ConstantArrays.txt" />
-    <EmbeddedResource Include="Output\Array\ThisArrays.txt" />
+    <EmbeddedResource Include="Output\Array\TextArrays.txt" />
     <EmbeddedResource Include="Output\Constant\BracketSubstitution.txt" />
     <EmbeddedResource Include="Output\Constant\Constants.txt" />
     <EmbeddedResource Include="Output\Function\ConstantFunctions.txt" />
     <EmbeddedResource Include="Output\Identifier\Children.txt" />
-    <EmbeddedResource Include="Output\Identifier\This.txt" />
+    <EmbeddedResource Include="Output\Identifier\Text.txt" />
     <EmbeddedResource Include="Output\Object\Children.txt" />
     <EmbeddedResource Include="Output\Object\ConstantObjects.txt" />
   </ItemGroup>

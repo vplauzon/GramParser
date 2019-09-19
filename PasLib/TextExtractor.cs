@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace PasLib
 {
-    internal class ThisExtractor : IOutputExtractor
+    internal class TextExtractor : IOutputExtractor
     {
         object IOutputExtractor.ExtractOutput(
             SubString text,

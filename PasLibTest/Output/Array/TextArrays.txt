@@ -1,1 +1,1 @@
-﻿rule this = "Hello" => [this, this, this];
+﻿rule text = "Hello" => [text, text, text];
