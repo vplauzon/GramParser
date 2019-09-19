@@ -33,7 +33,7 @@ namespace PasLibTest
                 (true, "sequence", "Hello World", "Hello World")
             };
 
-            Test("This.txt", samples);
+            Test("Identifier.This.txt", samples);
         }
         #endregion
 
@@ -52,11 +52,23 @@ namespace PasLibTest
                 (true, "double", "abab", -3.14)
             };
 
-            Test("Constants.txt", samples);
+            Test("Constant.Constants.txt", samples);
+        }
+
+        [TestMethod]
+        public void BracketSubstitution()
+        {
+            var samples = new[]
+            {
+                (true, "main", "a", (object)"d"),
+                (true, "main", "b", "d")
+            };
+
+            Test("Constant.BracketSubstitution.txt", samples);
         }
         #endregion
 
-        #region Constants
+        #region Arrays
         [TestMethod]
         public void ConstantArrays()
         {
@@ -71,7 +83,7 @@ namespace PasLibTest
                 (true, "nulls", "Hello", new object[]{null, null})
             };
 
-            Test("ConstantArrays.txt", samples);
+            Test("Array.ConstantArrays.txt", samples);
         }
 
         [TestMethod]
@@ -82,7 +94,7 @@ namespace PasLibTest
                 (true, "this", "Hello", (object)new[]{ "Hello", "Hello", "Hello"})
             };
 
-            Test("ThisArrays.txt", samples);
+            Test("Array.ThisArrays.txt", samples);
         }
         #endregion
 
@@ -98,7 +110,7 @@ namespace PasLibTest
                 (true, "threeFields", "hi", ImmutableDictionary<string, object>.Empty.Add("text", "Hello").Add("number", -42).Add("boolean", true))
             };
 
-            Test("ConstantObjects.txt", samples);
+            Test("Object.ConstantObjects.txt", samples);
         }
         #endregion
 
@@ -112,7 +124,7 @@ namespace PasLibTest
                 (true, "manyParams", "Hello", "HiMyNameIsMax")
             };
 
-            Test("ConstantFunctions.txt", samples);
+            Test("Function.ConstantFunctions.txt", samples);
         }
         #endregion
 

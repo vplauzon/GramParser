@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Meta\AdHoc\Bracket.txt" />
     <None Remove="Meta\AdHoc\Comments.txt" />
     <None Remove="Meta\AdHoc\Interleave.txt" />
     <None Remove="Meta\AdHoc\RepeatWithInterleaves.txt" />
@@ -50,15 +51,23 @@
     <None Remove="Meta\Simple\SequenceGrammar.txt" />
     <None Remove="Meta\Simple\SubstractGrammar.txt" />
     <None Remove="Meta\SubstractGrammar.txt" />
+    <None Remove="Output\Array\ConstantArrays.txt" />
+    <None Remove="Output\Array\ThisArrays.txt" />
     <None Remove="Output\ConstantArrays.txt" />
     <None Remove="Output\ConstantFunctions.txt" />
     <None Remove="Output\ConstantObjects.txt" />
     <None Remove="Output\Constants.txt" />
+    <None Remove="Output\Constant\BracketSubstitution.txt" />
+    <None Remove="Output\Constant\Constants.txt" />
+    <None Remove="Output\Function\ConstantFunctions.txt" />
+    <None Remove="Output\Identifier\This.txt" />
+    <None Remove="Output\Object\ConstantObjects.txt" />
     <None Remove="Output\This.txt" />
     <None Remove="Output\ThisArrays.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Meta\AdHoc\Bracket.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Comments.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Interleave.txt" />
     <EmbeddedResource Include="Meta\AdHoc\RepeatWithInterleaves.txt" />
@@ -79,12 +88,13 @@
     <EmbeddedResource Include="Meta\Simple\RepeatGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\SequenceGrammar.txt" />
     <EmbeddedResource Include="Meta\Simple\SubstractGrammar.txt" />
-    <EmbeddedResource Include="Output\ConstantFunctions.txt" />
-    <EmbeddedResource Include="Output\ConstantObjects.txt" />
-    <EmbeddedResource Include="Output\ThisArrays.txt" />
-    <EmbeddedResource Include="Output\ConstantArrays.txt" />
-    <EmbeddedResource Include="Output\Constants.txt" />
-    <EmbeddedResource Include="Output\This.txt" />
+    <EmbeddedResource Include="Output\Array\ConstantArrays.txt" />
+    <EmbeddedResource Include="Output\Array\ThisArrays.txt" />
+    <EmbeddedResource Include="Output\Constant\BracketSubstitution.txt" />
+    <EmbeddedResource Include="Output\Constant\Constants.txt" />
+    <EmbeddedResource Include="Output\Function\ConstantFunctions.txt" />
+    <EmbeddedResource Include="Output\Identifier\This.txt" />
+    <EmbeddedResource Include="Output\Object\ConstantObjects.txt" />
   </ItemGroup>
 
   <ItemGroup>
