@@ -47,12 +47,13 @@ stages:
             command:  build
             Dockerfile: '**/Dockerfile'
             tags: '$(full-version)'
+        # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
         # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image?view=azure-devops
         - task: Docker@2
           displayName:  Push Docker image
           inputs:
-            containerRegistry: 'vplauzon-docker-hub'
-            repository: $(imageName)
+            containerRegistry: vplauzon-docker-hub
+            repository: $(image-name)
             command: push
             tags: '$(full-version)'
         # Helm tool installer:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/helm-installer
