@@ -7,7 +7,9 @@ trigger:
 - master
 
 variables:
-  chart-path: deployment/helm-chart/ParserAsServiceApi
+  chart-root: deployment/helm-chart
+  chart-name: ParserAsServiceApi
+  chart-path: $(chart-root)/$(chart-name)
   image-name:  vplauzon/pas-api
 
 stages:
@@ -33,7 +35,7 @@ stages:
           displayName: 'Run Tests'
         - script: dotnet publish PasWebApi -c release -o app
           displayName: 'Build / Publish API'
-        # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image?view=azure-devops
+        # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image
         - task: Docker@2
           displayName: Build Docker Image
           inputs:
@@ -42,7 +44,7 @@ stages:
             Dockerfile: '**/Dockerfile'
             tags: '$(full-version)'
         # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
-        # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image?view=azure-devops
+        # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image
         - task: Docker@2
           displayName:  Push Docker image
           inputs:
@@ -59,12 +61,25 @@ stages:
           displayName:  Helm Package
           inputs:
             command: package
-            chartPath: '$(chart-path)'
+            chartPath: $(chart-path)
             chartVersion: '$(full-version)'
         # Copy files:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
         - task: CopyFiles@2
+          displayName:  Copy deployment directory
           inputs:
             sourceFolder: deployment
+            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
+        - task: CopyFiles@2
+          displayName:  Copy helm chart
+          inputs:
+            sourceFolder: .
+            contents:  *.tgz
+            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
+        - task: CopyFiles@2
+          displayName:  Copy full version
+          inputs:
+            sourceFolder: $(Build.ArtifactStagingDirectory)
+            contents:  FullVersion.txt
             targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
         # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
         - task: PublishBuildArtifacts@1
