@@ -16,7 +16,7 @@ jobs:
           # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
           - task: DownloadPipelineArtifact@2
             displayName:  Download artefact
-            inputs: current
+            inputs:
               artifact: deployment
           # Azure CLI:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-cli
           - task: AzureCLI@2
