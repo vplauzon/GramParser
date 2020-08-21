@@ -25,4 +25,4 @@ jobs:
               azureSubscription: shared-infra
               scriptType:  'bash'
               scriptLocation: 'scriptPath'
-              scriptPath:  $(Pipeline.Workspace)/deployment/get-deploy-colour.sh
+              scriptPath:  $(Pipeline.Workspace)/deployment/deployment/get-deploy-colour.sh
