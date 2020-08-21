@@ -65,8 +65,7 @@ stages:
         - task: CopyFiles@2
           inputs:
             sourceFolder: deployment
-            contents: '**'
-            targetFolder: $(Build.ArtifactStagingDirectory)/deployment
+            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
         # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact'
