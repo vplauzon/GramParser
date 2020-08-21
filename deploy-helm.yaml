@@ -1,8 +1,8 @@
 parameters:
   environment:  ''
 jobs:
-  - deployment:  'deploy_aks_${{ parameters.environment }}'
-    displayName: 'Deploy AKS in ${{ parameters.environment }}'
+  - deployment:  'deploy_helm_${{ parameters.environment }}'
+    displayName: 'Deploy Helm in ${{ parameters.environment }}'
     pool:
       vmImage: 'ubuntu-latest'
     environment:  ${{ parameters.environment }}
