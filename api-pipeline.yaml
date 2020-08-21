@@ -63,17 +63,12 @@ stages:
             command: package
             chartPath: $(chart-path)
             chartVersion: '$(full-version)'
+            destination:  $(Build.ArtifactStagingDirectory)/deployment/
         # Copy files:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
         - task: CopyFiles@2
           displayName:  Copy deployment directory
           inputs:
             sourceFolder: deployment
-            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
-        - task: CopyFiles@2
-          displayName:  Copy helm chart
-          inputs:
-            sourceFolder: .
-            contents:  '*.tgz'
             targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
         - task: CopyFiles@2
           displayName:  Copy full version
