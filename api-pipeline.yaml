@@ -37,6 +37,8 @@ stages:
           displayName: pwd
         - script: ls -l
           displayName: ls
+        - script: ls -l PasWebApi
+          displayName: ls2
         # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image?view=azure-devops
         - task: Docker@2
           displayName: Build Docker Image
