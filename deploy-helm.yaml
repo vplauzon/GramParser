@@ -43,7 +43,7 @@ jobs:
               kubernetesCluster: $(clusterPrefix)-$(colour)-${{ parameters.environment }}
               command: upgrade
               install:  true
-              chartName:  '???'
+              chartName:  $(chart-path)-$(full-version)
               releaseName:  pas-api
               arguments: --wait
               timeoutInMinutes: 2
