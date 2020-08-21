@@ -30,9 +30,13 @@ stages:
             scriptPath: 'deployment/manage-version.py'
             arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
         - script: dotnet test PasLibTest -c release
-          displayName: 'Test'
+          displayName: 'Run Tests'
         - script: dotnet publish PasWebApi -c release -o app
           displayName: 'Build / Publish API'
+        - script: pwd
+          displayName: pwd
+        - script: ls -l
+          displayName: ls
         # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image?view=azure-devops
         - task: Docker@2
           displayName: Build Docker Image
