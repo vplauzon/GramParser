@@ -65,7 +65,7 @@ stages:
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact'
           inputs:
-            targetPath: $(Build.ArtifactStagingDirectory)/deployment
+            targetPath: deployment
             artifactName: deployment
   - stage: dev
     displayName: dev
