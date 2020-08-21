@@ -28,11 +28,12 @@ jobs:
               scriptPath:  $(Pipeline.Workspace)/deployment/deployment/get-deploy-colour.sh
           # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
           - task: Bash@3
-            displayName:  Fetch Full Version
+            displayName:  Retrieve Full Version
             inputs:
               targetType: filePath
               filePath:  $(Pipeline.Workspace)/deployment/deployment/retrieve-full-version.sh
               workingDirectory:  $(Pipeline.Workspace)/deployment/deployment
+              arguments:  $(Pipeline.Workspace)/deployment/deployment/FullVersion.txt
           # Helm deploy:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/helm-deploy
           - task: HelmDeploy@0
             displayName: Helm Deploy
