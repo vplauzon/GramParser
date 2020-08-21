@@ -73,7 +73,7 @@ stages:
           displayName:  Copy helm chart
           inputs:
             sourceFolder: .
-            contents:  *.tgz
+            contents:  '*.tgz'
             targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
         - task: CopyFiles@2
           displayName:  Copy full version
