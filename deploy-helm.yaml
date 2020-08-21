@@ -43,7 +43,7 @@ jobs:
               kubernetesCluster: $(clusterPrefix)-$(colour)-${{ parameters.environment }}
               command: upgrade
               install:  true
-              chartName:  $(Pipeline.Workspace)/deployment/deployment/$(chart-name)-$(full-version)
+              chartName:  $(Pipeline.Workspace)/deployment/deployment/$(chart-name)-$(full-version).tgz
               releaseName:  pas-api
               arguments: --wait
               timeoutInMinutes: 2
