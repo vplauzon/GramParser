@@ -5,7 +5,7 @@ FROM microsoft/dotnet:2.1-aspnetcore-runtime AS final
 WORKDIR /work
 
 #	Copy package
-COPY PasWebApi/app .
+COPY app .
 
 # Make port 80 available to the world outside this container
 
