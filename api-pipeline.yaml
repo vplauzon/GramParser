@@ -9,7 +9,8 @@ trigger:
 variables:
   chart-path: deployment/helm-chart/ParserAsServiceApi
   image-name:  vplauzon/pas-api
-- stages:
+
+stages:
   - stage:  build
     dependsOn:  []
     variables:
@@ -22,7 +23,7 @@ variables:
       continueOnError:  false
       pool:
         vmImage: 'ubuntu-latest'
-    - steps:
+    steps:
       - task: PythonScript@0
         displayName: 'Manage Version'
         inputs:
