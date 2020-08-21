@@ -33,12 +33,6 @@ stages:
           displayName: 'Run Tests'
         - script: dotnet publish PasWebApi -c release -o app
           displayName: 'Build / Publish API'
-        - script: pwd
-          displayName: pwd
-        - script: ls -l
-          displayName: ls
-        - script: ls -l PasWebApi
-          displayName: ls2
         # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image?view=azure-devops
         - task: Docker@2
           displayName: Build Docker Image
@@ -67,10 +61,16 @@ stages:
             command: package
             chartPath: '$(chart-path)'
             chartVersion: '$(full-version)'
-        - task: CopyFiles@2
-          displayName: 'Copy Release scripts'
-          inputs:
-            SourceFolder: deployment
-            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
         - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifact: drop'
+          displayName: 'Publish Artifact'
+          inputs:
+            targetPath: $(Build.ArtifactStagingDirectory)/deployment
+            artifactName: deployment
+  - stage: dev
+    displayName: dev
+    dependsOn:  build
+    jobs:
+      - template: deploy-helm.yaml
+        parameters:
+          environment:  dev

@@ -1,0 +1,28 @@
+parameters:
+  environment:  ''
+jobs:
+  - deployment:  'deploy_aks_${{ parameters.environment }}'
+    displayName: 'Deploy AKS in ${{ parameters.environment }}'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment:  ${{ parameters.environment }}
+    variables:
+      statelessRgPrefix:  'shared-stateless'
+      clusterPrefix:  'vpl-cluster'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
+          - task: DownloadPipelineArtifact@2
+            displayName:  Download artefact
+            inputs: current
+              artifact: deployment
+          # Azure CLI:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-cli
+          - task: AzureCLI@2
+            displayName:  Fetch deployment colour
+            inputs:
+              azureSubscription: shared-infra
+              scriptType:  'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath:  $(Pipeline.Workspace)/deployment/get-deploy-colour.sh
