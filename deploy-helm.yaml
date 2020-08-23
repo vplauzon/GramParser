@@ -8,8 +8,8 @@ jobs:
     environment:  ${{ parameters.environment }}
     variables:
       statefulRg:  'shared-state-${{ parameters.environment }}'
-      statelessRgPrefix:  'shared-stateless'
-      clusterPrefix:  'vpl-cluster'
+      statelessRgPrefix:  'shared-stateless-${{ parameters.environment }}'
+      clusterPrefix:  'vpl-cluster-${{ parameters.environment }}'
     strategy:
       runOnce:
         deploy:
@@ -49,8 +49,8 @@ jobs:
             displayName: Helm Deploy
             inputs:
               azureSubscriptionEndpoint: shared-infra
-              azureResourceGroup: '$(statelessRgPrefix)-$(colour)-${{ parameters.environment }}'
-              kubernetesCluster: $(clusterPrefix)-$(colour)-${{ parameters.environment }}
+              azureResourceGroup: '$(statelessRgPrefix)-$(colour)'
+              kubernetesCluster: $(clusterPrefix)-$(colour)
               command: upgrade
               install:  true
               chartName:  $(Pipeline.Workspace)/deployment/deployment/$(chart-name)-$(full-version).tgz
