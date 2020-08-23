@@ -7,6 +7,7 @@ jobs:
       vmImage: 'ubuntu-latest'
     environment:  ${{ parameters.environment }}
     variables:
+      statefulRg:  'shared-state-${{ parameters.environment }}'
       statelessRgPrefix:  'shared-stateless'
       clusterPrefix:  'vpl-cluster'
     strategy:
@@ -26,6 +27,15 @@ jobs:
               scriptType:  'bash'
               scriptLocation: 'scriptPath'
               scriptPath:  $(Pipeline.Workspace)/deployment/deployment/get-deploy-colour.sh
+          # Azure CLI:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-cli
+          - task: AzureCLI@2
+            displayName:  Fetch Instrumentation Key
+            inputs:
+              azureSubscription: shared-infra
+              scriptType:  'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath:  $(Pipeline.Workspace)/deployment/deployment/fetch-instrumentation-key.sh
+              arguments:  $(statefulRg)
           # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
           - task: Bash@3
             displayName:  Retrieve Full Version
@@ -46,4 +56,6 @@ jobs:
               chartName:  $(Pipeline.Workspace)/deployment/deployment/$(chart-name)-$(full-version).tgz
               releaseName:  pas-api
               arguments: --wait
+              overrideValues: applicationInsights.instrumentationKey=$(instrumentationKey)
+              valueFile:  $(Pipeline.Workspace)/deployment/deployment/values-${{ parameters.environment }}-$(colour)
               timeoutInMinutes: 2
