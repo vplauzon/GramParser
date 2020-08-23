@@ -14,7 +14,7 @@ jobs:
       runOnce:
         deploy:
           steps:
-          # Don't checkout repo
+          # Don't checkout repo:  https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git#checkout
           - checkout: none
           # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
           - task: DownloadPipelineArtifact@2
