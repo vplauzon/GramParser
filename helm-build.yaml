@@ -1,13 +1,17 @@
 parameters:
   appVersionTxtPath:  deployment/ApiVersion.txt
-  appVersionCsPath:  PasWebApi/ApiVersion.cs
+  appVersionCsPath:  ''
+  chartName:  ''
+  imageName:  ''
 jobs:
   - deployment:  build_helm
     displayName: Build Helm
     environment:  build
     pool:
       vmImage: 'ubuntu-latest'
-    variables: []
+    variables:
+      chart-root: deployment/helm-chart
+      chart-path: $(chart-root)/${{ chartName }}
     strategy:
       runOnce:
         deploy:
@@ -39,7 +43,7 @@ jobs:
           - task: Docker@2
             displayName: Build and push Docker Image
             inputs:
-              repository: $(image-name)
+              repository: ${{ imageName }}
               command:  buildAndPush
               Dockerfile: '**/Dockerfile'
               buildContext:  $(Build.ArtifactStagingDirectory)

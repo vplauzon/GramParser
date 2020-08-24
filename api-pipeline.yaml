@@ -6,12 +6,6 @@ resources:
 trigger:
 - master
 
-variables:
-  chart-root: deployment/helm-chart
-  chart-name: ParserAsServiceApi
-  chart-path: $(chart-root)/$(chart-name)
-  image-name:  vplauzon/pas-api
-
 stages:
   - stage: build
     displayName: build
@@ -21,6 +15,8 @@ stages:
       - template: helm-build.yaml
         parameters:
           appVersionCsPath:  PasWebApi/ApiVersion.cs
+          chartName: ParserAsServiceApi
+          imageName: vplauzon/pas-api
 
   - stage: dev
     displayName: dev
