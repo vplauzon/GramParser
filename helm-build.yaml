@@ -12,6 +12,8 @@ jobs:
       runOnce:
         deploy:
           steps:
+          # Checkout:  https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git#checkout
+          - checkout: self
           - script: ls -l
           # Python script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/python-script
           - task: PythonScript@0
