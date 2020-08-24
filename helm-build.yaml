@@ -40,6 +40,7 @@ jobs:
               publishWebProjects: True
               arguments: --configuration $(build-configuration) --output build-output
               zipAfterPublish: True
+          - script:  ls -l build-output
           # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/docker#build-and-push
           - task: Docker@2
             displayName: Build and push Docker Image
