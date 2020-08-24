@@ -1,11 +1,9 @@
 parameters:
-  deploymentName:  ''
-  deploymentDisplayName:  ''
   appVersionTxtPath:  deployment/ApiVersion.txt
   appVersionCsPath:  PasWebApi/ApiVersion.cs
 jobs:
-  - deployment:  ${{ parameters.deploymentName }}
-    displayName: ${{ parameters.deploymentDisplayName }}
+  - deployment:  build_helm
+    displayName: Build Helm
     environment:  build
     pool:
       vmImage: 'ubuntu-latest'

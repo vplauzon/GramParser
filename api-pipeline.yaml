@@ -19,8 +19,6 @@ stages:
     jobs:
       - template: helm-build.yaml
         parameters:
-          deploymentName:  build_helm_api
-          deploymentDisplayName:  Build API Helm
           appVersionCsPath:  PasWebApi/ApiVersion.cs
 
   - stage: dev
