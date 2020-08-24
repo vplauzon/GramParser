@@ -12,6 +12,7 @@ jobs:
       runOnce:
         deploy:
           steps:
+          - script: ls -l
           - task: PythonScript@0
             displayName: 'Manage Version'
             inputs:
