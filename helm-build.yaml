@@ -6,6 +6,7 @@ parameters:
 jobs:
   - deployment:  ${{ parameters.deploymentName }}
     displayName: ${{ parameters.deploymentDisplayName }}
+    environment:  ''
     pool:
       vmImage: 'ubuntu-latest'
     variables: []
