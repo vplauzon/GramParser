@@ -25,3 +25,4 @@ stages:
       - template: helm-deploy.yaml
         parameters:
           environment:  dev
+          chartName: ParserAsServiceApi

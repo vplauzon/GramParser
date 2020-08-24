@@ -1,5 +1,6 @@
 parameters:
   environment:  ''
+  chartName:  ''
 jobs:
   - deployment:  'deploy_helm_${{ parameters.environment }}'
     displayName: 'Deploy Helm in ${{ parameters.environment }}'
@@ -21,7 +22,6 @@ jobs:
             displayName:  Download artefact
             inputs:
               artifact: deployment
-          - script:  ls -l
           # Azure CLI:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-cli
           - task: AzureCLI@2
             displayName:  Fetch deployment colour
@@ -56,7 +56,7 @@ jobs:
               kubernetesCluster: $(clusterPrefix)-$(colour)
               command: upgrade
               install:  true
-              chartName:  $(Pipeline.Workspace)/deployment/deployment/$(chart-name)-$(full-version).tgz
+              chartName:  $(Pipeline.Workspace)/deployment/deployment/${{ chartName }}-$(full-version).tgz
               releaseName:  pas-api
               arguments: --wait
               overrideValues: applicationInsights.instrumentationKey=$(instrumentationKey)
