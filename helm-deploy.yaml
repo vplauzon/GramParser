@@ -57,7 +57,7 @@ jobs:
               command: upgrade
               install:  true
               chartName:  $(Pipeline.Workspace)/deployment/deployment/${{ parameters.chartName }}-$(full-version).tgz
-              releaseName:  pas-api
+              releaseName:  ${{ parameters.chartName }}
               arguments: --wait
               overrideValues: applicationInsights.instrumentationKey=$(instrumentationKey)
               valueFile:  $(Pipeline.Workspace)/deployment/deployment/values-${{ parameters.environment }}-$(colour).yaml
