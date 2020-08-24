@@ -40,7 +40,7 @@ jobs:
               publishWebProjects: True
               arguments: --configuration $(build-configuration) --output build-output
               zipAfterPublish: False
-          - script:  ls -l build-output
+          - script:  ls -l build-output/PasWebApi
           # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/docker#build-and-push
           - task: Docker@2
             displayName: Build and push Docker Image
