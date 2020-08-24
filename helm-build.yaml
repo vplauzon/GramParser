@@ -13,6 +13,7 @@ jobs:
         deploy:
           steps:
           - script: ls -l
+          # Python script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/python-script
           - task: PythonScript@0
             displayName: 'Manage Version'
             inputs:
