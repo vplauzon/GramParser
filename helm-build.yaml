@@ -11,7 +11,7 @@ jobs:
       vmImage: 'ubuntu-latest'
     variables:
       chart-root: deployment/helm-chart
-      chart-path: $(chart-root)/${{ chartName }}
+      chart-path: '$(chart-root)/${{ chartName }}'
     strategy:
       runOnce:
         deploy:
