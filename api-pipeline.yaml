@@ -14,8 +14,8 @@ stages:
       # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
       - template: helm-build.yaml
         parameters:
-          appVersionTxtPath:  deployment/AppVersion.txt
-          appVersionCsPath:  PasWebApi/AppVersion.cs
+          appVersionTxtPath:  deployment/ApiVersion.txt
+          appVersionCsPath:  PasWebApi/ApiVersion.cs
           chartName: ParserAsServiceApi
           imageName: vplauzon/pas-api
 
