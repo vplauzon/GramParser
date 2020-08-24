@@ -13,79 +13,20 @@ variables:
   image-name:  vplauzon/pas-api
 
 stages:
-  - stage:  build
+  - stage: build
+    displayName: build
     dependsOn:  []
-    variables:
-      app-version-txt-path:  deployment/ApiVersion.txt
-      app-version-cs-path:  PasWebApi/ApiVersion.cs
     jobs:
-    - job:  main
-      dependsOn:  []
-      variables:  []
-      continueOnError:  false
-      pool:
-        vmImage: 'ubuntu-latest'
-      steps:
-        - task: PythonScript@0
-          displayName: 'Manage Version'
-          inputs:
-            scriptPath: 'deployment/manage-version.py'
-            arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) $(Build.ArtifactStagingDirectory)/FullVersion.txt'
-        - script: dotnet test PasLibTest -c release
-          displayName: 'Run Tests'
-        - script: dotnet publish PasWebApi -c release -o app
-          displayName: 'Build / Publish API'
-        # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image
-        - task: Docker@2
-          displayName: Build Docker Image
-          inputs:
-            repository: '$(image-name)'
-            command:  build
-            Dockerfile: '**/Dockerfile'
-            tags: '$(full-version)'
-        # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
-        # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image
-        - task: Docker@2
-          displayName:  Push Docker image
-          inputs:
-            containerRegistry: vplauzon-docker-hub
-            repository: $(image-name)
-            command: push
-            tags: '$(full-version)'
-        # Helm tool installer:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/helm-installer
-        - task: HelmInstaller@1
-          inputs:
-            helmVersionToInstall: 'latest'
-        # Helm deploy:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/helm-deploy
-        - task: HelmDeploy@0
-          displayName:  Helm Package
-          inputs:
-            command: package
-            chartPath: $(chart-path)
-            chartVersion: '$(full-version)'
-            destination:  $(Build.ArtifactStagingDirectory)/deployment/
-        # Copy files:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
-        - task: CopyFiles@2
-          displayName:  Copy deployment directory
-          inputs:
-            sourceFolder: deployment
-            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
-        - task: CopyFiles@2
-          displayName:  Copy full version
-          inputs:
-            sourceFolder: $(Build.ArtifactStagingDirectory)
-            contents:  FullVersion.txt
-            targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
-        # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifact'
-          inputs:
-            targetPath: $(Build.ArtifactStagingDirectory)/deployment
-            artifactName: deployment
+      - template: helm-build.yaml
+        parameters:
+          deployment-name:  deploy_helm_${{ parameters.environment }}
+          deployment-display-name:  Deploy Helm in ${{ parameters.environment }}
+          app-version-cs-path:  PasWebApi/ApiVersion.cs
+
   - stage: dev
     displayName: dev
     dependsOn:  build
     jobs:
-      - template: deploy-helm.yaml
+      - template: helm-deploy.yaml
         parameters:
           environment:  dev

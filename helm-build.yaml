@@ -1,0 +1,76 @@
+parameters:
+  deployment-name:  ''
+  deployment-display-name:  ''
+  app-version-txt-path:  deployment/ApiVersion.txt
+  app-version-cs-path:  PasWebApi/ApiVersion.cs
+jobs:
+  - deployment:  $(deployment-name)
+    displayName: $(deployment-display-name)
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables: []
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: PythonScript@0
+            displayName: 'Manage Version'
+            inputs:
+              scriptPath: 'deployment/manage-version.py'
+              arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) deployment/FullVersion.txt'
+          # .NET Core tests:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#run-your-tests
+          - task: DotNetCoreCLI@2
+            displayName: 'Run Unit Tests'
+            inputs:
+              command: test
+              projects: '**/*UnitTests/*.csproj'
+              arguments: -c release --configuration $(BuildConfiguration)
+          # .NET Core publish:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#publish-artifacts-to-azure-pipelines
+          - task: DotNetCoreCLI@2
+            displayName: 'Build / Publish'
+            inputs:
+              command: publish
+              publishWebProjects: True
+              arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+              zipAfterPublish: True
+          # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image
+          - task: Docker@2
+            displayName: Build Docker Image
+            inputs:
+              repository: '$(image-name)'
+              command:  build
+              Dockerfile: '**/Dockerfile'
+              tags: '$(full-version)'
+          # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
+          # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image
+          - task: Docker@2
+            displayName:  Push Docker image
+            inputs:
+              containerRegistry: vplauzon-docker-hub
+              repository: $(image-name)
+              command: push
+              tags: '$(full-version)'
+          # Helm tool installer:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/helm-installer
+          - task: HelmInstaller@1
+            inputs:
+              helmVersionToInstall: 'latest'
+          # Helm deploy:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/helm-deploy
+          - task: HelmDeploy@0
+            displayName:  Helm Package
+            inputs:
+              command: package
+              chartPath: $(chart-path)
+              chartVersion: '$(full-version)'
+              destination:  $(Build.ArtifactStagingDirectory)/deployment/
+          # Copy files:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
+          - task: CopyFiles@2
+            displayName:  Copy deployment directory
+            inputs:
+              sourceFolder: deployment
+              targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
+          # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Artifact'
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/deployment
+              artifactName: deployment
