@@ -15,7 +15,7 @@ stages:
       - template: helm-build.yaml
         parameters:
           appVersionTxtPath:  deployment/AppVersion.txt
-          appVersionCsPath:  PasWebApi/ApiVersion.cs
+          appVersionCsPath:  PasWebApi/AppVersion.cs
           chartName: ParserAsServiceApi
           imageName: vplauzon/pas-api
 
