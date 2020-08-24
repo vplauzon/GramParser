@@ -61,13 +61,14 @@ jobs:
               chartPath: $(chart-path)
               chartVersion: '$(full-version)'
               destination:  $(Build.ArtifactStagingDirectory)/deployment/
+          - script:  ls -l $(Build.ArtifactStagingDirectory)/deployment/
           # Copy files:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/copy-files
           - task: CopyFiles@2
             displayName:  Copy deployment directory
             inputs:
               sourceFolder: deployment
               targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
-          - script:  ls -l
+          - script:  ls -l $(Build.ArtifactStagingDirectory)/deployment/
           # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Artifact'
