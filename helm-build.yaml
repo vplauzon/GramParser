@@ -4,8 +4,8 @@ parameters:
   app-version-txt-path:  deployment/ApiVersion.txt
   app-version-cs-path:  PasWebApi/ApiVersion.cs
 jobs:
-  - deployment:  $(deployment-name)
-    displayName: $(deployment-display-name)
+  - deployment:  ${{ parameters.deployment-name }}
+    displayName: ${{ parameters.deployment-display-name }}
     pool:
       vmImage: 'ubuntu-latest'
     variables: []
@@ -17,7 +17,7 @@ jobs:
             displayName: 'Manage Version'
             inputs:
               scriptPath: 'deployment/manage-version.py'
-              arguments: '$(app-version-txt-path) $(app-version-cs-path) $(Build.BuildId) deployment/FullVersion.txt'
+              arguments: '${{ parameters.app-version-txt-path }} ${{ parameters.app-version-cs-path }} $(Build.BuildId) deployment/FullVersion.txt'
           # .NET Core tests:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#run-your-tests
           - task: DotNetCoreCLI@2
             displayName: 'Run Unit Tests'
