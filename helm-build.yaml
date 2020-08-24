@@ -1,10 +1,10 @@
 parameters:
-  deployment-name:  ''
+  deploymentName:  ''
   deployment-display-name:  ''
   app-version-txt-path:  deployment/ApiVersion.txt
   app-version-cs-path:  PasWebApi/ApiVersion.cs
 jobs:
-  - deployment:  ${{ parameters.deployment-name }}
+  - deployment:  ${{ parameters.deploymentName }}
     displayName: ${{ parameters.deployment-display-name }}
     pool:
       vmImage: 'ubuntu-latest'
