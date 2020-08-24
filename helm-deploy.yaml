@@ -21,6 +21,7 @@ jobs:
             displayName:  Download artefact
             inputs:
               artifact: deployment
+          - script:  ls -l
           # Azure CLI:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-cli
           - task: AzureCLI@2
             displayName:  Fetch deployment colour

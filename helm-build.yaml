@@ -67,6 +67,7 @@ jobs:
             inputs:
               sourceFolder: deployment
               targetFolder: $(Build.ArtifactStagingDirectory)/deployment/
+          - script:  ls -l
           # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Artifact'
