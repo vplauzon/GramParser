@@ -17,6 +17,7 @@ stages:
     displayName: build
     dependsOn:  []
     jobs:
+      # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
       - template: helm-build.yaml
         parameters:
           appVersionCsPath:  PasWebApi/ApiVersion.cs

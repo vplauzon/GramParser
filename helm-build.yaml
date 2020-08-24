@@ -14,7 +14,6 @@ jobs:
           steps:
           # Checkout:  https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git#checkout
           - checkout: self
-          - script: ls -l
           # Python script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/python-script
           - task: PythonScript@0
             displayName: 'Manage Version'
@@ -28,7 +27,7 @@ jobs:
               command: test
               projects: '**/*UnitTests/*.csproj'
               arguments: -c release --configuration $(BuildConfiguration)
-          # .NET Core publish:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#publish-artifacts-to-azure-pipelines
+          # .NET Core publish:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#publish
           - task: DotNetCoreCLI@2
             displayName: 'Build / Publish'
             inputs:
@@ -36,22 +35,14 @@ jobs:
               publishWebProjects: True
               arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
               zipAfterPublish: True
-          # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/build-image
+          # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/docker#build-and-push
           - task: Docker@2
-            displayName: Build Docker Image
+            displayName: Build and push Docker Image
             inputs:
-              repository: '$(image-name)'
-              command:  build
-              Dockerfile: '**/Dockerfile'
-              tags: '$(full-version)'
-          # Docker Hub Repo:  https://hub.docker.com/repository/docker/vplauzon/pas-api
-          # Push Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/push-image
-          - task: Docker@2
-            displayName:  Push Docker image
-            inputs:
-              containerRegistry: vplauzon-docker-hub
               repository: $(image-name)
-              command: push
+              command:  buildAndPush
+              Dockerfile: '**/Dockerfile'
+              buildContext:  $(Build.ArtifactStagingDirectory)
               tags: '$(full-version)'
           # Helm tool installer:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/helm-installer
           - task: HelmInstaller@1
