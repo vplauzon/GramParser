@@ -56,7 +56,7 @@ jobs:
               kubernetesCluster: $(clusterPrefix)-$(colour)
               command: upgrade
               install:  true
-              chartName:  $(Pipeline.Workspace)/deployment/deployment/${{ chartName }}-$(full-version).tgz
+              chartName:  $(Pipeline.Workspace)/deployment/deployment/${{ parameters.chartName }}-$(full-version).tgz
               releaseName:  pas-api
               arguments: --wait
               overrideValues: applicationInsights.instrumentationKey=$(instrumentationKey)
