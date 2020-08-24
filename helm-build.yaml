@@ -29,7 +29,7 @@ jobs:
             displayName: 'Run Unit Tests'
             inputs:
               command: test
-              projects: '**/*UnitTests/*.csproj'
+              projects: '**/*UnitTest/*.csproj'
               arguments: -c release --configuration $(BuildConfiguration)
           # .NET Core publish:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#publish
           - task: DotNetCoreCLI@2
