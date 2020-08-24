@@ -12,6 +12,7 @@ jobs:
     variables:
       chart-root: deployment/helm-chart
       chart-path: '$(chart-root)/${{ parameters.chartName }}'
+      build-configuration: release
     strategy:
       runOnce:
         deploy:
@@ -30,19 +31,20 @@ jobs:
             inputs:
               command: test
               projects: '**/*UnitTest*/*.csproj'
-              arguments: --configuration $(BuildConfiguration)
+              arguments: --configuration $(build-configuration)
           # .NET Core publish:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#publish
           - task: DotNetCoreCLI@2
             displayName: 'Build / Publish'
             inputs:
               command: publish
               publishWebProjects: True
-              arguments: --configuration $(BuildConfiguration) --output build-output
+              arguments: --configuration $(build-configuration) --output build-output
               zipAfterPublish: True
           # Build Docker:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/docker#build-and-push
           - task: Docker@2
             displayName: Build and push Docker Image
             inputs:
+              containerRegistry:  docker-hub
               repository: ${{ parameters.imageName }}
               command:  buildAndPush
               Dockerfile: '**/Dockerfile'
