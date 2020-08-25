@@ -3,9 +3,6 @@
 resources:
 - repo: self
 
-trigger:
-- master
-
 stages:
   - stage:  build
     dependsOn:  []
@@ -69,3 +66,19 @@ stages:
         inputs:
           artifactName:  source
           pathtoPublish: .
+
+  - stage: alpha
+    displayName: alpha
+    dependsOn:  build
+    jobs:
+      - template: nuget-deploy.yaml
+        parameters:
+          environment:  alpha
+
+  - stage: gold
+    displayName: gold
+    dependsOn:  alpha
+    jobs:
+      - template: nuget-deploy.yaml
+        parameters:
+          environment:  gold
