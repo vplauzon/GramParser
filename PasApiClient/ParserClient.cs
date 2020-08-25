@@ -86,31 +86,15 @@ namespace PasApiClient
             {
                 throw new ArgumentNullException(nameof(text));
             }
-            using (var client = new HttpClient())
+
+            var input = new SingleParsingInput
             {
-                var uri = new Uri(_baseUri, new Uri("v1/single", UriKind.Relative));
-                var input = new SingleParsingInput
-                {
-                    Grammar = grammar,
-                    Rule = rule,
-                    Text = text
-                };
-                var inputString = JsonConvert.SerializeObject(input);
-                var content = new StringContent(inputString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(uri, content);
-                var outputString = await response.Content.ReadAsStringAsync();
+                Grammar = grammar,
+                Rule = rule,
+                Text = text
+            };
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    var output = JsonConvert.DeserializeObject<ParsingResult>(outputString);
-
-                    return output;
-                }
-                else
-                {
-                    throw new ParsingException(outputString, (int)response.StatusCode);
-                }
-            }
+            return await PostAsync<SingleParsingInput, ParsingResult>("v1/single", input);
         }
         #endregion
 
@@ -140,32 +124,46 @@ namespace PasApiClient
                 throw new ArgumentNullException(nameof(texts));
             }
 
+            var input = new MultipleParsingInput
+            {
+                Grammar = grammar,
+                Rule = rule,
+                Texts = texts.ToArray()
+            };
+
+            return await PostAsync<MultipleParsingInput, ParsingResult[]>("v1/multiple", input);
+        }
+        #endregion
+
+        private async Task<Output> PostAsync<Input, Output>(string uriStem, Input input)
+        {
             using (var client = new HttpClient())
             {
-                var uri = new Uri(_baseUri, new Uri("v1/multiple", UriKind.Relative));
-                var input = new MultipleParsingInput
-                {
-                    Grammar = grammar,
-                    Rule = rule,
-                    Texts = texts.ToArray()
-                };
-                var inputString = JsonConvert.SerializeObject(input);
-                var content = new StringContent(inputString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(uri, content);
-                var outputString = await response.Content.ReadAsStringAsync();
+                var uri = new Uri(_baseUri, new Uri(uriStem, UriKind.Relative));
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                try
                 {
-                    var output = JsonConvert.DeserializeObject<ParsingResult[]>(outputString);
+                    var inputString = JsonConvert.SerializeObject(input);
+                    var content = new StringContent(inputString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(uri, content);
+                    var outputString = await response.Content.ReadAsStringAsync();
 
-                    return output;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var output = JsonConvert.DeserializeObject<Output>(outputString);
+
+                        return output;
+                    }
+                    else
+                    {
+                        throw new ParsingException(outputString, (int)response.StatusCode);
+                    }
                 }
-                else
+                catch(Exception ex)
                 {
-                    throw new ParsingException(outputString, (int)response.StatusCode);
+                    throw new Exception($"Communication error with {uri}", ex);
                 }
             }
         }
-        #endregion
     }
 }

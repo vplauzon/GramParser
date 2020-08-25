@@ -18,8 +18,6 @@ jobs:
             displayName:  Download artefact 'source'
             inputs:
               artifact: source
-          - script:  ls -l $(Pipeline.Workspace)/source/
-          - script:  ls -l $(Pipeline.Workspace)/source/PasApiClientTest
           # .NET Core tests:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#run-your-tests
           - task: DotNetCoreCLI@2
             displayName: Run Client Tests
@@ -32,3 +30,12 @@ jobs:
             displayName:  Download artefact 'nuget'
             inputs:
               artifact: nuget
+          - script:  ls -l $(Pipeline.Workspace)/nuget/
+          - script:  ls -l $(Pipeline.Workspace)/nuget/${{ parameters.environment }}
+          # Nuget:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/package/nuget
+          - task: NuGetCommand@2
+            displayName:  Push Nuget Package to nuget.org
+            inputs:
+              command: push
+              packagesToPush: $(Pipeline.Workspace)/nuget/${{ parameters.environment }}/*.nupkg
+              publishFeedCredentials:  nuget
