@@ -45,7 +45,9 @@ namespace PasLibTest
                 (true, "justA", "aaa", "aaa"),
                 (true, "justA", "abbbb", "a"),
                 (true, "justA", "bbbb", ""),
-                (true, "justB", "aaabb", "bb")
+                (true, "justB", "aaabb", "bb"),
+                (true, "arrayOf", "a", new object[]{"a", ""}),
+                (true, "range", "b", new object[]{"b"})
             };
 
             Test("Identifier.Children.txt", samples);

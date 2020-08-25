@@ -8,7 +8,7 @@ namespace PasApiClientTest
     {
         private const string BASE_URI_KEY = "baseUri";
 
-        public TestContext? TestContext { get; set; }
+        public TestContext TestContext { get; set; }
 
         protected ParserClient CreateClient()
         {

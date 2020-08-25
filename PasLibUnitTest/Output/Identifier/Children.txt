@@ -1,2 +1,4 @@
 ﻿rule justA = a:"a"* b:"b"* => a;
 rule justB = a:"a"* b:"b"* => b;
+rule arrayOf = a:"a"* b:"b"* => [a, b];
+rule range = "a".."c" => [text];

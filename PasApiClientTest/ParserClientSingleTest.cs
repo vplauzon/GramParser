@@ -18,6 +18,7 @@ namespace PasApiClientTest
             var result = await client.SingleParseAsync(grammar, text);
 
             Assert.IsTrue(result.IsMatch, "IsMatch");
+            Assert.IsNotNull(result.RuleMatch, "IsMatch not null");
             Assert.AreEqual(text, result.RuleMatch.Text, "Text");
             Assert.AreEqual(3, result.RuleMatch.Children.Length, "Children");
         }
@@ -31,10 +32,30 @@ namespace PasApiClientTest
             var result = await client.SingleParseAsync(grammar, text);
 
             Assert.IsTrue(result.IsMatch, "IsMatch");
+            Assert.IsNotNull(result.RuleMatch, "IsMatch not null");
             Assert.AreEqual(text, result.RuleMatch.Text, "Text");
             Assert.IsNull(result.RuleMatch.Children, "Children");
             Assert.AreEqual(1, result.RuleMatch.NamedChildren.Count, "NamedChildren");
             Assert.AreEqual("l", result.RuleMatch.NamedChildren.Keys.First(), "Name");
+        }
+
+        [TestMethod]
+        public async Task WithOutput()
+        {
+            var client = CreateClient();
+            var grammar = "rule main = \"a\"..\"c\" => [text];";
+            var text = "b";
+            var result = await client.SingleParseAsync(grammar, text);
+
+            Assert.IsTrue(result.IsMatch, "IsMatch");
+            Assert.IsNull(result.RuleMatch, "IsMatch null");
+
+            var output = result.Output;
+
+            Assert.IsNotNull(output, "Output null");
+            Assert.IsInstanceOfType(output, typeof(object[]));
+            Assert.AreEqual(1, ((object[])output), "Length");
+            Assert.AreEqual("b", ((object[])output)[0], "Value");
         }
 
         [TestMethod]

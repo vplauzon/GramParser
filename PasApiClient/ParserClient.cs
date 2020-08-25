@@ -113,7 +113,7 @@ namespace PasApiClient
         /// <param name="rule">Rule, within the grammar, to use to parse the text.</param>
         /// <param name="texts">Texts to parse with the grammar.</param>
         /// <returns>Parsing results of the texts:  one for each text.</returns>
-        public async Task<ParsingResult[]> MultipleParseAsync(string grammar, string rule, IEnumerable<string> texts)
+        public async Task<ParsingResult[]> MultipleParseAsync(string grammar, string? rule, IEnumerable<string> texts)
         {
             if (string.IsNullOrWhiteSpace(grammar))
             {

@@ -15,5 +15,8 @@ namespace PasApiClient
 
         /// <summary>Match found.</summary>
         public RuleMatchResult? RuleMatch { get; set; }
+
+        /// <summary>Output of the rule.</summary>
+        public object? Output{ get; set; }
     }
 }
