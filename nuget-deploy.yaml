@@ -15,7 +15,7 @@ jobs:
           - checkout: none
           # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
           - task: DownloadPipelineArtifact@2
-            displayName:  Download artefact
+            displayName:  Download artefact 'source'
             inputs:
               artifact: source
           # .NET Core tests:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#run-your-tests
@@ -23,10 +23,10 @@ jobs:
             displayName: Run Client Tests
             inputs:
               command: test
-              projects: '**/PasApiClientTest/*.csproj'
+              projects: '$(Pipeline.Workspace)/source/**/PasApiClientTest/*.csproj'
               arguments: --configuration release --settings TestRunParameters-${{ parameters.environment }}.runsettings
           # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
           - task: DownloadPipelineArtifact@2
-            displayName:  Download artefact
+            displayName:  Download artefact 'nuget'
             inputs:
               artifact: nuget
