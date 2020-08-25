@@ -23,8 +23,6 @@ stages:
         inputs:
           scriptPath: deployment/patch-nuget-version.py
           arguments: PasApiClient/PasApiClient.csproj $(Build.BuildId)
-      - script:  ls -l
-      - script:  ls -l PasApiClient
       # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
       - task: Bash@3
         displayName: Copy Alpha project
@@ -41,6 +39,7 @@ stages:
       - task: Bash@3
         displayName: Copy Gold project
         inputs:
+          targetType: inline
           script: cp PasApiClient/gold-nuget.csproj PasApiClient/PasApiClient.csproj
       # .NET Core build:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#build
       - task: DotNetCoreCLI@2
@@ -52,6 +51,7 @@ stages:
       - task: Bash@3
         displayName: Copy Nuget packages
         inputs:
+          targetType: inline
           script: |
             mkdir $(build.artifactstagingdirectory)/nuget
             mkdir $(build.artifactstagingdirectory)/nuget/alpha
