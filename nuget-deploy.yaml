@@ -18,6 +18,8 @@ jobs:
             displayName:  Download artefact 'source'
             inputs:
               artifact: source
+          - script:  ls -l $(Pipeline.Workspace)/source/
+          - script:  ls -l $(Pipeline.Workspace)/source/PasApiClientTest
           # .NET Core tests:  https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core#run-your-tests
           - task: DotNetCoreCLI@2
             displayName: Run Client Tests
