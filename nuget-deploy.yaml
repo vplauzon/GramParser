@@ -25,8 +25,8 @@ jobs:
             displayName: Run Client Tests
             inputs:
               command: test
-              projects: '$(Pipeline.Workspace)/source/**/PasApiClientTest/*.csproj'
-              arguments: --configuration release --settings TestRunParameters-${{ parameters.environment }}.runsettings
+              projects: $(Pipeline.Workspace)/source/PasApiClientTest/PasApiClientTest.csproj
+              arguments: --configuration release --settings $(Pipeline.Workspace)/source/PasApiClientTest/TestRunParameters-${{ parameters.environment }}.runsettings
           # Download artifact:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts#downloading-artifacts
           - task: DownloadPipelineArtifact@2
             displayName:  Download artefact 'nuget'
