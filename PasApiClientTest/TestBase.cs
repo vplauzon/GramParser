@@ -8,16 +8,29 @@ namespace PasApiClientTest
     {
         private const string BASE_URI_KEY = "baseUri";
 
-        public TestContext TestContext { get; set; }
+        public TestContext? TestContext { get; set; }
 
         protected ParserClient CreateClient()
         {
+            if (TestContext == null)
+            {
+                throw new ArgumentNullException(nameof(TestContext));
+            }
+
             if (TestContext.Properties.ContainsKey(BASE_URI_KEY))
             {
                 var url = TestContext.Properties["baseUri"] as string;
-                var baseUri = new Uri(url);
 
-                return ParserClient.CreateFromBaseUri(baseUri);
+                if (url == null)
+                {
+                    throw new ArgumentNullException("baseUri");
+                }
+                else
+                {
+                    var baseUri = new Uri(url);
+
+                    return ParserClient.CreateFromBaseUri(baseUri);
+                }
             }
             else
             {
