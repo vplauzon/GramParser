@@ -15,20 +15,20 @@ namespace PasApiClient
         #region Inner Types
         private class SingleParsingInput
         {
-            public string Grammar { get; set; }
+            public string? Grammar { get; set; }
 
-            public string Rule { get; set; }
+            public string? Rule { get; set; }
 
-            public string Text { get; set; }
+            public string? Text { get; set; }
         }
 
         private class MultipleParsingInput
         {
-            public string Grammar { get; set; }
+            public string? Grammar { get; set; }
 
-            public string Rule { get; set; }
+            public string? Rule { get; set; }
 
-            public string[] Texts { get; set; }
+            public string[]? Texts { get; set; }
         }
         #endregion
 
@@ -76,7 +76,7 @@ namespace PasApiClient
         /// <param name="rule">Rule, within the grammar, to use to parse the text.</param>
         /// <param name="text">Text to parse with the grammar.</param>
         /// <returns>Parsing result of the text.</returns>
-        public async Task<ParsingResult> SingleParseAsync(string grammar, string rule, string text)
+        public async Task<ParsingResult> SingleParseAsync(string grammar, string? rule, string text)
         {
             if (string.IsNullOrWhiteSpace(grammar))
             {

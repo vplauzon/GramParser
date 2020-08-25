@@ -13,6 +13,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>

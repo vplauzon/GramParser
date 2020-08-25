@@ -8,12 +8,12 @@ namespace PasApiClient
     public class ParsingResult
     {
         /// <summary>Version of the API.</summary>
-        public string ApiVersion { get; set; }
+        public string? ApiVersion { get; set; }
 
         /// <summary>Is match successful:  <c>true</c> iif a match was found.</summary>
         public bool IsMatch { get; set; }
 
         /// <summary>Match found.</summary>
-        public RuleMatchResult RuleMatch { get; set; }
+        public RuleMatchResult? RuleMatch { get; set; }
     }
 }
