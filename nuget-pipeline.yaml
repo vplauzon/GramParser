@@ -23,6 +23,7 @@ stages:
         inputs:
           scriptPath: deployment/patch-nuget-version.py
           arguments: PasApiClient/PasApiClient.csproj $(Build.BuildId)
+      - script:  ls -l
       # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
       - task: Bash@3
         displayName: Copy Alpha project
