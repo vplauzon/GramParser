@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PasApiClient
@@ -71,12 +71,37 @@ namespace PasApiClient
             return SingleParseAsync(grammar, null, text);
         }
 
+        /// <summary>Parse a grammar and use that grammar to parse a text, using the default rule.</summary>
+        /// <typeparam name="OUTPUT">Generic parameter for the output.</typeparam>
+        /// <param name="grammar">Grammar.</param>
+        /// <param name="text">Text to parse with the grammar.</param>
+        /// <returns>Parsing result of the text.</returns>
+        public Task<ParsingResult<OUTPUT>> SingleParseAsync<OUTPUT>(string grammar, string text)
+            where OUTPUT : class
+        {
+            return SingleParseAsync<OUTPUT>(grammar, null, text);
+        }
+
         /// <summary>Parse a grammar and use that grammar to parse a text.</summary>
         /// <param name="grammar">Grammar.</param>
         /// <param name="rule">Rule, within the grammar, to use to parse the text.</param>
         /// <param name="text">Text to parse with the grammar.</param>
         /// <returns>Parsing result of the text.</returns>
         public async Task<ParsingResult> SingleParseAsync(string grammar, string? rule, string text)
+        {
+            var result = await SingleParseAsync<object>(grammar, rule, text);
+
+            return new ParsingResult
+            {
+                ApiVersion = result.ApiVersion,
+                IsMatch = result.IsMatch,
+                RuleMatch = result.RuleMatch,
+                Output = result.Output
+            };
+        }
+
+        public async Task<ParsingResult<OUTPUT>> SingleParseAsync<OUTPUT>(string grammar, string? rule, string text)
+            where OUTPUT : class
         {
             if (string.IsNullOrWhiteSpace(grammar))
             {
@@ -94,7 +119,7 @@ namespace PasApiClient
                 Text = text
             };
 
-            return await PostAsync<SingleParsingInput, ParsingResult>("v1/single", input);
+            return await PostAsync<SingleParsingInput, ParsingResult<OUTPUT>>("v1/single", input);
         }
         #endregion
 
@@ -135,7 +160,7 @@ namespace PasApiClient
         }
         #endregion
 
-        private async Task<Output> PostAsync<Input, Output>(string uriStem, Input input)
+        private async Task<Result> PostAsync<Input, Result>(string uriStem, Input input)
         {
             using (var client = new HttpClient())
             {
@@ -143,16 +168,21 @@ namespace PasApiClient
 
                 try
                 {
-                    var inputString = JsonConvert.SerializeObject(input);
+                    var inputString = JsonSerializer.Serialize(input);
                     var content = new StringContent(inputString, Encoding.UTF8, "application/json");
                     var response = await client.PostAsync(uri, content);
                     var outputString = await response.Content.ReadAsStringAsync();
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        var output = JsonConvert.DeserializeObject<Output>(outputString);
+                        var result = JsonSerializer.Deserialize<Result>(
+                            outputString,
+                            new JsonSerializerOptions
+                            {
+                                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                            });
 
-                        return output;
+                        return result;
                     }
                     else
                     {

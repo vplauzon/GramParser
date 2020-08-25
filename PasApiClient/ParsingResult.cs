@@ -4,8 +4,13 @@ using System.Text;
 
 namespace PasApiClient
 {
+    /// <summary>Default implementation with <see cref="object"/> as output.</summary>
+    public class ParsingResult : ParsingResult<object>
+    {
+    }
+
     /// <summary>Result of parsing.</summary>
-    public class ParsingResult
+    public class ParsingResult<OUTPUT> where OUTPUT : class
     {
         /// <summary>Version of the API.</summary>
         public string? ApiVersion { get; set; }
@@ -17,6 +22,6 @@ namespace PasApiClient
         public RuleMatchResult? RuleMatch { get; set; }
 
         /// <summary>Output of the rule.</summary>
-        public object? Output{ get; set; }
+        public OUTPUT? Output{ get; set; }
     }
 }

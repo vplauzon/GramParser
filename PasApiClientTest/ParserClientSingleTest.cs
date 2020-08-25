@@ -45,7 +45,7 @@ namespace PasApiClientTest
             var client = CreateClient();
             var grammar = "rule main = \"a\"..\"c\" => [text];";
             var text = "b";
-            var result = await client.SingleParseAsync(grammar, text);
+            var result = await client.SingleParseAsync<string[]>(grammar, text);
 
             Assert.IsTrue(result.IsMatch, "IsMatch");
             Assert.IsNull(result.RuleMatch, "IsMatch null");
@@ -53,9 +53,8 @@ namespace PasApiClientTest
             var output = result.Output;
 
             Assert.IsNotNull(output, "Output null");
-            Assert.IsInstanceOfType(output, typeof(object[]));
-            Assert.AreEqual(1, ((object[])output), "Length");
-            Assert.AreEqual("b", ((object[])output)[0], "Value");
+            Assert.AreEqual(1, output.Length, "Length");
+            Assert.AreEqual("b", output[0], "Value");
         }
 
         [TestMethod]
