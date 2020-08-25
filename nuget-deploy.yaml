@@ -30,8 +30,6 @@ jobs:
             displayName:  Download artefact 'nuget'
             inputs:
               artifact: nuget
-          - script:  ls -l $(Pipeline.Workspace)/nuget/
-          - script:  ls -l $(Pipeline.Workspace)/nuget/${{ parameters.environment }}
           # Nuget.org:  https://www.nuget.org/packages/PasApiClient/
           # Nuget:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/package/nuget
           - task: NuGetCommand@2
