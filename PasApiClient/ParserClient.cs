@@ -32,7 +32,7 @@ namespace PasApiClient
         }
         #endregion
 
-        private static readonly Uri DEFAULT_BASE_URI = new Uri("http://pas-api.vplauzon.com");
+        private static readonly Uri DEFAULT_BASE_URI = new Uri("http://pas-api.vincentlauzon.com");
         private readonly Uri _baseUri;
 
         #region Constructors

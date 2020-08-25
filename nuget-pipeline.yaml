@@ -1,0 +1,68 @@
+# Help:  https://aka.ms/yaml
+
+resources:
+- repo: self
+
+trigger:
+- master
+
+stages:
+  - stage:  build
+    dependsOn:  []
+    variables:  []
+    jobs:
+    - job:  main
+      dependsOn:  []
+      variables:  []
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+      # Python script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/python-script
+      - task: PythonScript@0
+        displayName: 'Inject build number'
+        inputs:
+          scriptPath: deployment/patch-nuget-version.py
+          arguments: PasApiClient/PasApiClient.csproj $(Build.BuildId)
+      # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
+      - task: Bash@3
+        displayName: Copy Alpha project
+        inputs:
+          script: cp PasApiClient/alpha-nuget.csproj PasApiClient/PasApiClient.csproj
+      # .NET Core build:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#build
+      - task: DotNetCoreCLI@2
+        displayName: Build Alpha Nuget
+        inputs:
+          projects: PasApiClient/PasApiClient.csproj
+          arguments: --configuration release
+      # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
+      - task: Bash@3
+        displayName: Copy Gold project
+        inputs:
+          script: cp PasApiClient/gold-nuget.csproj PasApiClient/PasApiClient.csproj
+      # .NET Core build:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/build/dotnet-core-cli#build
+      - task: DotNetCoreCLI@2
+        displayName: Build Gold Nuget
+        inputs:
+          projects: PasApiClient/PasApiClient.csproj
+          arguments: '--configuration release'
+      # Bash script:  https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/bash
+      - task: Bash@3
+        displayName: Copy Nuget packages
+        inputs:
+          script: |
+            mkdir $(build.artifactstagingdirectory)/nuget
+            mkdir $(build.artifactstagingdirectory)/nuget/alpha
+            mkdir $(build.artifactstagingdirectory)/nuget/gold
+            cp PasApiClient/bin/release/*-alpha.nupkg $(build.artifactstagingdirectory)/nuget/alpha
+            cp PasApiClient/bin/release/*$(Build.BuildId).nupkg $(build.artifactstagingdirectory)/nuget/gold
+      # Publish artefacts:  https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact Nuget'
+        inputs:
+          artifactName:  nuget
+          pathtoPublish: '$(build.artifactstagingdirectory)/nuget'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact Sources'
+        inputs:
+          artifactName:  source
+          pathtoPublish: .

@@ -2,6 +2,6 @@
 <!--	dotnet test - -settings TestRunParameters.xml	-->
 <RunSettings>
 	<TestRunParameters>
-		<Parameter name="baseUri" value="http://pas-api.dev.vplauzon.com/" />
+		<Parameter name="baseUri" value="http://pas-api.dev.vincentlauzon.com/" />
 	</TestRunParameters>
 </RunSettings>
