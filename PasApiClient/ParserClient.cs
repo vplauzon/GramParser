@@ -159,7 +159,11 @@ namespace PasApiClient
                         throw new ParsingException(outputString, (int)response.StatusCode);
                     }
                 }
-                catch(Exception ex)
+                catch (ParsingException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
                 {
                     throw new Exception($"Communication error with {uri}", ex);
                 }
