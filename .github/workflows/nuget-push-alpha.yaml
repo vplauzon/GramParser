@@ -22,7 +22,5 @@ jobs:
       run: dotnet build PasLib/gold-nuget.csproj --configuration Release --no-restore
     - name: Build Alpha
       run: dotnet build PasLib/alpha-nuget.csproj --configuration Release --no-restore
-    - uses: actions/upload-artifact@v2
-      with:	
-        name: 'nugets'	
-        path: PasLib/bin/Release/*.nupkg
+    - name: Publish Alpha Nuget
+      run:  nuget push PasLib/bin/Release/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.nuget }}

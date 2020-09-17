@@ -6,6 +6,12 @@
     <Authors>Vincent-Philippe Lauzon</Authors>
     <PackageProjectUrl>https://github.com/vplauzon/ParserAsServiceApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vplauzon/ParserAsServiceApi</RepositoryUrl>
+    <Title>Grammar.Parser</Title>
+    <PackageId>Grammar.Parser</PackageId>
+    <Product>Grammar.Parser</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Grammar-based (generic) parser</Description>
+    <Copyright />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
