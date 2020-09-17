@@ -1,7 +1,7 @@
 name:  Package Nuget Alpha
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
     inputs:
       alpha:
         required:  true
