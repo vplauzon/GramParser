@@ -2,16 +2,11 @@
 
 import sys
 import os
+import xml.dom.minidom as md 
 
-def readAll(path):
-    with open(path, 'r') as f:
-        content = f.read()
-
-        return content
-
-def writeAll(path, content):
-    with open(path, 'w') as f:
-        f.write(content)
+def writeXml(document, path):
+    with open(path, "w" ) as fs:  
+        fs.write(document.toxml() ) 
 
 if len(sys.argv) != 3:
     print("There are %d arguments" % (len(sys.argv)-1))
@@ -29,18 +24,28 @@ else:
     print ('Alpha path:  %s' % (alphaPath))
     print ('Gold path:  %s' % (goldPath))
 
-    txtContent = readAll(path)
-    
-    print('Text content:')
-    print(txtContent)
+    #   Load XML and print out
+    document = md.parse(path)
+    print('XML content:')
+    print(document.toxml())
 
-    alphaContent = txtContent.replace('.0</Version>', '.'+patchNumber+'-alpha</Version>')
-    goldContent = txtContent.replace('.0</Version>', '.'+patchNumber+'</Version>')
+    #   Set GeneratePackageOnBuild to true
+    generate=document.getElementsByTagName('GeneratePackageOnBuild')[0]
+    generate.firstChild.nodeValue = "true"
 
-    print('Alpha content:')
-    print(alphaContent)
+    #   Add patch to the version
+    version=document.getElementsByTagName('Version')[0]
+    version.firstChild.nodeValue += "." + patchNumber
+
+    #   Output gold
     print('Gold content:')
-    print(goldContent)
+    print(document.toxml())
+    writeXml(document, goldPath)
 
-    writeAll(alphaPath, alphaContent)
-    writeAll(goldPath, goldContent)
+    #   Add '-alpha' to the version
+    version.firstChild.nodeValue += "-alpha"
+
+    #   Output alpha
+    print('Alpha content:')
+    print(document.toxml())
+    writeXml(document, alphaPath)

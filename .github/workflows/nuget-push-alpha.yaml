@@ -16,7 +16,7 @@ jobs:
         dotnet-version: 3.1.301
     - name: Install dependencies
       run: dotnet restore PasLib
+    - name: Patch version
+      run: python3 deployment/patch-nuget-version.py PasLib/PasLib.csproj ${{ github.run_id }}
     - name: Build
       run: dotnet build PasLib --configuration Release --no-restore
-
-#${{ github.run_id }}
