@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test PasLibTest --no-restore --verbosity normal
+      run: dotnet test PasLibUnitTest --no-restore --verbosity normal
