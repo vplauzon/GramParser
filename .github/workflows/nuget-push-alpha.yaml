@@ -19,6 +19,6 @@ jobs:
     - name: Patch version
       run: python3 deployment/patch-nuget-version.py PasLib/PasLib.csproj ${{ github.run_id }}
     - name: Build Alpha
-      run: dotnet build PasLib/alpha-nuget --configuration Release --no-restore
+      run: dotnet build PasLib/alpha-nuget.csproj --configuration Release --no-restore
     - name: Build Gold
-      run: dotnet build PasLib/gold-nuget --configuration Release --no-restore
+      run: dotnet build PasLib/gold-nuget.csproj --configuration Release --no-restore
