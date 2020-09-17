@@ -1,10 +1,8 @@
 name:  Continuous Test
 
 on:
-  push:
-    paths:  PasLib
-  pull_request:
-    paths:  PasLib
+  push
+  pull_request
 
 jobs:
   build:
