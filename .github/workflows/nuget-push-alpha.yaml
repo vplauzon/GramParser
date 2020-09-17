@@ -23,6 +23,6 @@ jobs:
     - name: Build Alpha
       run: dotnet build PasLib/alpha-nuget.csproj --configuration Release --no-restore
     - uses: actions/upload-artifact@v2
-        with:	
-          name: 'nugets'	
-          path: PasLib/bin/Release/*.nupkg
+      with:	
+        name: 'nugets'	
+        path: PasLib/bin/Release/*.nupkg
