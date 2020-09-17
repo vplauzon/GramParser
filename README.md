@@ -1,5 +1,7 @@
 # Parser as a Service
 
+![Continuous Build / Test](https://github.com/vplauzon/ParserAsServiceApi/workflows/Continuous%20Build%20/%20Test/badge.svg)
+
 See the <span style="background:yellow">[following blog article](http://todefine.com)</span> introducing it.
 
 Parser as a Service (PAS) is a grammar-based parser running as a REST service.  It allows you to implement Domain Specific Languages (DSLs).
