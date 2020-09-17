@@ -1,7 +1,6 @@
 name:  Continuous Test
 
 on:
-  workflow_dispatch
   push:
     paths:  PasLib
   pull_request:
