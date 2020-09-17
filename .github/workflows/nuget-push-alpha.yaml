@@ -9,8 +9,7 @@ on:
         description:  'Publish alpha version'
 
 jobs:
-  build:
-
+  publish:
     runs-on: ubuntu-latest
 
     steps:
