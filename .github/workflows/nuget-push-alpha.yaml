@@ -2,6 +2,11 @@ name:  Package Nuget Alpha
 
 on:
   workflow_dispatch
+    inputs:
+      alpha:
+        required:  true
+        default:  true
+        description:  'Publish alpha version'
 
 jobs:
   build:
