@@ -14,7 +14,7 @@ def writeAll(path, content):
 
 def getPartialVersion(content):
     import re
-
+    
     m = re.search('\d+\.\d+', content)
     
     return m.group(0)

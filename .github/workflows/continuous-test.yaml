@@ -2,9 +2,9 @@ name:  Continuous Test
 
 on:
   push:
-    branches: [ master ]
+    paths:  PasLib
   pull_request:
-    branches: [ master ]
+    paths:  PasLib
 
 jobs:
   build:
@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test PasLibTest --no-restore --verbosity normal
