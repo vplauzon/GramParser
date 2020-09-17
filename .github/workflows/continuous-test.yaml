@@ -20,4 +20,4 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     # - name: Test
     #   run: dotnet test PasLibUnitTest --no-restore --verbosity normal
-    - run:  ls -l PasLib
+    - run:  ls -l PasLib/bin
