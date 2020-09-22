@@ -136,8 +136,8 @@ namespace PasLibTest
             var samples = new[]
             {
                 (true, "seq", "aaabb", (object)new{ a="aaa", b="bb"}),
-                (true, "dij", "aaa", (object)new{ a="aaa"}),
-                (true, "dij", "bbbb", (object)new{ b="bbbb"})
+                (true, "dij", "aaa", new {a="aaa" }),
+                (true, "dij", "bbbb", new {b="bbbb" })
             };
 
             Test("Object.Children.txt", samples);
@@ -151,25 +151,21 @@ namespace PasLibTest
             var samples = new[]
             {
                 (true, "oneParam", "Hello", (object)42 ),
-                (true, "manyParams", "Hello", "HiMyNameIsMax"),
-                (true, "int", "74", (object)74)
+                (true, "manyParams", "Hello", "HiMyNameIsMax")
             };
 
             Test("Function.ConstantFunctions.txt", samples);
         }
-        #endregion
 
-        #region Misc
         [TestMethod]
-        public void DisjunctionMisc()
+        public void WithTextFunctions()
         {
             var samples = new[]
             {
-                (true, "dij", "92", (object)92 ),
-                (true, "dij", "abc", "abc")
+                (true, "int", "74", (object)74)
             };
 
-            Test("Misc.Disjunction.txt", samples);
+            Test("Function.WithTextFunctions.txt", samples);
         }
         #endregion
 
