@@ -1,2 +1,3 @@
 ﻿rule oneParam = "Hello" => integer("42");
 rule manyParams = "Hello" => concat("Hi", "My", "Name", "Is", "Max");
+rule int = ("0".."9")+ => integer(text);

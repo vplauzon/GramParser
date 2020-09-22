@@ -151,7 +151,8 @@ namespace PasLibTest
             var samples = new[]
             {
                 (true, "oneParam", "Hello", (object)42 ),
-                (true, "manyParams", "Hello", "HiMyNameIsMax")
+                (true, "manyParams", "Hello", "HiMyNameIsMax"),
+                (true, "int", "74", (object)74)
             };
 
             Test("Function.ConstantFunctions.txt", samples);
