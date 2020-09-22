@@ -1,0 +1,3 @@
+﻿rule int = ("0".."9")+ => integer(text);
+rule id = ("a".."z")+ => text;
+rule dij = in:int | i:id;

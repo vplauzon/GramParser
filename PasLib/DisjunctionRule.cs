@@ -7,6 +7,20 @@ namespace PasLib
 {
     internal class DisjunctionRule : RuleBase
     {
+        #region Inner Types
+        private class DefaultDisjunctionOutputExtractor : IOutputExtractor
+        {
+            object IOutputExtractor.ExtractOutput(
+                SubString text,
+                IImmutableDictionary<string, RuleMatch> namedChildren)
+            {
+                var output = namedChildren.First().Value.Output;
+
+                return output;
+            }
+        }
+        #endregion
+
         private readonly TaggedRuleCollection _rules;
 
         public DisjunctionRule(
@@ -18,7 +32,7 @@ namespace PasLib
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractorFactory,
+                  WrapDefaultExtractorFactory(outputExtractorFactory),
                   hasInterleave,
                   isRecursive,
                   false,
@@ -60,6 +74,24 @@ namespace PasLib
             var join = string.Join(" | ", rules);
 
             return ToStringRuleName() + $"({join})";
+        }
+
+        private static Func<IOutputExtractor> WrapDefaultExtractorFactory(
+            Func<IOutputExtractor> outputExtractorFactory)
+        {
+            return () =>
+            {
+                var outputExtractorFromFactory = outputExtractorFactory();
+
+                if (outputExtractorFromFactory != null)
+                {
+                    return outputExtractorFromFactory;
+                }
+                else
+                {
+                    return new DefaultDisjunctionOutputExtractor();
+                }
+            };
         }
     }
 }

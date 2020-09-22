@@ -159,6 +159,20 @@ namespace PasLibTest
         }
         #endregion
 
+        #region Misc
+        [TestMethod]
+        public void DisjunctionMisc()
+        {
+            var samples = new[]
+            {
+                (true, "dij", "92", (object)92 ),
+                (true, "dij", "abc", "abc")
+            };
+
+            Test("Misc.Disjunction.txt", samples);
+        }
+        #endregion
+
         private string GetResource(string resourceName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;

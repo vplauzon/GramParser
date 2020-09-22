@@ -69,6 +69,7 @@
     <None Remove="Output\Identifier\Children.txt" />
     <None Remove="Output\Identifier\Text.txt" />
     <None Remove="Output\Identifier\This.txt" />
+    <None Remove="Output\Misc\Disjunction.txt" />
     <None Remove="Output\Object\Children.txt" />
     <None Remove="Output\Object\ConstantObjects.txt" />
     <None Remove="Output\This.txt" />
@@ -104,6 +105,7 @@
     <EmbeddedResource Include="Output\Function\ConstantFunctions.txt" />
     <EmbeddedResource Include="Output\Identifier\Children.txt" />
     <EmbeddedResource Include="Output\Identifier\Text.txt" />
+    <EmbeddedResource Include="Output\Misc\Disjunction.txt" />
     <EmbeddedResource Include="Output\Object\Children.txt" />
     <EmbeddedResource Include="Output\Object\ConstantObjects.txt" />
   </ItemGroup>
