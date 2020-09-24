@@ -53,7 +53,7 @@ namespace PasLib
             {
                 var output = rule.OutputExtractor != null
                     ? rule.OutputExtractor.ExtractOutput(text, namedChildren)
-                    : ExtractDefaultOutput(text, namedChildren);
+                    : ExtractDefaultOutput(text, children, namedChildren);
 
                 return ExtractorHelper.CleanOutput(output);
             });
@@ -158,13 +158,10 @@ namespace PasLib
 
         private static object ExtractDefaultOutput(
             SubString text,
+            IEnumerable<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            if (namedChildren == null || namedChildren.Count == 0)
-            {
-                return text.ToString();
-            }
-            else
+            if (namedChildren != null && namedChildren.Count != 0)
             {
                 var components = from c in namedChildren
                                  let output = c.Value.Output
@@ -172,6 +169,18 @@ namespace PasLib
                 var obj = ImmutableDictionary<string, object>.Empty.AddRange(components);
 
                 return obj;
+            }
+            else if (children != null)
+            {
+                var outputs = from c in children
+                              select c.Output;
+                var obj = outputs.ToArray();
+
+                return obj;
+            }
+            else
+            {
+                return text.ToString();
             }
         }
     }

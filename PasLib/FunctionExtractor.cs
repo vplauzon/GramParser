@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace PasLib
                         + $"at parameter {firstTypeViolation.Index}");
                 }
 
-                if(typeof(T).IsValueType)
+                if (typeof(T).IsValueType)
                 {
                     var isValueNull = from p in parameters.Zip(
                         Enumerable.Range(1, parameters.Count),
@@ -210,6 +211,58 @@ namespace PasLib
                 return _function((T1)parameters[0], (T2)parameters[1]);
             }
         }
+
+        private class PrependFunctionProxy : IFunctionProxy
+        {
+            #region Inner Types
+            private class PrependList : IEnumerable
+            {
+                private readonly object _head;
+                private readonly IEnumerable _tail;
+
+                public PrependList(object head, IEnumerable tail)
+                {
+                    if (head == null)
+                    {
+                        throw new ArgumentNullException(nameof(head));
+                    }
+                    if (tail == null)
+                    {
+                        throw new ArgumentNullException(nameof(tail));
+                    }
+                    _head = head;
+                    _tail = tail;
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    yield return _head;
+                    foreach(var element in _tail)
+                    {
+                        yield return element;
+                    }
+                }
+            }
+            #endregion
+
+            string IFunctionProxy.FunctionName => "prepend";
+
+            int? IFunctionProxy.ParameterCount => 2;
+
+            object IFunctionProxy.Invoke(IImmutableList<object> parameters)
+            {
+                var list = parameters[1] as IEnumerable;
+
+                if (list == null)
+                {
+                    throw new ParsingException(
+                        $"Function '{((IFunctionProxy)this).FunctionName}' has wrong argument "
+                        + "at parameter 1:  isn't a list");
+                }
+
+                return new PrependList(parameters[0], list);
+            }
+        }
         #endregion
 
         private static readonly IImmutableDictionary<string, IFunctionProxy>
@@ -251,7 +304,8 @@ namespace PasLib
             var proxies = new IFunctionProxy[]
             {
                 new FixedFunctionProxyOneParam<SubString, int>(Integer),
-                new ScalableFunctionProxyBase<SubString, string>(Concat)
+                new ScalableFunctionProxyBase<SubString, string>(Concat),
+                new PrependFunctionProxy()
             };
             var pairs = from p in proxies
                         select KeyValuePair.Create(p.FunctionName, p);

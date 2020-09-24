@@ -37,16 +37,16 @@ namespace PasLibTest
         }
 
         [TestMethod]
-        public void Children()
+        public void ChildrenIdentifier()
         {
             var samples = new[]
             {
-                (true, "justA", "aaabbbb", (object)"aaa"),
-                (true, "justA", "aaa", "aaa"),
-                (true, "justA", "abbbb", "a"),
-                (true, "justA", "bbbb", ""),
-                (true, "justB", "aaabb", "bb"),
-                (true, "arrayOf", "a", new object[]{"a", ""}),
+                (true, "justA", "aaabbbb", (object)new[]{"a","a","a" }),
+                (true, "justA", "aaa", (object)new[]{"a","a","a" }),
+                (true, "justA", "abbbb", (object)new[]{"a" }),
+                (true, "justA", "bbbb", new object[0]),
+                (true, "justB", "aaabb", (object)new[]{"b","b" }),
+                (true, "arrayOf", "a", new object[]{ new[] { "a" }, new object[0]}),
                 (true, "range", "b", new object[]{"b"})
             };
 
@@ -135,9 +135,9 @@ namespace PasLibTest
         {
             var samples = new[]
             {
-                (true, "seq", "aaabb", (object)new{ a="aaa", b="bb"}),
-                (true, "dij", "aaa", new {a="aaa" }),
-                (true, "dij", "bbbb", new {b="bbbb" })
+                (true, "seq", "aaabb", (object)new{ a=new[]{"a","a","a" }, b=new[]{"b","b" } }),
+                (true, "dij", "aaa", new {a=new[]{"a","a","a" } }),
+                (true, "dij", "bbbb", new {b=new[]{"b","b","b", "b" } })
             };
 
             Test("Object.Children.txt", samples);
@@ -167,6 +167,23 @@ namespace PasLibTest
 
             Test("Function.WithTextFunctions.txt", samples);
         }
+
+        //[TestMethod]
+        public void PrependFunctions()
+        {
+            var samples = new[]
+            {
+                //(true, "item", "abc", (object)new[]{"a"}),
+                //(true, "item2", ",a", (object)new[]{"a"}),
+                (true, "list3", "a,b,c", (object)new[]{"a"}),
+                (true, "list2", "a,b,c", (object)new[]{"a"}),
+                (true, "list", "a", (object)new[]{"a"}),
+                (true, "list", "a,b", (object)new[]{"a", "b"}),
+                (true, "list", "a,b,c", (object)new[]{"a", "b", "c"})
+            };
+
+            Test("Function.Prepend.txt", samples);
+        }
         #endregion
 
         private string GetResource(string resourceName)
@@ -175,11 +192,19 @@ namespace PasLibTest
             var fullResourceName = "PasLibTest.Output." + resourceName;
 
             using (var stream = assembly.GetManifestResourceStream(fullResourceName))
-            using (var reader = new StreamReader(stream))
             {
-                var text = reader.ReadToEnd();
+                if (stream == null)
+                {
+                    throw new ArgumentException(
+                        $"Can't find resource file '{resourceName}'",
+                        nameof(resourceName));
+                }
+                using (var reader = new StreamReader(stream))
+                {
+                    var text = reader.ReadToEnd();
 
-                return text;
+                    return text;
+                }
             }
         }
 

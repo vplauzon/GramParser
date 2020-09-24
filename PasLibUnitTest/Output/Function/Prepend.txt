@@ -1,0 +1,5 @@
+﻿rule item = ("a".."z")+ => text;
+rule item2 = "," i:item => i;
+rule list2 = head:item tail:("," i:item => i)* => tail;
+rule list3 = head:item tail:(item2)* => tail;
+rule list = head:item tail:("," i:item => i)* => prepend(head, tail);
