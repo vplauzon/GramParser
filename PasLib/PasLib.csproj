@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Authors>Vincent-Philippe Lauzon</Authors>
     <PackageProjectUrl>https://github.com/vplauzon/ParserAsServiceApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vplauzon/ParserAsServiceApi</RepositoryUrl>
