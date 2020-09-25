@@ -166,17 +166,16 @@ namespace PasLib
                 RuleMatch outputMatch)
             {
                 var propertyBag = CreatePropertyBag(parameterAssignationList);
-                Func<IOutputExtractor> outputExtractorFactory =
-                    () => CreateOutputExtractor(outputMatch);
+                var outputExtractor = CreateOutputExtractor(outputMatch);
 
-                return CreateRule(ruleID, propertyBag, ruleBodyMatch, outputExtractorFactory);
+                return CreateRule(ruleID, propertyBag, ruleBodyMatch, outputExtractor);
             }
 
             private IRule CreateRule(
                 string ruleID,
                 PropertyBag propertyBag,
                 RuleMatch ruleBodyMatch,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Key;
                 var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Value;
@@ -187,28 +186,28 @@ namespace PasLib
                         return CreateRuleReference(ruleID, ruleBodyBody, propertyBag);
                     case "literal":
                         return CreateLiteral(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "any":
                         return CreateAnyCharacter(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "range":
                         return CreateRange(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "repeat":
                         return CreateRepeat(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "disjunction":
                         return CreateDisjunction(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "sequence":
                         return CreateSequence(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "substract":
                         return CreateSubstract(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     case "bracket":
                         return CreateBracket(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractorFactory);
+                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
                     default:
                         throw new NotSupportedException(ruleBodyTag);
                 }
@@ -518,13 +517,13 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var literal = ruleBodyBody.NamedChildren.First().Value;
                 var characters = from l in literal.Children
                                  let c = GetCharacter(l)
                                  select c;
-                var rule = new LiteralRule(ruleID, outputExtractorFactory, characters);
+                var rule = new LiteralRule(ruleID, outputExtractor, characters);
 
                 return rule;
             }
@@ -576,16 +575,16 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
-                return new MatchAnyCharacterRule(ruleID, outputExtractorFactory);
+                return new MatchAnyCharacterRule(ruleID, outputExtractor);
             }
 
             private IRule CreateRange(
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var lower =
                             ruleBodyBody.NamedChildren["lower"].NamedChildren.First().Value;
@@ -594,14 +593,14 @@ namespace PasLib
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
-                return new RangeRule(ruleID, outputExtractorFactory, lowerChar, upperChar);
+                return new RangeRule(ruleID, outputExtractor, lowerChar, upperChar);
             }
 
             private IRule CreateRepeat(
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var subRuleBody = ruleBodyBody.NamedChildren["rule"];
                 var rule = CreateRule(subRuleBody);
@@ -612,7 +611,7 @@ namespace PasLib
                     case "star":
                         return new RepeatRule(
                             ruleID,
-                            outputExtractorFactory,
+                            outputExtractor,
                             rule,
                             null,
                             null,
@@ -622,7 +621,7 @@ namespace PasLib
                     case "plus":
                         return new RepeatRule(
                             ruleID,
-                            outputExtractorFactory,
+                            outputExtractor,
                             rule,
                             1,
                             null,
@@ -632,7 +631,7 @@ namespace PasLib
                     case "question":
                         return new RepeatRule(
                             ruleID,
-                            outputExtractorFactory,
+                            outputExtractor,
                             rule,
                             0,
                             1,
@@ -646,7 +645,7 @@ namespace PasLib
 
                             return new RepeatRule(
                                 ruleID,
-                                outputExtractorFactory,
+                                outputExtractor,
                                 rule,
                                 n,
                                 n,
@@ -661,7 +660,7 @@ namespace PasLib
 
                             return new RepeatRule(
                                 ruleID,
-                                outputExtractorFactory,
+                                outputExtractor,
                                 rule,
                                 min,
                                 max,
@@ -713,7 +712,7 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var headTag = ruleBodyBody.NamedChildren["t"];
                 var head = ruleBodyBody.NamedChildren["head"];
@@ -728,7 +727,7 @@ namespace PasLib
 
                 return new DisjunctionRule(
                     ruleID,
-                    outputExtractorFactory,
+                    outputExtractor,
                     rules,
                     bag.HasInterleave,
                     bag.IsRecursive,
@@ -739,7 +738,7 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var rules = from tagRule in ruleBodyBody.Children
                             let t = tagRule.NamedChildren["t"]
@@ -749,7 +748,7 @@ namespace PasLib
 
                 return new SequenceRule(
                     ruleID,
-                    outputExtractorFactory,
+                    outputExtractor,
                     rules,
                     bag.HasInterleave,
                     bag.IsRecursive,
@@ -760,7 +759,7 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var primary = ruleBodyBody.NamedChildren["primary"];
                 var excluded = ruleBodyBody.NamedChildren["excluded"];
@@ -769,7 +768,7 @@ namespace PasLib
 
                 return new SubstractRule(
                     ruleID,
-                    outputExtractorFactory,
+                    outputExtractor,
                     primaryRule,
                     excludedRule,
                     bag.HasInterleave,
@@ -781,18 +780,17 @@ namespace PasLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                Func<IOutputExtractor> outputExtractorFactory)
+                IOutputExtractor outputExtractor)
             {
                 var ruleBodyOutput = ruleBodyBody.NamedChildren.First().Value;
                 var ruleBody = ruleBodyOutput.NamedChildren["body"];
                 var output = ruleBodyOutput.NamedChildren["output"];
-                Func<IOutputExtractor> innerOutputExtractorFactory =
-                    () => CreateOutputExtractor(output);
-                var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractorFactory);
+                var innerOutputExtractor = CreateOutputExtractor(output);
+                var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractor);
                 var outerRule = new SequenceRule(
                     ruleID,
-                    outputExtractorFactory,
-                    new[] { new TaggedRule(innerRule)},
+                    outputExtractor,
+                    new[] { new TaggedRule(innerRule) },
                     bag.HasInterleave,
                     bag.IsRecursive,
                     bag.HasChildrenDetails);

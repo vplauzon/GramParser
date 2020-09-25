@@ -11,14 +11,14 @@ namespace PasLib
 
         public SequenceRule(
             string ruleName,
-            Func<IOutputExtractor> outputExtractorFactory,
+            IOutputExtractor outputExtractor,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractorFactory,
+                  outputExtractor,
                   hasInterleave,
                   isRecursive,
                   false,

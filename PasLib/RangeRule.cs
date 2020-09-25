@@ -10,10 +10,10 @@ namespace PasLib
     {
         public RangeRule(
             string ruleName,
-            Func<IOutputExtractor> outputExtractorFactory,
+            IOutputExtractor outputExtractor,
             char first,
             char last)
-            : base(ruleName, outputExtractorFactory, false, true, true, false)
+            : base(ruleName, outputExtractor, false, true, true, false)
         {
             if (last < first)
             {

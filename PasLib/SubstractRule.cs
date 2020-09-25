@@ -12,7 +12,7 @@ namespace PasLib
 
         public SubstractRule(
             string ruleName,
-            Func<IOutputExtractor> outputExtractorFactory,
+            IOutputExtractor outputExtractor,
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
@@ -20,7 +20,7 @@ namespace PasLib
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractorFactory,
+                  outputExtractor,
                   hasInterleave,
                   isRecursive,
                   false,
