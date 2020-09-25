@@ -1,0 +1,1 @@
+﻿rule bool = "true" | "false" => boolean(text);

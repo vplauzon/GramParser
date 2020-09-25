@@ -304,6 +304,7 @@ namespace PasLib
         {
             var proxies = new IFunctionProxy[]
             {
+                new FixedFunctionProxyOneParam<SubString, bool>(Boolean),
                 new FixedFunctionProxyOneParam<SubString, int>(Integer),
                 new ScalableFunctionProxyBase<SubString, string>(Concat),
                 new PrependFunctionProxy()
@@ -332,6 +333,18 @@ namespace PasLib
             }
 
             return integer;
+        }
+
+        private static bool Boolean(SubString text)
+        {
+            bool boolean;
+
+            if (!bool.TryParse(text.ToString(), out boolean))
+            {
+                throw new ParsingException($"Can't parse '{text}' to a boolean");
+            }
+
+            return boolean;
         }
 
         private static string Concat(IEnumerable<SubString> texts)

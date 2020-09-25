@@ -65,6 +65,7 @@
     <None Remove="Output\Constants.txt" />
     <None Remove="Output\Constant\BracketSubstitution.txt" />
     <None Remove="Output\Constant\Constants.txt" />
+    <None Remove="Output\Function\BooleanFunctions.txt" />
     <None Remove="Output\Function\ChildFunctions.txt" />
     <None Remove="Output\Function\ConstantFunctions.txt" />
     <None Remove="Output\Function\IntegerFunctions.txt" />
@@ -106,6 +107,7 @@
     <EmbeddedResource Include="Output\Array\TextArrays.txt" />
     <EmbeddedResource Include="Output\Constant\BracketSubstitution.txt" />
     <EmbeddedResource Include="Output\Constant\Constants.txt" />
+    <EmbeddedResource Include="Output\Function\BooleanFunctions.txt" />
     <EmbeddedResource Include="Output\Function\IntegerFunctions.txt" />
     <EmbeddedResource Include="Output\Function\Prepend.txt" />
     <EmbeddedResource Include="Output\Function\WithTextFunctions.txt" />

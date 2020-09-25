@@ -188,6 +188,18 @@ namespace PasLibTest
         }
 
         [TestMethod]
+        public void BooleanFunctions()
+        {
+            var samples = new[]
+            {
+                (true, "bool", "true", (object)true),
+                (true, "bool", "false", (object)false)
+            };
+
+            Test("Function.BooleanFunctions.txt", samples);
+        }
+
+        [TestMethod]
         public void WithTextFunctions()
         {
             var samples = new[]
