@@ -3,8 +3,8 @@
 resources:
 - repo: self
 
-trigger:
-- master
+# trigger:
+# - master
 
 stages:
   - stage: build
