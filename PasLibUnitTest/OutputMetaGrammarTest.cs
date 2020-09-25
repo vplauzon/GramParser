@@ -52,6 +52,19 @@ namespace PasLibTest
 
             Test("Identifier.Children.txt", samples);
         }
+
+        //[TestMethod]
+        public void SubItemIdentifier()
+        {
+            var samples = new[]
+            {
+                (true, "list", "a", (object)new object[0]),
+                (true, "list", "a,b", (object)new []{ "b" }),
+                (true, "list", "a,b,c", (object)new []{ "b", "c" })
+            };
+
+            Test("Identifier.SubItem.txt", samples);
+        }
         #endregion
 
         #region Constants
@@ -175,7 +188,7 @@ namespace PasLibTest
             {
                 //(true, "item", "abc", (object)new[]{"a"}),
                 //(true, "item2", ",a", (object)new[]{"a"}),
-                (true, "list3", "a,b,c", (object)new[]{"a"}),
+                (true, "list3", "a,b,c", (object)new[]{"b", "c"}),
                 (true, "list2", "a,b,c", (object)new[]{"a"}),
                 (true, "list", "a", (object)new[]{"a"}),
                 (true, "list", "a,b", (object)new[]{"a", "b"}),

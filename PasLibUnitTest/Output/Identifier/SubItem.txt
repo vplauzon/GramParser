@@ -1,0 +1,3 @@
+﻿rule item = ("a".."z")+ => text;
+rule commaItem = "," i:item => i;
+rule list = head:item tail:(commaItem)* => tail;
