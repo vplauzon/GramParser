@@ -11,7 +11,6 @@ namespace PasLib
     {
         private readonly ImmutableArray<TaggedRule> _rules;
         private readonly bool _hasSelection;
-        private readonly bool _hasWithNames;
 
         public TaggedRuleCollection(IEnumerable<TaggedRule> rules)
         {
@@ -40,8 +39,10 @@ namespace PasLib
             }
 
             _hasSelection = hasWithNames || hasWithoutNames;
-            _hasWithNames = hasWithNames;
+            HasNames = hasWithNames;
         }
+
+        public bool HasNames { get; }
 
         #region IEnumerable<TaggedRule>
         public IEnumerator<TaggedRule> GetEnumerator()
@@ -93,7 +94,7 @@ namespace PasLib
             }
             if (subMatches.Any())
             {
-                if (_hasWithNames)
+                if (HasNames)
                 {
                     var namedMatches = from m in subMatches
                                        select new KeyValuePair<string, RuleMatch>(

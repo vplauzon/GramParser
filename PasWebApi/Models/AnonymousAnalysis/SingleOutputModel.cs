@@ -11,14 +11,8 @@ namespace PasWebApi.Models.AnonymousAnalysis
             IsMatch = match != null;
             if (match != null)
             {
-                if (match.Rule.OutputExtractor == null)
-                {
-                    RuleMatch = new RuleMatchModel(match);
-                }
-                else
-                {
-                    Output = match.Output;
-                }
+                RuleMatch = new RuleMatchModel(match);
+                Output = match.ComputeOutput();
             }
         }
 

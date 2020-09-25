@@ -50,7 +50,21 @@ namespace PasLib
             IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            throw new NotImplementedException();
+            if (_rules.HasNames)
+            {
+                var components = from c in namedChildren
+                                 select new { Name = c.Key, Output = c.Value.ComputeOutput() };
+                var map = components.ToImmutableDictionary(c => c.Name, c => c.Output);
+
+                return map;
+            }
+            else
+            {
+                var subOutputs = from c in children
+                                 select c.ComputeOutput();
+
+                return subOutputs.ToArray();
+            }
         }
 
         #region object methods

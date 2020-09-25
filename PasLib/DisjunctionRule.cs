@@ -58,11 +58,20 @@ namespace PasLib
             IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            var uniqueChild = namedChildren.First();
-            var subOutput = uniqueChild.Value.ComputeOutput();
-            var map = ImmutableDictionary<string, object>.Empty.Add(uniqueChild.Key, subOutput);
+            if (_rules.HasNames)
+            {
+                var uniqueChild = namedChildren.First();
+                var subOutput = uniqueChild.Value.ComputeOutput();
+                var map = ImmutableDictionary<string, object>.Empty.Add(uniqueChild.Key, subOutput);
 
-            return map;
+                return map;
+            }
+            else
+            {
+                var subOutput = children.First().ComputeOutput();
+
+                return subOutput;
+            }
         }
 
         public override string ToString()
