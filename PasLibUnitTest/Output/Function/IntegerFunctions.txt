@@ -1,0 +1,2 @@
+﻿rule singleDigit = ("0".."9") => integer(text);
+rule manyDigits = singleDigit+ => integer(text);

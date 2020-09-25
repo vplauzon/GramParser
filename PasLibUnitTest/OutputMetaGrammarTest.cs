@@ -171,6 +171,23 @@ namespace PasLibTest
         }
 
         [TestMethod]
+        public void IntegerFunctions()
+        {
+            var samples = new[]
+            {
+                (true, "singleDigit", "0", (object)0),
+                (true, "singleDigit", "4", 4),
+                (true, "singleDigit", "9", 9),
+                (true, "manyDigits", "12", 12),
+                (true, "manyDigits", "012", 12),
+                (true, "manyDigits", "00012", 12),
+                (true, "manyDigits", "7897", 7897)
+            };
+
+            Test("Function.IntegerFunctions.txt", samples);
+        }
+
+        [TestMethod]
         public void WithTextFunctions()
         {
             var samples = new[]
