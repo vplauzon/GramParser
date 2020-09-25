@@ -53,7 +53,7 @@ namespace PasLibTest
             Test("Identifier.Children.txt", samples);
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void SubItemIdentifier()
         {
             var samples = new[]
@@ -181,15 +181,11 @@ namespace PasLibTest
             Test("Function.WithTextFunctions.txt", samples);
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void PrependFunctions()
         {
             var samples = new[]
             {
-                //(true, "item", "abc", (object)new[]{"a"}),
-                //(true, "item2", ",a", (object)new[]{"a"}),
-                (true, "list3", "a,b,c", (object)new[]{"b", "c"}),
-                (true, "list2", "a,b,c", (object)new[]{"a"}),
                 (true, "list", "a", (object)new[]{"a"}),
                 (true, "list", "a,b", (object)new[]{"a", "b"}),
                 (true, "list", "a,b,c", (object)new[]{"a", "b", "c"})
@@ -238,7 +234,6 @@ namespace PasLibTest
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Text - {i}");
 
                     if (match.ComputeOutput() == null)

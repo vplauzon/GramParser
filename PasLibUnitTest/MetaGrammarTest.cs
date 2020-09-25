@@ -435,7 +435,6 @@ namespace PasLibTest
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
                 }
             }
