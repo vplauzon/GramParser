@@ -13,6 +13,7 @@ namespace PasLib
 
         object IOutputExtractor.ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             RuleMatch child;
@@ -24,7 +25,7 @@ namespace PasLib
             }
             else if (namedChildren.TryGetValue(_name, out child))
             {
-                return child.Output;
+                return child.ComputeOutput();
             }
             else
             {

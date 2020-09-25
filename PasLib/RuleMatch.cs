@@ -7,8 +7,6 @@ namespace PasLib
 {
     public class RuleMatch
     {
-        private readonly Lazy<object> _lazyOutput;
-
         public RuleMatch(IRule rule, SubString text)
             : this(rule, text, text.Length, null, null)
         {
@@ -49,14 +47,6 @@ namespace PasLib
 
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             Text = text;
-            _lazyOutput = new Lazy<object>(() =>
-            {
-                var output = rule.OutputExtractor != null
-                    ? rule.OutputExtractor.ExtractOutput(text, namedChildren)
-                    : ExtractDefaultOutput(text, children, namedChildren);
-
-                return ExtractorHelper.CleanOutput(output);
-            });
             LengthWithInterleaves = lengthWithInterleaves;
             Children = children != null
                 ? ImmutableList<RuleMatch>.Empty.AddRange(children)
@@ -72,8 +62,6 @@ namespace PasLib
 
         public SubString Text { get; }
 
-        public object Output => _lazyOutput.Value;
-
         public int LengthWithInterleaves { get; }
 
         public IImmutableList<RuleMatch> Children { get; }
@@ -81,6 +69,13 @@ namespace PasLib
 
         public IImmutableDictionary<string, RuleMatch> NamedChildren { get; }
             = ImmutableDictionary<string, RuleMatch>.Empty;
+
+        public object ComputeOutput()
+        {
+            var output = Rule.ExtractOutput(Text, Children, NamedChildren);
+
+            return ExtractorHelper.StringAsString(output);
+        }
 
         public RuleMatch ChangeRule(IRule rule)
         {
@@ -164,7 +159,7 @@ namespace PasLib
             if (namedChildren != null && namedChildren.Count != 0)
             {
                 var components = from c in namedChildren
-                                 let output = c.Value.Output
+                                 let output = c.Value.ComputeOutput()
                                  select KeyValuePair.Create(c.Key, output);
                 var obj = ImmutableDictionary<string, object>.Empty.AddRange(components);
 
@@ -173,7 +168,7 @@ namespace PasLib
             else if (children != null)
             {
                 var outputs = from c in children
-                              select c.Output;
+                              select c.ComputeOutput();
                 var obj = outputs.ToArray();
 
                 return obj;

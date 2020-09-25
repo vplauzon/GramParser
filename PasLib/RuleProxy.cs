@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace PasLib
@@ -53,7 +54,13 @@ namespace PasLib
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);
 
-        IOutputExtractor IRule.OutputExtractor => ReferencedRule.OutputExtractor;
+        object IRule.ExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            return ReferencedRule.ExtractOutput(text, children, namedChildren);
+        }
 
         private bool HasNoRecursion(IRule value)
         {

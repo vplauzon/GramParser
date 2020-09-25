@@ -16,11 +16,12 @@ namespace PasLib
 
         object IOutputExtractor.ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             var outputsEnum = from extractor in _extractors
-                              let output = extractor.ExtractOutput(text, namedChildren)
-                              let cleanOutput = ExtractorHelper.CleanOutput(output)
+                              let output = extractor.ExtractOutput(text, children, namedChildren)
+                              let cleanOutput = ExtractorHelper.StringAsString(output)
                               select cleanOutput;
             var outputs = outputsEnum.ToArray();
             var types = (from o in outputs

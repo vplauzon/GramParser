@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace PasLib
 {
@@ -17,6 +18,14 @@ namespace PasLib
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             return RuleMatch.EmptyMatch;
+        }
+
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            throw new NotSupportedException("This should never be fired as this rule never match anything");
         }
 
         public override string ToString()

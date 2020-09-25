@@ -9,6 +9,7 @@ namespace PasLib
     {
         object ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren);
     }
 }

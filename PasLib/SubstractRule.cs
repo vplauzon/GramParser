@@ -55,6 +55,14 @@ namespace PasLib
             }
         }
 
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ToString()
         {
             return ToStringRuleName()

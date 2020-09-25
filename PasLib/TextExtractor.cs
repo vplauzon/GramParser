@@ -8,6 +8,7 @@ namespace PasLib
     {
         object IOutputExtractor.ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             return text;

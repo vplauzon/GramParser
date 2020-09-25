@@ -291,10 +291,11 @@ namespace PasLib
 
         object IOutputExtractor.ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             var parameterOutputs = from p in _parameters
-                                   select p.ExtractOutput(text, namedChildren);
+                                   select p.ExtractOutput(text, children, namedChildren);
 
             return _function.Invoke(ImmutableList<object>.Empty.AddRange(parameterOutputs));
         }

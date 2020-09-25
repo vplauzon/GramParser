@@ -210,7 +210,7 @@ namespace PasLibTest
 
         private void Test(
             string grammarFile,
-            (bool isSuccess, string ruleName, string text, object output)[] samples)
+            (bool isSuccess, string ruleName, string text, object expectedOutput)[] samples)
         {
             var grammarText = GetResource(grammarFile);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
@@ -218,7 +218,7 @@ namespace PasLibTest
             Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
             for (int i = 0; i != samples.Length; ++i)
             {
-                (var isSuccess, var ruleName, var text, var output) = samples[i];
+                (var isSuccess, var ruleName, var text, var expectedOutput) = samples[i];
                 var match = grammar.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
@@ -228,16 +228,20 @@ namespace PasLibTest
                     Assert.AreEqual(ruleName, match.Rule.RuleName, $"Rule Name - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Text - {i}");
 
-                    if (match.Output == null)
+                    if (match.ComputeOutput() == null)
                     {
-                        Assert.AreEqual(output, match.Output, $"Output Null - {i}");
+                        Assert.AreEqual(expectedOutput, match.ComputeOutput(), $"Output Null - {i}");
                     }
                     else
                     {
-                        string outputText = StandardizeObject(output);
-                        var matchOutputText = StandardizeObject(match.Output);
+                        string expectedOutputText = StandardizeObject(expectedOutput);
+                        var computedOutput = match.ComputeOutput();
+                        var matchOutputText = StandardizeObject(computedOutput);
 
-                        Assert.AreEqual(outputText, matchOutputText, $"Output JSON Compare - {i}");
+                        Assert.AreEqual(
+                            expectedOutputText,
+                            matchOutputText,
+                            $"Output JSON Compare - {i}");
                     }
                 }
             }

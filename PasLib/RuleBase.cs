@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace PasLib
@@ -48,9 +49,29 @@ namespace PasLib
             return OnMatch(context);
         }
 
-        public IOutputExtractor OutputExtractor => _outputExtractorFactory.Value;
+        public object ExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            var outputExtractor = _outputExtractorFactory.Value;
+
+            if (outputExtractor != null)
+            {
+                return outputExtractor.ExtractOutput(text, children, namedChildren);
+            }
+            else
+            {
+                return DefaultExtractOutput(text, children, namedChildren);
+            }
+        }
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
+
+        protected abstract object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren);
 
         protected string ToString(IRule rule)
         {

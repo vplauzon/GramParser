@@ -6,7 +6,7 @@ namespace PasLib
 {
     internal static class ExtractorHelper
     {
-        public static object CleanOutput(object output)
+        public static object StringAsString(object output)
         {
             var stringLike = output as IEnumerable<char>;
 

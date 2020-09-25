@@ -53,6 +53,18 @@ namespace PasLib
             }
         }
 
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            var uniqueChild = namedChildren.First();
+            var subOutput = uniqueChild.Value.ComputeOutput();
+            var map = ImmutableDictionary<string, object>.Empty.Add(uniqueChild.Key, subOutput);
+
+            return map;
+        }
+
         public override string ToString()
         {
             var rules = from t in _rules

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace PasLib
@@ -11,6 +12,9 @@ namespace PasLib
 
         IEnumerable<RuleMatch> Match(ExplorerContext context);
 
-        IOutputExtractor OutputExtractor { get; }
+        object ExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren);
     }
 }

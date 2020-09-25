@@ -49,6 +49,17 @@ namespace PasLib
                 ImmutableStack<RuleMatch>.Empty);
         }
 
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            var outputs = from c in children
+                          select c.ComputeOutput();
+
+            return outputs.ToImmutableArray();
+        }
+
         public override string ToString()
         {
             var min = _min.HasValue ? _min.Value.ToString() : string.Empty;

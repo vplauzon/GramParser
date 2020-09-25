@@ -45,6 +45,14 @@ namespace PasLib
             return matches;
         }
 
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            throw new NotImplementedException();
+        }
+
         #region object methods
         public override string ToString()
         {

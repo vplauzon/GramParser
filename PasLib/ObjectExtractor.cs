@@ -20,13 +20,14 @@ namespace PasLib
 
         object IOutputExtractor.ExtractOutput(
             SubString text,
+            IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
             var outputPairs = (from pair in _extractorPairs
-                               let rawKey = pair.Key.ExtractOutput(text, namedChildren)
-                               let key = ExtractorHelper.CleanOutput(rawKey) as string
-                               let rawValue = pair.Value.ExtractOutput(text, namedChildren)
-                               let value = ExtractorHelper.CleanOutput(rawValue)
+                               let rawKey = pair.Key.ExtractOutput(text, children, namedChildren)
+                               let key = ExtractorHelper.StringAsString(rawKey) as string
+                               let rawValue = pair.Value.ExtractOutput(text, children, namedChildren)
+                               let value = ExtractorHelper.StringAsString(rawValue)
                                select new
                                {
                                    KeyExtractor = pair.Key,

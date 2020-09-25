@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace PasLib
@@ -26,6 +27,14 @@ namespace PasLib
                     new RuleMatch(this, text.Take(1))
                 };
             }
+        }
+
+        protected override object DefaultExtractOutput(
+            SubString text,
+            IImmutableList<RuleMatch> children,
+            IImmutableDictionary<string, RuleMatch> namedChildren)
+        {
+            return text;
         }
 
         public override string ToString()
