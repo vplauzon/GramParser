@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GramParserLib
+{
+    internal static class ExtractorHelper
+    {
+        public static object StringAsString(object output)
+        {
+            var stringLike = output as IEnumerable<char>;
+
+            if (stringLike != null && !(output is string))
+            {
+                return new string(stringLike.ToArray());
+            }
+
+            return output;
+        }
+    }
+}
