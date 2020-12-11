@@ -40,13 +40,23 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            return RecurseMatch(
+            var matches = RecurseMatch(
                 context.ContextID,
                 context,
                 context.Text,
                 0,
-                0,
-                ImmutableStack<RuleMatch>.Empty);
+                1,
+                ImmutableList<RuleMatch>.Empty);
+
+            foreach (var m in matches)
+            {
+                yield return m;
+            }
+            //  We are returning the matches in decreasing order of text length, so the empty one goes last
+            if (!_min.HasValue || _min.Value == 0)
+            {
+                yield return new RuleMatch(this, context.Text.Take(0));
+            }
         }
 
         protected override object DefaultExtractOutput(
@@ -75,22 +85,18 @@ namespace PasLib
             SubString originalText,
             int totalMatchLength,
             int iteration,
-            ImmutableStack<RuleMatch> childenStack)
+            ImmutableList<RuleMatch> childrenMatches)
         {
             var matches = context.InvokeRule(_rule);
-            var nonEmptyMatches = from m in matches
-                                  where m.Text.HasContent
-                                  select m;
-            var hasOneMatchSentinel = false;
+            var nonEmptyMatches = matches.Where(m => m.Text.Length != 0);
 
             foreach (var match in nonEmptyMatches)
             {
-                var newChildenStack = childenStack.Push(match);
                 var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
+                var newChildrenMatches = childrenMatches.Add(match);
 
-                hasOneMatchSentinel = true;
-                if (!_max.HasValue || iteration + 1 < _max.Value)
-                {   //  We can still repeat
+                if (IsRepeatCountBelowMaximum(iteration + 1))
+                {   //  Recurse to next iteration
                     var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
                         masterContextID,
@@ -98,37 +104,36 @@ namespace PasLib
                         originalText,
                         newTotalMatchLength,
                         iteration + 1,
-                        newChildenStack);
+                        newChildrenMatches);
 
                     foreach (var m in downstreamMatches)
                     {
                         yield return m;
                     }
                 }
-                //  We have reached our max:  end recursion
-                //  Have we reached our min?
-                else if ((!_min.HasValue || iteration + 1 >= _min.Value))
+                //  We are returning the matches in decreasing order of text length, so the "current" one goes last
+                if (IsRepeatCountInRange(iteration))
                 {
                     var content = originalText.Take(newTotalMatchLength);
-
-                    yield return new RuleMatch(
+                    var completeMatch = new RuleMatch(
                         this,
                         content,
-                        newChildenStack.Reverse());
+                        newChildrenMatches);
+
+                    yield return completeMatch;
                 }
             }
-            //  Repeat didn't work, but if we already reached our min, we're good
-            //  (even if no content)
-            if (!hasOneMatchSentinel
-                && (!_min.HasValue || iteration >= _min.Value))
-            {
-                var content = originalText.Take(totalMatchLength);
+        }
 
-                yield return new RuleMatch(
-                    this,
-                    content,
-                    childenStack.Reverse());
-            }
+        private bool IsRepeatCountInRange(int repeatCount)
+        {
+            return IsRepeatCountBelowMaximum(repeatCount)
+                && (!_min.HasValue || _min.Value <= repeatCount);
+        }
+
+        private bool IsRepeatCountBelowMaximum(int repeatCount)
+        {
+            return !_max.HasValue || _max.Value >= repeatCount;
         }
     }
 }

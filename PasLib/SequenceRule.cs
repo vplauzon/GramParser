@@ -34,15 +34,13 @@ namespace PasLib
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            var matches = RecurseMatch(
+            return RecurseMatch(
                 _rules,
                 context.ContextID,
                 context,
                 context.Text,
                 0,
                 ImmutableList<(TaggedRule, RuleMatch)>.Empty);
-
-            return matches;
         }
 
         protected override object DefaultExtractOutput(

@@ -1,0 +1,14 @@
+﻿#	Comments & interleaves
+rule(interleave=false) comment = "//" (. - ("\r" | "\n"))*;
+interleave = (" " | "\r" | "\n" | "\t") | comment;
+
+#	Blank lines
+rule(interleave=false) blankLineFiller = " " | "\t" | "\r";
+rule(interleave=false) blankLine = (blankLineFiller* "\n"){2,};
+
+#	Black box
+rule(interleave=false) blackBox = (. - blankLine)*;
+rule(interleave=false) blackBoxesSeparatedWithBlankLine = blackBox (blankLine blackBox)*;
+
+#	Scoped black boxes
+rule scopedBlackBoxes = "{" blackBoxesSeparatedWithBlankLine? "}";

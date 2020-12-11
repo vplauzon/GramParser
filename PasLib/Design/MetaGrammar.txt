@@ -9,7 +9,7 @@ rule(interleave=false) double = "-"? number* ("." number+)?;
 rule(interleave=false) character = normal::(. - ("\"" | "\r" | "\n" | "\\"))
 	| escapeQuote::("\\" "\"") | escapeBackslash::"\\\\"
 	| escapeLetter:("\\" l::("n" | "r" | "t" | "v"))
-	| escapeHexa:("\\x" h::("0".."9" | "a".."f" | "A".."F"){1,2});
+	| escapeHexa:("\\x" h::("0".."9" | "a".."f" | "A".."F"){2,2});
 rule(interleave=false) quotedCharacter = "\"" c:character "\"";
 
 #	rules
@@ -35,7 +35,9 @@ rule disjunctionable = ruleRef:identifier | literal:literal | range:range | brac
 rule disjunction = t:tag head:disjunctionable tail:("|" t:tag d:disjunctionable)+;
 rule sequenceable = ruleRef:identifier | literal:literal | range:range | bracket:bracket
 	| any:any | repeat:repeat;
-rule sequence = (t:tag r:sequenceable){2,};
+rule(interleave=false) innerSequenceable = t:tag r:sequenceable;
+rule(interleave=false) tailSequenceable = interleave+ s:innerSequenceable;
+rule(interleave=false) sequence = head:innerSequenceable tail:tailSequenceable+;
 rule substractable = ruleRef:identifier | literal:literal | range:range
 	| bracket:bracket | any:any | repeat:repeat;
 rule substracted = ruleRef:identifier | literal:literal | range:range

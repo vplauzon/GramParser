@@ -27,6 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Meta\AdHoc\BlankLines.txt" />
     <None Remove="Meta\AdHoc\Bracket.txt" />
     <None Remove="Meta\AdHoc\Comments.txt" />
     <None Remove="Meta\AdHoc\Interleave.txt" />
@@ -82,6 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Meta\AdHoc\BlankLines.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Bracket.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Comments.txt" />
     <EmbeddedResource Include="Meta\AdHoc\Interleave.txt" />

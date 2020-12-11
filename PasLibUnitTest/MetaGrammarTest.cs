@@ -12,6 +12,14 @@ namespace PasLibTest
     {
         #region Just parsing the grammar
         [TestMethod]
+        public void ParsingString()
+        {
+            var ruleSet = MetaGrammar.ParseGrammar("rule main = \"a\";");
+
+            Assert.IsNotNull(ruleSet);
+        }
+
+        [TestMethod]
         public void ParsingSequence()
         {
             var ruleSet = MetaGrammar.ParseGrammar("rule seq = \"a\" \"b\";");
@@ -297,6 +305,20 @@ namespace PasLibTest
                 {
                     (true, "main", "a"),
                     (true, "main", "b")
+                });
+        }
+
+        [TestMethod]
+        public void NoBlankLines()
+        {
+            Test(
+                "AdHoc.BlankLines.txt",
+                new[]
+                {
+                    (true, "blackBox", "adf"),
+                    (true, "blackBoxesSeparatedWithBlankLine", "adf"),
+                    (true, "blackBoxesSeparatedWithBlankLine", "adf  \n  \t\njhlk"),
+                    (true, "scopedBlackBoxes", "{}")
                 });
         }
         #endregion

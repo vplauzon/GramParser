@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -7,7 +8,40 @@ namespace PasLib
 {
     public class ExplorerContext
     {
+        #region Inner Types
+        private class UniqueRuleMatchEnumerable : IEnumerable<RuleMatch>
+        {
+            private readonly IEnumerable<RuleMatch> _source;
+
+            public UniqueRuleMatchEnumerable(IEnumerable<RuleMatch> source)
+            {
+                _source = source;
+            }
+
+            IEnumerator<RuleMatch> IEnumerable<RuleMatch>.GetEnumerator()
+            {
+                var lengthSet = new HashSet<int>();
+
+                foreach (var match in _source)
+                {
+                    if (!lengthSet.Contains(match.LengthWithInterleaves))
+                    {
+                        lengthSet.Add(match.LengthWithInterleaves);
+
+                        yield return match;
+                    }
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IEnumerable<RuleMatch>)this).GetEnumerator();
+            }
+        }
+        #endregion
+
         private const int DEFAULT_MAX_DEPTH = 40;
+        private static readonly RuleMatch[] EMPTY_RULE_MATCHES = new RuleMatch[0];
 
         private readonly SubString _text;
         private readonly IRule _interleaveRule;
@@ -106,23 +140,33 @@ namespace PasLib
                     _depth - 1,
                     newExcepts,
                     newAmbiantRuleProperties);
-                var ruleMatches = rule.Match(newContext);
+                var ruleMatches = rule
+                    .Match(newContext)
+                    .Select(m => newAmbiantRuleProperties.HasChildrenDetails
+                    ? m.AddInterleaveLength(interleaveLength)
+                    : m.AddInterleaveLength(interleaveLength).RemoveChildren());
+                var uniqueRuleMatches = new UniqueRuleMatchEnumerable(ruleMatches);
 
-                foreach (var m in ruleMatches)
+#if DEBUG
+                //  Useful when debugging and faster than a breakpoint condition
+                //if (rule.RuleName == "outputDeclaration")
+                //{
+                //}
+
+                //  No yield, easier to debug
+                var ruleMatchList = uniqueRuleMatches.ToArray();
+
+                return ruleMatchList;
+#else
+                foreach (var m in uniqueRuleMatches)
                 {
-                    if (newAmbiantRuleProperties.HasChildrenDetails == false)
-                    {
-                        yield return
-                            m.AddInterleaveLength(interleaveLength).RemoveChildren();
-                    }
-                    else
-                    {
-                        yield return m.AddInterleaveLength(interleaveLength);
-                    }
+                    yield return m;
                 }
+#endif
             }
             else
-            {   //  Just for breakpoints, to detect recursion breaks
+            {
+                return EMPTY_RULE_MATCHES;
             }
         }
 
@@ -145,8 +189,9 @@ namespace PasLib
         {
             if (UseInterleave())
             {
-                var interleaveMatch =
-                    _interleaveRule.Match(ForInterleave()).FirstOrDefault();
+                var interleaveMatch = _interleaveRule
+                    .Match(ForInterleave())
+                    .ArgMax(m => m.Text.Length);
 
                 return interleaveMatch == null ? 0 : interleaveMatch.Text.Length;
             }
