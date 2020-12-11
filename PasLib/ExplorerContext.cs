@@ -158,10 +158,7 @@ namespace PasLib
 
                 return ruleMatchList;
 #else
-                foreach (var m in uniqueRuleMatches)
-                {
-                    yield return m;
-                }
+                return uniqueRuleMatches;
 #endif
             }
             else
