@@ -60,7 +60,7 @@ namespace PasLib
             IImmutableList<RuleMatch> children,
             IImmutableDictionary<string, RuleMatch> namedChildren)
         {
-            throw new NotImplementedException();
+            return children.First().ComputeOutput();
         }
 
         public override string ToString()
