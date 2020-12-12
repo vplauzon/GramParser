@@ -18,11 +18,14 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
     - name: Install dependencies
-      run: dotnet restore PasLib
+      run: dotnet restore code/GramParserLib
     - name: Patch version
-      run: python3 deployment/patch-nuget-version.py PasLib/PasLib.csproj ${{ github.run_number }} ${{ github.event.inputs.alpha }}
+      run: python3 deployment/patch-nuget-version.py code/GramParserLib/GramParserLib.csproj ${{ github.run_number }} ${{ github.event.inputs.alpha }}
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build
     - name: Build Nuget
-      run: dotnet build PasLib/nuget.csproj --configuration Release --no-restore
+      run: dotnet build code/GramParserLib --configuration Release --no-restore
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-push
     - name: Publish Nuget
-      run:  nuget push PasLib/bin/Release/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.nuget }}
+      run:  nuget push code/GramParserLib/bin/Release/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.nuget }}
