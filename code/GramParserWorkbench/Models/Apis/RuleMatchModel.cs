@@ -1,10 +1,10 @@
-﻿using PasLib;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.Immutable;
+using GramParserLib;
 
-namespace PasWebApi.Models.AnonymousAnalysis
+namespace GramParserWorkbench.Models.Apis
 {
     internal class RuleMatchModel
     {

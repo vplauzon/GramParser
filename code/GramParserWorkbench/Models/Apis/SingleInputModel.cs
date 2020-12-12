@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PasWebApi.Models.AnonymousAnalysis
+namespace GramParserWorkbench.Models.Apis
 {
-    public class MultipleInputModel
+    public class SingleInputModel
     {
         public string Grammar { get; set; }
 
         public string Rule { get; set; }
 
-        public string[] Texts { get; set; }
+        public string Text { get; set; }
     }
 }

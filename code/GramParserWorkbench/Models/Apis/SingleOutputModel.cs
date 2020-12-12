@@ -1,8 +1,8 @@
-﻿using PasLib;
+﻿using GramParserLib;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PasWebApi.Models.AnonymousAnalysis
+namespace GramParserWorkbench.Models.Apis
 {
     internal class SingleOutputModel
     {
@@ -16,7 +16,7 @@ namespace PasWebApi.Models.AnonymousAnalysis
             }
         }
 
-        public string ApiVersion { get { return PasWebApi.ApiVersion.FullVersion; } }
+        public string ApiVersion { get { return AppVersion.FullVersion; } }
 
         public bool IsMatch { get; set; }
 

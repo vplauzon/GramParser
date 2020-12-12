@@ -1,0 +1,59 @@
+﻿body {
+    height: 100%;
+}
+
+header {
+    height: 3%;
+    text-align: center;
+}
+
+.doc-link {
+    float: left;
+    text-align: left;
+}
+
+.app-version {
+    float: right;
+    text-align: right;
+}
+
+.grammar {
+    float: left;
+    width: 34%;
+    height: 93%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.sample {
+    display: inline-block;
+    width: 33%;
+    height: 93%;
+}
+
+.analysis {
+    float: right;
+    width: 33%;
+    height: 93%;
+}
+
+.textBox {
+    height: 90%;
+    width: 95%;
+}
+
+.callInProgress {
+    opacity: 0.4;
+}
+
+.successAnalysis {
+    border-color: lawngreen;
+    border-width: 3px;
+    background-color: palegreen;
+}
+
+.failureAnalysis {
+    border-color: orangered;
+    border-width: 3px;
+    background-color: pink;
+}

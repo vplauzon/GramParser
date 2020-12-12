@@ -1,10 +1,10 @@
-﻿using PasLib;
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using GramParserLib;
 
-namespace PasWebApi
+namespace GramParserWorkbench
 {
     /// <summary>Caches the compute of a grammar.</summary>
     /// <remarks>

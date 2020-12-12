@@ -1,0 +1,17 @@
+﻿<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" type="text/css" href="css/mainsheet.css">
+    <script src="~/scripts/injectAppInsight.js"></script>
+    <script type="text/javascript">
+        var key = '@ViewData["InstrumentationKey"]';
+
+        injectAppInsight(key);
+    </script>
+    <script type="text/javascript">
+    </script>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

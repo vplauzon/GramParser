@@ -1,0 +1,36 @@
+﻿@page
+@model GramParserWorkbench.Pages.IndexModel
+@{
+    ViewData["Title"] = "GramParser - Workbench";
+    ViewData["InstrumentationKey"] = Model.InstrumentationKey;
+}
+<header>
+    <h1>@ViewData["Title"]</h1>
+</header>
+<div class="grammar">
+    <h2>Grammar</h2>
+    <textarea id="grammarText" class="textBox"></textarea>
+</div>
+<div class="sample">
+    <h2>Sample text</h2>
+    <textarea id="sampleText" class="textBox"></textarea>
+</div>
+<div class="analysis">
+    <h2>Analysis</h2>
+    <textarea id="analysisText" class="textBox" readonly="readonly"></textarea>
+</div>
+<footer>
+    <div class="doc-link">
+        Documentation & user guide can be
+        <a href="https://github.com/vplauzon/GramParser/tree/master/documentation">
+            found here
+        </a>.
+    </div>
+    <div class="app-version">
+        @Model.FullVersion
+    </div>
+</footer>
+<script src="~/scripts/mainPage.js"></script>
+<script type="text/javascript">
+    startScript('@Model.ParsingApiUrl');
+</script>
