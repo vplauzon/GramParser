@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GramParserLib
+namespace GramParserLib.Output
 {
     internal static class ExtractorHelper
     {

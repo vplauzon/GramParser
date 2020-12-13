@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
-namespace GramParserLib
+namespace GramParserLib.Rule
 {
     internal class TaggedRuleCollection : IEnumerable<TaggedRule>
     {

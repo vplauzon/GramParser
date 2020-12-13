@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace GramParserLib
+namespace GramParserLib.Output
 {
     internal class ObjectExtractor : IOutputExtractor
     {

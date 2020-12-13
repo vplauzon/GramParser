@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace GramParserLib
+namespace GramParserLib.Rule
 {
     internal class RuleProxy : IRule
     {
