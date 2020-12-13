@@ -16,11 +16,11 @@ jobs:
         dotnet-version: 3.1.301
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
     - name: Install dependencies
-      run: dotnet restore code/GramParser-Full.sln
+      run: dotnet restore code
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build
     - name: Build
-      run: dotnet build code/GramParser-Full.sln --configuration Release --no-restore
+      run: dotnet build code --configuration Release --no-restore
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
     - name: Test
-      run: dotnet test code/GramParser-Full.sln --no-restore --verbosity normal
+      run: dotnet test code --no-restore --verbosity normal
     
