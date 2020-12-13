@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace GramParserLib
+namespace GramParserLib.Output
 {
     internal class ArrayExtractor : IOutputExtractor
     {

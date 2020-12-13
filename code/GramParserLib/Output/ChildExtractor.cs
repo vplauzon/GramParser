@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace GramParserLib
+namespace GramParserLib.Output
 {
     internal class ChildExtractor : IOutputExtractor
     {

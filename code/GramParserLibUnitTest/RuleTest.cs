@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GramParserLib;
+using GramParserLib.Rule;
 
 namespace GramParserLibUnitTest
 {

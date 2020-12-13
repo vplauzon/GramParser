@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace GramParserLib
+namespace GramParserLib.Rule
 {
     internal class MatchNoneRule : RuleBase
     {
