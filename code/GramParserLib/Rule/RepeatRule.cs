@@ -7,7 +7,6 @@ namespace GramParserLib.Rule
 {
     internal class RepeatRule : RuleBase
     {
-        private static readonly object[] EMPTY_OUTPUT = new object[0];
         private readonly IRule _rule;
         private readonly int? _min;
         private readonly int? _max;
@@ -59,7 +58,7 @@ namespace GramParserLib.Rule
                 yield return new RuleMatch(
                     this,
                     matchText,
-                    () => RuleOutput.ComputeOutput(matchText, EMPTY_OUTPUT));
+                    () => RuleOutput.ComputeOutput(matchText, ImmutableArray<object>.Empty));
             }
         }
 

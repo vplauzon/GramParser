@@ -234,11 +234,6 @@ namespace GramParserLibUnitTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-
-                    var output = ToList(match.ComputeOutput());
-
-                    Assert.IsNotNull(output, $"Children - {i}");
-                    Assert.AreEqual(1, output.Count, $"Children Count - {i}");
                 }
             }
         }
