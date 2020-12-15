@@ -121,7 +121,7 @@ namespace GramParserLib.Rule
                 var subOutputs = from m in subMatches
                                  select m.match.ComputeOutput();
 
-                return subOutputs.ToArray();
+                return subOutputs.ToImmutableArray();
             }
         }
     }

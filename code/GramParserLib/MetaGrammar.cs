@@ -3,6 +3,7 @@ using GramParserLib.Rule;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -45,29 +46,32 @@ namespace GramParserLib
             public GrammarCreator(RuleMatch match)
             {
                 IRule interleave = null;
+                var children = ToList(match.ComputeOutput());
 
-                foreach (var ruleMatch in match.Children)
+                foreach (var ruleMatch in children)
                 {
-                    var tag = ruleMatch.NamedChildren.Keys.First();
-                    var subMatch = ruleMatch.NamedChildren.Values.First();
+                    var ruleMatchMap = ToMap(ruleMatch);
+                    var tag = ruleMatchMap.Keys.First();
+                    var subMatch = ruleMatchMap.Values.First();
 
                     if (tag == "interleaveDeclaration")
                     {
-                        var ruleBodyMatch = subMatch.NamedChildren.First().Value;
+                        var ruleBody = ToMap(ToMap(subMatch).First().Value);
 
                         interleave = CreateRule(
                             "#interleave",
                             PropertyBag.Default,
-                            ruleBodyMatch,
+                            ruleBody,
                             null);
                     }
                     else if (tag == "ruleDeclaration")
                     {
-                        var ruleID = subMatch.NamedChildren["id"].Text.ToString();
-                        var parameterAssignationList = subMatch.NamedChildren["params"];
-                        var ruleBodyOutput = subMatch.NamedChildren["rule"];
-                        var ruleBody = ruleBodyOutput.NamedChildren["body"];
-                        var output = ruleBodyOutput.NamedChildren["output"];
+                        var subMatchMap = ToMap(subMatch);
+                        var ruleID = subMatchMap["id"].ToString();
+                        var parameterAssignationList = ToList(subMatchMap["params"]);
+                        var ruleBodyOutput = ToMap(subMatchMap["rule"]);
+                        var ruleBody = ToMap(ruleBodyOutput["body"]);
+                        var output = ToMap(ruleBodyOutput["output"]);
                         var rule = CreateRule(ruleID, parameterAssignationList, ruleBody, output);
 
                         _ruleMap[ruleID] = rule;
@@ -80,6 +84,16 @@ namespace GramParserLib
 
                 ResolveProxies();
                 CreatedGrammar = new Grammar(_ruleMap, interleave);
+            }
+
+            private IImmutableList<object> ToList(object obj)
+            {
+                return (IImmutableList<object>)obj;
+            }
+
+            private IImmutableDictionary<string, object> ToMap(object obj)
+            {
+                return (IImmutableDictionary<string, object>)obj;
             }
 
             private void ResolveProxies()
@@ -106,9 +120,11 @@ namespace GramParserLib
 
             public Grammar CreatedGrammar { get; }
 
-            private TaggedRule CreateTaggedRule(RuleMatch tag, IRule rule)
+            private TaggedRule CreateTaggedRule(
+                IImmutableDictionary<string, object> tag,
+                IRule rule)
             {
-                var tagChild = tag.NamedChildren.First();
+                var tagChild = tag.First();
 
                 switch (tagChild.Key)
                 {
@@ -116,7 +132,7 @@ namespace GramParserLib
                         return new TaggedRule(rule);
                     case "noChildrenTag":
                         {
-                            var id = tagChild.Value.NamedChildren;
+                            var id = ToMap(tagChild.Value);
 
                             if (id.Count() == 0)
                             {
@@ -124,7 +140,7 @@ namespace GramParserLib
                             }
                             else
                             {
-                                var idText = id.First().Value.Text;
+                                var idText = (SubString)id.First().Value;
 
                                 return new TaggedRule(
                                     idText.Length == 0 ? null : idText.ToString(),
@@ -134,7 +150,7 @@ namespace GramParserLib
                         }
                     case "withChildrenTag":
                         {
-                            var id = tagChild.Value.NamedChildren;
+                            var id = ToMap(tagChild.Value);
 
                             if (id.Count() == 0)
                             {
@@ -142,7 +158,7 @@ namespace GramParserLib
                             }
                             else
                             {
-                                var idText = id.First().Value.Text;
+                                var idText = (SubString)id.First().Value;
 
                                 return new TaggedRule(
                                     idText.Length == 0 ? null : idText.ToString(),
@@ -156,86 +172,87 @@ namespace GramParserLib
                 }
             }
 
-            private IRule CreateRule(RuleMatch ruleBodyMatch)
+            private IRule CreateRule(IImmutableDictionary<string, object> ruleBody)
             {
-                return CreateRule(null, PropertyBag.Default, ruleBodyMatch, null);
+                return CreateRule(null, PropertyBag.Default, ruleBody, null);
             }
 
             private IRule CreateRule(
                 string ruleID,
-                RuleMatch parameterAssignationList,
-                RuleMatch ruleBodyMatch,
-                RuleMatch outputMatch)
+                IImmutableList<object> parameterAssignationList,
+                IImmutableDictionary<string, object> ruleBody,
+                IImmutableDictionary<string, object> outputMatch)
             {
                 var propertyBag = CreatePropertyBag(parameterAssignationList);
                 var outputExtractor = CreateOutputExtractor(outputMatch);
 
-                return CreateRule(ruleID, propertyBag, ruleBodyMatch, outputExtractor);
+                return CreateRule(ruleID, propertyBag, ruleBody, outputExtractor);
             }
 
             private IRule CreateRule(
                 string ruleID,
                 PropertyBag propertyBag,
-                RuleMatch ruleBodyMatch,
+                IImmutableDictionary<string, object> ruleBody,
                 IRuleOutput outputExtractor)
             {
-                var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Key;
-                var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Value;
+                var ruleBodyTag = ruleBody.First().Key;
+                var ruleBodyBody = ruleBody.First().Value;
 
                 switch (ruleBodyTag)
                 {
                     case "ruleRef":
-                        return CreateRuleReference(ruleID, ruleBodyBody, propertyBag);
+                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, propertyBag);
                     case "literal":
                         return CreateLiteral(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "any":
-                        return CreateAnyCharacter(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                        return CreateAnyCharacter(ruleID, propertyBag, outputExtractor);
                     case "range":
                         return CreateRange(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "repeat":
                         return CreateRepeat(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "disjunction":
                         return CreateDisjunction(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "sequence":
                         return CreateSequence(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "substract":
                         return CreateSubstract(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     case "bracket":
                         return CreateBracket(
-                            ruleID, ruleBodyBody, propertyBag, outputExtractor);
+                            ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
                     default:
                         throw new NotSupportedException(ruleBodyTag);
                 }
             }
 
-            private PropertyBag CreatePropertyBag(RuleMatch parameterAssignationList)
+            private PropertyBag CreatePropertyBag(IImmutableList<object> parameterAssignationList)
             {
                 if (parameterAssignationList == null
-                    || parameterAssignationList.Children.Count == 0)
+                    || parameterAssignationList.Count == 0)
                 {
                     return PropertyBag.Default;
                 }
                 else
                 {
-                    var list = parameterAssignationList.Children.First();
-                    var head = list.NamedChildren["head"];
-                    var tail = list.NamedChildren["tail"];
-                    var tailParamAssignations = from t in tail.Children
-                                                select t.NamedChildren.First().Value;
+                    var list = ToMap(parameterAssignationList.First());
+                    var head = list["head"];
+                    var tail = ToList(list["tail"]);
+                    var tailParamAssignations = from t in tail
+                                                let tMap = ToMap(t)
+                                                select tMap.First().Value;
                     var paramAssignations = tailParamAssignations.Append(head);
                     var bag = new PropertyBag();
 
                     foreach (var assignation in paramAssignations)
                     {
-                        var id = assignation.NamedChildren["id"].Text.ToString();
-                        var value = assignation.NamedChildren["value"].Text.ToString();
+                        var assignationMap = ToMap(assignation);
+                        var id = assignationMap["id"].ToString();
+                        var value = assignationMap["value"].ToString();
 
                         switch (id)
                         {
@@ -258,49 +275,50 @@ namespace GramParserLib
                 }
             }
 
-            private IRuleOutput CreateOutputExtractor(RuleMatch outputMatch)
+            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputMap)
             {
-                if (outputMatch.Children.Count == 0)
+                if (outputMap.Count == 0)
                 {
                     return null;
                 }
                 else
                 {
-                    var outputBody = outputMatch.Children.First().NamedChildren.First().Value;
+                    var outputBody = ToMap(ToMap(outputMap.First()).First().Value);
 
                     return CreateOutputExtractorFromBody(outputBody);
                 }
             }
 
-            private IRuleOutput CreateOutputExtractorFromBody(RuleMatch outputBody)
+            private IRuleOutput CreateOutputExtractorFromBody(IImmutableDictionary<string, object> outputBody)
             {
-                var item = outputBody.NamedChildren.First();
+                var item = outputBody.First();
                 var tagName = item.Key;
                 var tagValue = item.Value;
 
                 switch (tagName)
                 {
                     case "id":
-                        return CreateOutputExtractorFromId(tagValue.Text);
+                        return CreateOutputExtractorFromId((SubString)tagValue);
                     case "literal":
-                        return CreateOutputExtractorFromLiteral(tagValue);
+                        return CreateOutputExtractorFromLiteral(ToMap(tagValue));
                     case "number":
-                        return CreateOutputExtractorFromNumber(tagValue.Text);
+                        return CreateOutputExtractorFromNumber(tagValue.ToString());
                     case "array":
-                        return CreateOutputExtractorFromArray(tagValue);
+                        return CreateOutputExtractorFromArray(ToMap(tagValue));
                     case "object":
-                        return CreateOutputExtractorFromObject(tagValue);
+                        return CreateOutputExtractorFromObject(ToMap(tagValue));
                     case "function":
-                        return CreateOutputExtractorFromFunction(tagValue);
+                        return CreateOutputExtractorFromFunction(ToMap(tagValue));
                     default:
                         throw new NotSupportedException($"Tag '{tagName}' not supported for output body");
                 }
             }
 
-            private IRuleOutput CreateOutputExtractorFromFunction(RuleMatch functionMatch)
+            private IRuleOutput CreateOutputExtractorFromFunction(
+                IImmutableDictionary<string, object> functionMap)
             {
-                var functionName = functionMatch.NamedChildren["id"].Text;
-                var listChildren = functionMatch.NamedChildren["list"].Children;
+                var functionName = functionMap["id"];
+                var listChildren = ToList(functionMap["list"]);
 
                 if (listChildren.Count == 0)
                 {
@@ -310,17 +328,18 @@ namespace GramParserLib
                 }
                 else
                 {
-                    var outputBodies = ExtractOutputBodiesFromArray(listChildren.First());
+                    var outputBodies = ExtractOutputBodiesFromArray(ToMap(listChildren.First()));
                     var extractors = from outputBody in outputBodies
-                                     select CreateOutputExtractorFromBody(outputBody);
+                                     select CreateOutputExtractorFromBody(ToMap(outputBody));
 
                     return new FunctionOutput(functionName.ToString(), extractors);
                 }
             }
 
-            private IRuleOutput CreateOutputExtractorFromObject(RuleMatch objectMatch)
+            private IRuleOutput CreateOutputExtractorFromObject(
+                IImmutableDictionary<string, object> objectMatch)
             {
-                var listChildren = objectMatch.NamedChildren["list"].Children;
+                var listChildren = ToList(objectMatch["list"]);
 
                 if (listChildren.Count == 0)
                 {
@@ -328,23 +347,25 @@ namespace GramParserLib
                 }
                 else
                 {
-                    var pairs = ExtractPairsFromPairList(listChildren.First());
+                    var pairs = ExtractPairsFromPairList(ToMap(listChildren.First()));
 
                     return new ObjectOutput(pairs);
                 }
             }
 
             private IEnumerable<KeyValuePair<IRuleOutput, IRuleOutput>>
-                ExtractPairsFromPairList(RuleMatch list)
+                ExtractPairsFromPairList(IImmutableDictionary<string, object> listMap)
             {
-                var head = list.NamedChildren["head"];
-                var tail = list.NamedChildren["tail"];
-                var tailElements = from e in tail.Children
-                                   select e.NamedChildren.First().Value;
+                var head = listMap["head"];
+                var tail = ToList(listMap["tail"]);
+                var tailElements = from e in tail
+                                   let eMap = ToMap(e)
+                                   select eMap.First().Value;
                 var matchPairs = tailElements.Prepend(head);
                 var extractorPairs = from p in matchPairs
-                                     let keyMatch = p.NamedChildren["key"]
-                                     let valueMatch = p.NamedChildren["value"]
+                                     let pMap = ToMap(p)
+                                     let keyMatch = ToMap(pMap["key"])
+                                     let valueMatch = ToMap(pMap["value"])
                                      let key = CreateOutputExtractorFromBody(keyMatch)
                                      let value = CreateOutputExtractorFromBody(valueMatch)
                                      select KeyValuePair.Create(key, value);
@@ -352,9 +373,9 @@ namespace GramParserLib
                 return extractorPairs;
             }
 
-            private IRuleOutput CreateOutputExtractorFromArray(RuleMatch arrayMatch)
+            private IRuleOutput CreateOutputExtractorFromArray(IImmutableDictionary<string, object> arrayMap)
             {
-                var listChildren = arrayMatch.NamedChildren["list"].Children;
+                var listChildren = ToList(arrayMap["list"]);
 
                 if (listChildren.Count == 0)
                 {
@@ -362,45 +383,45 @@ namespace GramParserLib
                 }
                 else
                 {
-                    var outputBodies = ExtractOutputBodiesFromArray(listChildren.First());
+                    var outputBodies = ExtractOutputBodiesFromArray(ToMap(listChildren.First()));
                     var extractors = from outputBody in outputBodies
-                                     select CreateOutputExtractorFromBody(outputBody);
+                                     let outputBodyMap = ToMap(outputBody)
+                                     select CreateOutputExtractorFromBody(outputBodyMap);
 
                     return new ArrayOutput(extractors);
                 }
             }
 
-            private IEnumerable<RuleMatch> ExtractOutputBodiesFromArray(RuleMatch list)
+            private IEnumerable<object> ExtractOutputBodiesFromArray(IImmutableDictionary<string, object> listMap)
             {
-                var head = list.NamedChildren["head"];
-                var tail = list.NamedChildren["tail"];
-                var tailElements = from e in tail.Children
-                                   select e.NamedChildren.First().Value;
+                var head = listMap["head"];
+                var tail = ToMap(listMap["tail"]);
+                var tailElements = from e in tail
+                                   let eMap = ToMap(e)
+                                   select eMap.First().Value;
 
                 return Enumerable.Prepend(tailElements, head);
             }
 
-            private IRuleOutput CreateOutputExtractorFromNumber(SubString text)
+            private IRuleOutput CreateOutputExtractorFromNumber(string text)
             {
-                var numberText = text.ToString();
-
-                if (!numberText.Contains('.'))
+                if (!text.Contains('.'))
                 {
-                    var value = int.Parse(numberText);
+                    var value = int.Parse(text);
 
                     return new ConstantOutput(value);
                 }
                 else
                 {
-                    var value = double.Parse(numberText);
+                    var value = double.Parse(text);
 
                     return new ConstantOutput(value);
                 }
             }
 
-            private IRuleOutput CreateOutputExtractorFromLiteral(RuleMatch literal)
+            private IRuleOutput CreateOutputExtractorFromLiteral(IImmutableDictionary<string, object> literal)
             {
-                var text = literal.NamedChildren.First().Value.Text;
+                var text = (SubString)literal.First().Value;
 
                 return new ConstantOutput(text);
             }
@@ -479,7 +500,7 @@ namespace GramParserLib
 
             private IRule CreateRuleReference(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                SubString ruleName,
                 PropertyBag propertyBag)
             {
                 if (!propertyBag.IsDefault)
@@ -487,7 +508,7 @@ namespace GramParserLib
                     throw new ParsingException("Rule reference can't have parameters");
                 }
 
-                var identifier = ruleBodyBody.Text.ToString();
+                var identifier = ruleName.ToString();
 
                 //  If the referenced rule has already been parsed we insert it
                 //  Otherwise, we put a proxy
@@ -517,37 +538,43 @@ namespace GramParserLib
 
             private IRule CreateLiteral(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBodyMap,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
             {
-                var literal = ruleBodyBody.NamedChildren.First().Value;
-                var characters = from l in literal.Children
-                                 let c = GetCharacter(l)
+                if (ruleBodyBodyMap is null)
+                {
+                    throw new ArgumentNullException(nameof(ruleBodyBodyMap));
+                }
+
+                var literal = ToMap(ruleBodyBodyMap.First().Value);
+                var characters = from l in literal
+                                 let lMap = ToMap(l)
+                                 let c = GetCharacter(lMap)
                                  select c;
                 var rule = new LiteralRule(ruleID, outputExtractor, characters);
 
                 return rule;
             }
 
-            private char GetCharacter(RuleMatch character)
+            private char GetCharacter(IImmutableDictionary<string, object> character)
             {
-                var charFragment = character.NamedChildren.First();
+                var charFragment = character.First();
                 var subMatch = charFragment.Value;
 
                 switch (charFragment.Key)
                 {
                     case "normal":
-                        return subMatch.Text.First();
+                        return ((SubString)subMatch).First();
                     case "escapeLetter":
-                        return GetEscapeLetter(subMatch.NamedChildren.First().Value.Text.First());
+                        return GetEscapeLetter(((SubString)ToMap(subMatch).First().Value).First());
                     case "escapeQuote":
                         return '\"';
                     case "escapeBackslash":
                         return '\\';
                     case "escapeHexa":
                         return (char)int.Parse(
-                            subMatch.NamedChildren.First().Value.Text.ToString(),
+                            ToMap(subMatch).First().Value.ToString(),
                             NumberStyles.HexNumber);
                     default:
                         throw new NotSupportedException(
@@ -575,7 +602,6 @@ namespace GramParserLib
 
             private IRule CreateAnyCharacter(
                 string ruleID,
-                RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
             {
@@ -584,14 +610,12 @@ namespace GramParserLib
 
             private IRule CreateRange(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
             {
-                var lower =
-                            ruleBodyBody.NamedChildren["lower"].NamedChildren.First().Value;
-                var upper =
-                    ruleBodyBody.NamedChildren["upper"].NamedChildren.First().Value;
+                var lower = ToMap(ToMap(ruleBodyBody["lower"]).First().Value);
+                var upper = ToMap(ToMap(ruleBodyBody["upper"]).First().Value);
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
@@ -600,15 +624,15 @@ namespace GramParserLib
 
             private IRule CreateRepeat(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
             {
-                var subRuleBody = ruleBodyBody.NamedChildren["rule"];
+                var subRuleBody = ToMap(ruleBodyBody["rule"]);
+                var cardinality = ToMap(ruleBodyBody["cardinality"]);
                 var rule = CreateRule(subRuleBody);
-                var cardinality = ruleBodyBody.NamedChildren["cardinality"];
 
-                switch (cardinality.NamedChildren.First().Key)
+                switch (cardinality.First().Key)
                 {
                     case "star":
                         return new RepeatRule(
@@ -642,8 +666,8 @@ namespace GramParserLib
                             bag.HasChildrenDetails);
                     case "exact":
                         {
-                            var exact = cardinality.NamedChildren.First().Value;
-                            var n = int.Parse(exact.NamedChildren.First().Value.Text.ToString());
+                            var exact = ToMap(cardinality.First().Value);
+                            var n = int.Parse(exact.First().Value.ToString());
 
                             return new RepeatRule(
                                 ruleID,
@@ -657,8 +681,8 @@ namespace GramParserLib
                         }
                     case "minMax":
                         {
-                            var minMaxCardinality = cardinality.NamedChildren.First().Value;
-                            (var min, var max) = GetMinMaxCardinality(minMaxCardinality);
+                            var minMaxCardinality = cardinality.First().Value;
+                            (var min, var max) = GetMinMaxCardinality(ToMap(minMaxCardinality));
 
                             return new RepeatRule(
                                 ruleID,
@@ -675,33 +699,34 @@ namespace GramParserLib
                 }
             }
 
-            private (int? min, int? max) GetMinMaxCardinality(RuleMatch minMaxCardinality)
+            private (int? min, int? max) GetMinMaxCardinality(
+                IImmutableDictionary<string, object> minMaxCardinality)
             {
-                var type = minMaxCardinality.NamedChildren.First().Key;
-                var cardinality = minMaxCardinality.NamedChildren.First().Value;
+                var type = minMaxCardinality.First().Key;
+                var cardinality = ToMap(minMaxCardinality.First().Value);
 
                 switch (type)
                 {
                     case "minmax":
                         {
-                            var minText = cardinality.NamedChildren["min"].Text;
-                            var maxText = cardinality.NamedChildren["max"].Text;
-                            var min = int.Parse(minText.ToString());
-                            var max = int.Parse(maxText.ToString());
+                            var minText = cardinality["min"].ToString();
+                            var maxText = cardinality["max"].ToString();
+                            var min = int.Parse(minText);
+                            var max = int.Parse(maxText);
 
                             return (min, max);
                         }
                     case "min":
                         {
-                            var minText = cardinality.NamedChildren["min"].Text;
-                            var min = int.Parse(minText.ToString());
+                            var minText = cardinality["min"].ToString();
+                            var min = int.Parse(minText);
 
                             return (min, null);
                         }
                     case "max":
                         {
-                            var maxText = cardinality.NamedChildren["max"].Text;
-                            var max = int.Parse(maxText.ToString());
+                            var maxText = cardinality["max"].ToString();
+                            var max = int.Parse(maxText);
 
                             return (null, max);
                         }
@@ -712,19 +737,21 @@ namespace GramParserLib
 
             private IRule CreateDisjunction(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
             {
-                var headTag = ruleBodyBody.NamedChildren["t"];
-                var head = ruleBodyBody.NamedChildren["head"];
-                var tail = ruleBodyBody.NamedChildren["tail"];
+                var headTag = ToMap(ruleBodyBody["t"]);
+                var head = ToMap(ruleBodyBody["head"]);
+                var tail = ToMap(ruleBodyBody["tail"]);
                 var headRule = CreateTaggedRule(headTag, CreateRule(head));
-                var tailRules = from c in tail.Children
-                                let tailTag = c.NamedChildren["t"]
-                                let tailDisjunctable = c.NamedChildren["d"]
+                var tailRules = from c in tail
+                                let cMap = ToMap(c)
+                                let tailTag = ToMap(cMap["t"])
+                                let tailDisjunctable = ToMap(cMap["d"])
                                 select CreateTaggedRule(
-                                    tailTag, CreateRule(tailDisjunctable));
+                                    tailTag,
+                                    CreateRule(tailDisjunctable));
                 var rules = new[] { headRule }.Concat(tailRules);
 
                 return new DisjunctionRule(
@@ -738,18 +765,19 @@ namespace GramParserLib
 
             private IRule CreateSequence(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
             {
-                var head = ruleBodyBody.NamedChildren["head"];
-                var tail = ruleBodyBody.NamedChildren["tail"];
-                var keys = tail.NamedChildren.Keys.ToArray();
-                var tailInner = from s in tail.Children
-                                select s.NamedChildren["s"];
+                var head = ruleBodyBody["head"];
+                var tail = ToList(ruleBodyBody["tail"]);
+                var tailInner = from s in tail
+                                let sMap = ToMap(s)
+                                select sMap["s"];
                 var rules = from tagRule in tailInner.Prepend(head)
-                            let t = tagRule.NamedChildren["t"]
-                            let r = tagRule.NamedChildren["r"]
+                            let tagRuleMap = ToMap(tagRule)
+                            let t = ToMap(tagRuleMap["t"])
+                            let r = ToMap(tagRuleMap["r"])
                             let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
@@ -764,12 +792,12 @@ namespace GramParserLib
 
             private IRule CreateSubstract(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
             {
-                var primary = ruleBodyBody.NamedChildren["primary"];
-                var excluded = ruleBodyBody.NamedChildren["excluded"];
+                var primary = ToMap(ruleBodyBody["primary"]);
+                var excluded = ToMap(ruleBodyBody["excluded"]);
                 var primaryRule = CreateRule(primary);
                 var excludedRule = CreateRule(excluded);
 
@@ -785,13 +813,13 @@ namespace GramParserLib
 
             private IRule CreateBracket(
                 string ruleID,
-                RuleMatch ruleBodyBody,
+                IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
             {
-                var ruleBodyOutput = ruleBodyBody.NamedChildren.First().Value;
-                var ruleBody = ruleBodyOutput.NamedChildren["body"];
-                var output = ruleBodyOutput.NamedChildren["output"];
+                var ruleBodyOutput = ToMap(ruleBodyBody.First().Value);
+                var ruleBody = ToMap(ruleBodyOutput["body"]);
+                var output = ToMap(ruleBodyOutput["output"]);
                 var innerOutputExtractor = CreateOutputExtractor(output);
                 var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractor);
 

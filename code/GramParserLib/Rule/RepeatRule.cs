@@ -126,7 +126,7 @@ namespace GramParserLib.Rule
         {
             var childrenOutputs = newChildrenMatches
                 .Select(m => m.ComputeOutput())
-                .ToArray();
+                .ToImmutableArray();
 
             return RuleOutput.ComputeOutput(matchText, childrenOutputs);
         }

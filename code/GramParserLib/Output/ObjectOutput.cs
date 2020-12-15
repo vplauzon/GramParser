@@ -38,7 +38,9 @@ namespace GramParserLib.Output
             {
                 var newObjectPairs = from p in outputPairs
                                      select KeyValuePair.Create(p.Key.ToString(), p.Value);
-                var dictionary = ImmutableDictionary<string, object>.Empty.AddRange(newObjectPairs);
+                var dictionary = ImmutableDictionary<string, object>
+                    .Empty
+                    .AddRange(newObjectPairs);
 
                 return dictionary;
             }

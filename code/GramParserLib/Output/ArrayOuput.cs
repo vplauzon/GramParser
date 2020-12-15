@@ -18,7 +18,7 @@ namespace GramParserLib.Output
         {
             var outputs = _outputs
                 .Select(o => o.ComputeOutput(text, defaultOutput))
-                .ToArray();
+                .ToImmutableArray();
 
             return outputs;
         }

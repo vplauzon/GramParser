@@ -60,12 +60,11 @@ namespace GramParserLib.Rule
             }
         }
 
-        private static IDictionary<string, object> MakeMap(string tag, object output)
+        private static IImmutableDictionary<string, object> MakeMap(string tag, object output)
         {
-            var dictionary = new Dictionary<string, object>(new[]
-            {
-                KeyValuePair.Create(tag, output)
-            });
+            var dictionary = ImmutableDictionary<string, object>
+                .Empty
+                .Add(tag, output);
 
             return dictionary;
         }
