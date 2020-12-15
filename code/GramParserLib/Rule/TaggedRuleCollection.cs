@@ -20,15 +20,8 @@ namespace GramParserLib.Rule
 
             _rules = ImmutableArray<TaggedRule>.Empty.AddRange(rules);
 
-            var withNames = from r in _rules
-                            where r.HasTag
-                            select r;
-            var withoutNames = from r in _rules
-                               where !r.HasTag
-                               select r;
-
             DoAllHaveNames = _rules.All(r => r.HasTag);
-            DoAllNotHaveNames = withoutNames.All(r => !r.HasTag);
+            DoAllNotHaveNames = _rules.All(r => !r.HasTag);
         }
 
         public bool DoAllHaveNames { get; }
