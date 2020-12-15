@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GramParserLib;
 using GramParserLib.Rule;
+using System.Collections.Immutable;
 
 namespace GramParserLibUnitTest
 {
@@ -121,7 +122,7 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(0, match.Text.Length, "MatchLength");
-            Assert.AreEqual(0, match.Children.Count(), "Contents");
+            Assert.AreEqual(0, ToList(match.ComputeOutput()).Count(), "Contents");
         }
 
         [TestMethod]
@@ -134,7 +135,7 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(5, match.Text.Length, "MatchLength");
-            Assert.AreEqual(5, match.Children.Count(), "Contents");
+            Assert.AreEqual(5, ToList(match.ComputeOutput()).Count(), "Contents");
         }
 
         [TestMethod]
@@ -173,7 +174,7 @@ namespace GramParserLibUnitTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.AreEqual(text.Length, match.Children.Count(), $"Contents - {i}");
+                    Assert.AreEqual(text.Length, ToList(match.ComputeOutput()).Count(), $"Contents - {i}");
                 }
             }
         }
@@ -194,7 +195,7 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
             Assert.AreEqual(text.Length - 1, match.Text.Length, "MatchLength");
-            Assert.AreEqual(3, match.Children.Count(), "Contents");
+            Assert.AreEqual(3, ToList(match.ComputeOutput()).Count(), "Contents");
         }
         #endregion
 
@@ -233,9 +234,11 @@ namespace GramParserLibUnitTest
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
-                    Assert.AreEqual(0, match.NamedChildren.Count, $"NamedChildren - {i}");
-                    Assert.IsNotNull(match.Children, $"Children - {i}");
-                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
+
+                    var output = ToList(match.ComputeOutput());
+
+                    Assert.IsNotNull(output, $"Children - {i}");
+                    Assert.AreEqual(1, output.Count, $"Children Count - {i}");
                 }
             }
         }
@@ -285,20 +288,22 @@ namespace GramParserLibUnitTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.NamedChildren, $"Fragments - {i}");
-                    Assert.AreEqual(1, match.NamedChildren.Count, $"Fragments Count - {i}");
-                    if (match.NamedChildren.First().Key == "s1")
+
+                    var output = ToMap(match.ComputeOutput());
+
+                    Assert.AreEqual(1, output.Count, $"Fragments Count - {i}");
+                    if (output.First().Key == "s1")
                     {
                         Assert.AreNotEqual(
                             0,
-                            match.NamedChildren["s1"].NamedChildren.Count,
+                            ToMap(output["s1"]).Count,
                             $"Sub Fragments 1 - {i}");
                     }
-                    if (match.NamedChildren.First().Key == "s2")
+                    if (output.First().Key == "s2")
                     {
                         Assert.AreEqual(
                             0,
-                            match.NamedChildren["s2"].NamedChildren.Count,
+                            ToMap(output["s2"]).Count,
                             $"Sub Fragments 2 - {i}");
                     }
                 }
@@ -345,7 +350,6 @@ namespace GramParserLibUnitTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.IsNotNull(match.Children, $"Contents - {i}");
                 }
             }
         }
@@ -368,7 +372,7 @@ namespace GramParserLibUnitTest
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(text.ToString().TrimStart(), match.Text.ToString(), "Content");
-            Assert.AreEqual(0, match.NamedChildren.Count, "Fragments");
+            Assert.AreEqual(3, ToList(match.ComputeOutput()).Count, "Fragments");
         }
 
         [TestMethod]
@@ -386,9 +390,12 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
-            Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
-            Assert.AreEqual("Hi", match.NamedChildren["h"].Text.ToString(), "Fragments - Hi");
-            Assert.AreEqual("Bob", match.NamedChildren["b"].Text.ToString(), "Fragments - Bob");
+
+            var output = ToMap(match.ComputeOutput());
+
+            Assert.AreEqual(2, output.Count(), "Fragments");
+            Assert.AreEqual("Hi", output["h"].ToString(), "Fragments - Hi");
+            Assert.AreEqual("Bob", output["b"].ToString(), "Fragments - Bob");
         }
 
         [TestMethod]
@@ -405,15 +412,14 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
-            Assert.AreEqual(2, match.NamedChildren.Count(), "Fragments");
+
+            var output = ToMap(match.ComputeOutput());
+
+            Assert.AreEqual(2, output.Count(), "Fragments");
             Assert.AreEqual(
-                "aaaa", match.NamedChildren["a"].Text.ToString(), "Fragments text - a");
-            Assert.IsNotNull(match.NamedChildren["a"].Children, "Fragments - Repeats - a");
+                "aaaa", output["a"].ToString(), "Fragments text - a");
             Assert.AreEqual(
-                4, match.NamedChildren["a"].Children.Count(), "Fragments - Counts - a");
-            Assert.AreEqual(
-                "bb", match.NamedChildren["b"].Text.ToString(), "Fragments text - b");
-            Assert.IsNotNull(match.NamedChildren["b"].Children, "Fragments - Repeats - b");
+                "bb", output["b"].ToString(), "Fragments text - b");
         }
         #endregion
 
@@ -489,9 +495,10 @@ namespace GramParserLibUnitTest
                     Assert.IsNotNull(match, $"Success - {i}");
                     Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
-                    Assert.AreEqual(0, match.NamedChildren.Count, $"NamedChildren - {i}");
-                    Assert.IsNotNull(match.Children, $"Children - {i}");
-                    Assert.AreEqual(1, match.Children.Count, $"Children Count - {i}");
+
+                    var output = ToList(match.ComputeOutput());
+
+                    Assert.AreEqual(1, output.Count, $"Children Count - {i}");
                 }
             }
         }
@@ -525,5 +532,15 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(match, "Should be a success");
         }
         #endregion
+
+        private IImmutableList<object> ToList(object output)
+        {
+            return (IImmutableList<object>)output;
+        }
+
+        private IImmutableDictionary<string, object> ToMap(object output)
+        {
+            return (IImmutableDictionary<string, object>)output;
+        }
     }
 }

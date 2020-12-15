@@ -4,6 +4,7 @@ using GramParserLib;
 using System.Linq;
 using System.Reflection;
 using System.IO;
+using System.Collections.Immutable;
 
 namespace GramParserLibUnitTest
 {
@@ -358,9 +359,11 @@ namespace GramParserLibUnitTest
                 var match = grammar.Match(rule, text);
 
                 Assert.IsNotNull(match, "Match - " + rule);
-                Assert.IsFalse(match.NamedChildren.Any(), "NamedChildren - " + rule);
-                Assert.IsNotNull(match.Children, "Children - " + rule);
-                Assert.AreEqual(expectedChildren, match.Children.Count(), "#Children - " + rule);
+
+                var output = match.ComputeOutput() as IImmutableList<object>;
+
+                Assert.IsNotNull(output, "Output null - " + rule);
+                Assert.AreEqual(expectedChildren, output.Count(), "#Children - " + rule);
             }
 
             {
@@ -368,9 +371,11 @@ namespace GramParserLibUnitTest
                 var match = grammar.Match("without", text);
 
                 Assert.IsNotNull(match, "Match - " + rule);
-                Assert.IsFalse(match.NamedChildren.Any(), "NamedChildren - " + rule);
-                Assert.IsNotNull(match.Children, "Children - " + rule);
-                Assert.AreEqual(0, match.Children.Count(), "#Children - " + rule);
+
+                var output = match.ComputeOutput() as IImmutableList<object>;
+
+                Assert.IsNotNull(output, "Output null - " + rule);
+                Assert.AreEqual(0, output.Count(), "#Children - " + rule);
             }
         }
         #endregion
