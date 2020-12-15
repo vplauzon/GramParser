@@ -45,16 +45,16 @@ namespace GramParserLib.Rule
                         yield return new RuleMatch(
                             this,
                             m.Text,
-                            () => RuleOutput.ComputeOutput(m.Text, m.ComputeOutput()));
+                            () => RuleOutput.ComputeOutput(
+                                m.Text,
+                                MakeMap(rule.Tag, m.ComputeOutput())));
                     }
                     else
                     {
                         yield return new RuleMatch(
                             this,
                             m.Text,
-                            () => RuleOutput.ComputeOutput(
-                                m.Text,
-                                MakeMap(rule.Tag, m.ComputeOutput())));
+                            () => RuleOutput.ComputeOutput(m.Text, m.ComputeOutput()));
                     }
                 }
             }

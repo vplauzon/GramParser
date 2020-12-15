@@ -302,7 +302,7 @@ namespace GramParserLibUnitTest
                     if (output.First().Key == "s2")
                     {
                         Assert.AreEqual(
-                            0,
+                            1,
                             ToMap(output["s2"]).Count,
                             $"Sub Fragments 2 - {i}");
                     }
