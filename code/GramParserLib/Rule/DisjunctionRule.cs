@@ -28,7 +28,7 @@ namespace GramParserLib.Rule
             }
 
             _rules = new TaggedRuleCollection(rules);
-            if (!_rules.DoAllHaveNames && _rules.DoAllNotHaveNames)
+            if (!_rules.DoAllHaveNames && !_rules.DoAllNotHaveNames)
             {
                 throw new ParsingException(
                     "Can't have both named & unnamed rule match in one rule");
