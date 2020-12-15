@@ -177,7 +177,7 @@ namespace GramParserLib
                 string ruleID,
                 PropertyBag propertyBag,
                 RuleMatch ruleBodyMatch,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var ruleBodyTag = ruleBodyMatch.NamedChildren.First().Key;
                 var ruleBodyBody = ruleBodyMatch.NamedChildren.First().Value;
@@ -258,7 +258,7 @@ namespace GramParserLib
                 }
             }
 
-            private IOutputExtractor CreateOutputExtractor(RuleMatch outputMatch)
+            private IRuleOutput CreateOutputExtractor(RuleMatch outputMatch)
             {
                 if (outputMatch.Children.Count == 0)
                 {
@@ -272,7 +272,7 @@ namespace GramParserLib
                 }
             }
 
-            private IOutputExtractor CreateOutputExtractorFromBody(RuleMatch outputBody)
+            private IRuleOutput CreateOutputExtractorFromBody(RuleMatch outputBody)
             {
                 var item = outputBody.NamedChildren.First();
                 var tagName = item.Key;
@@ -297,16 +297,16 @@ namespace GramParserLib
                 }
             }
 
-            private IOutputExtractor CreateOutputExtractorFromFunction(RuleMatch functionMatch)
+            private IRuleOutput CreateOutputExtractorFromFunction(RuleMatch functionMatch)
             {
                 var functionName = functionMatch.NamedChildren["id"].Text;
                 var listChildren = functionMatch.NamedChildren["list"].Children;
 
                 if (listChildren.Count == 0)
                 {
-                    return new FunctionExtractor(
+                    return new FunctionOutput(
                         functionName.ToString(),
-                        ImmutableArray<IOutputExtractor>.Empty);
+                        ImmutableArray<IRuleOutput>.Empty);
                 }
                 else
                 {
@@ -314,27 +314,27 @@ namespace GramParserLib
                     var extractors = from outputBody in outputBodies
                                      select CreateOutputExtractorFromBody(outputBody);
 
-                    return new FunctionExtractor(functionName.ToString(), extractors);
+                    return new FunctionOutput(functionName.ToString(), extractors);
                 }
             }
 
-            private IOutputExtractor CreateOutputExtractorFromObject(RuleMatch objectMatch)
+            private IRuleOutput CreateOutputExtractorFromObject(RuleMatch objectMatch)
             {
                 var listChildren = objectMatch.NamedChildren["list"].Children;
 
                 if (listChildren.Count == 0)
                 {
-                    return new ConstantExtrator(new object());
+                    return new ConstantOutput(new object());
                 }
                 else
                 {
                     var pairs = ExtractPairsFromPairList(listChildren.First());
 
-                    return new ObjectExtractor(pairs);
+                    return new ObjectOutput(pairs);
                 }
             }
 
-            private IEnumerable<KeyValuePair<IOutputExtractor, IOutputExtractor>>
+            private IEnumerable<KeyValuePair<IRuleOutput, IRuleOutput>>
                 ExtractPairsFromPairList(RuleMatch list)
             {
                 var head = list.NamedChildren["head"];
@@ -352,13 +352,13 @@ namespace GramParserLib
                 return extractorPairs;
             }
 
-            private IOutputExtractor CreateOutputExtractorFromArray(RuleMatch arrayMatch)
+            private IRuleOutput CreateOutputExtractorFromArray(RuleMatch arrayMatch)
             {
                 var listChildren = arrayMatch.NamedChildren["list"].Children;
 
                 if (listChildren.Count == 0)
                 {
-                    return new ConstantExtrator(new object[0]);
+                    return new ConstantOutput(new object[0]);
                 }
                 else
                 {
@@ -366,7 +366,7 @@ namespace GramParserLib
                     var extractors = from outputBody in outputBodies
                                      select CreateOutputExtractorFromBody(outputBody);
 
-                    return new ArrayExtractor(extractors);
+                    return new ArrayOutput(extractors);
                 }
             }
 
@@ -380,7 +380,7 @@ namespace GramParserLib
                 return Enumerable.Prepend(tailElements, head);
             }
 
-            private IOutputExtractor CreateOutputExtractorFromNumber(SubString text)
+            private IRuleOutput CreateOutputExtractorFromNumber(SubString text)
             {
                 var numberText = text.ToString();
 
@@ -388,44 +388,44 @@ namespace GramParserLib
                 {
                     var value = int.Parse(numberText);
 
-                    return new ConstantExtrator(value);
+                    return new ConstantOutput(value);
                 }
                 else
                 {
                     var value = double.Parse(numberText);
 
-                    return new ConstantExtrator(value);
+                    return new ConstantOutput(value);
                 }
             }
 
-            private IOutputExtractor CreateOutputExtractorFromLiteral(RuleMatch literal)
+            private IRuleOutput CreateOutputExtractorFromLiteral(RuleMatch literal)
             {
                 var text = literal.NamedChildren.First().Value.Text;
 
-                return new ConstantExtrator(text);
+                return new ConstantOutput(text);
             }
 
-            private IOutputExtractor CreateOutputExtractorFromId(SubString id)
+            private IRuleOutput CreateOutputExtractorFromId(SubString id)
             {
                 if (id.Equals("text"))
                 {
-                    return new TextExtractor();
+                    return new TextOutput();
                 }
                 else if (id.Equals("true"))
                 {
-                    return new ConstantExtrator(true);
+                    return new ConstantOutput(true);
                 }
                 else if (id.Equals("false"))
                 {
-                    return new ConstantExtrator(false);
+                    return new ConstantOutput(false);
                 }
                 else if (id.Equals("null"))
                 {
-                    return new ConstantExtrator(null);
+                    return new ConstantOutput(null);
                 }
                 else
                 {
-                    return new ChildExtractor(id.ToString());
+                    return new ChildOutput(id.ToString());
                 }
             }
 
@@ -519,7 +519,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var literal = ruleBodyBody.NamedChildren.First().Value;
                 var characters = from l in literal.Children
@@ -577,7 +577,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 return new MatchAnyCharacterRule(ruleID, outputExtractor);
             }
@@ -586,7 +586,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag propertyBag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var lower =
                             ruleBodyBody.NamedChildren["lower"].NamedChildren.First().Value;
@@ -602,7 +602,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var subRuleBody = ruleBodyBody.NamedChildren["rule"];
                 var rule = CreateRule(subRuleBody);
@@ -714,7 +714,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var headTag = ruleBodyBody.NamedChildren["t"];
                 var head = ruleBodyBody.NamedChildren["head"];
@@ -740,7 +740,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var head = ruleBodyBody.NamedChildren["head"];
                 var tail = ruleBodyBody.NamedChildren["tail"];
@@ -766,7 +766,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var primary = ruleBodyBody.NamedChildren["primary"];
                 var excluded = ruleBodyBody.NamedChildren["excluded"];
@@ -787,7 +787,7 @@ namespace GramParserLib
                 string ruleID,
                 RuleMatch ruleBodyBody,
                 PropertyBag bag,
-                IOutputExtractor outputExtractor)
+                IRuleOutput outputExtractor)
             {
                 var ruleBodyOutput = ruleBodyBody.NamedChildren.First().Value;
                 var ruleBody = ruleBodyOutput.NamedChildren["body"];

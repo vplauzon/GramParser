@@ -54,14 +54,6 @@ namespace GramParserLib.Rule
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);
 
-        object IRule.ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return ReferencedRule.ExtractOutput(text, children, namedChildren);
-        }
-
         private bool HasNoRecursion(IRule value)
         {
             if (ReferenceEquals(this, value))

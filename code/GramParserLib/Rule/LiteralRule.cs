@@ -12,9 +12,9 @@ namespace GramParserLib.Rule
 
         public LiteralRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             IEnumerable<char> literal)
-            : base(ruleName, outputExtractor, false, false, true, false)
+            : base(ruleName, ruleOutput, false, false, true, false)
         {
             if (literal == null)
             {
@@ -26,7 +26,7 @@ namespace GramParserLib.Rule
 
         public LiteralRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput outputExtractor,
             string literal)
             : base(ruleName, outputExtractor, false, false, true, false)
         {
@@ -46,23 +46,18 @@ namespace GramParserLib.Rule
                 && text.Length >= _literal.Length
                 && text.Take(_literal.Length).SequenceEqual(_literal))
             {
-                return new[]
-                {
-                    new RuleMatch(this, text.Take(_literal.Length))
-                };
+                var matchText = text.Take(_literal.Length);
+                var match = new RuleMatch(
+                    this,
+                    matchText,
+                    () => RuleOutput.ComputeOutput(matchText, matchText));
+
+                return new[] { match };
             }
             else
             {
                 return RuleMatch.EmptyMatch;
             }
-        }
-
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return text;
         }
 
         public override string ToString()

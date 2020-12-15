@@ -10,10 +10,10 @@ namespace GramParserLib.Rule
     {
         public RangeRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             char first,
             char last)
-            : base(ruleName, outputExtractor, false, true, true, false)
+            : base(ruleName, ruleOutput, false, true, true, false)
         {
             if (last < first)
             {
@@ -39,22 +39,17 @@ namespace GramParserLib.Rule
 
                 if (peek >= First && peek <= Last)
                 {
-                    return new[]
-                    {
-                        new RuleMatch(this, text.Take(1))
-                    };
+                    var matchText = text.Take(1);
+                    var match = new RuleMatch(
+                        this,
+                        matchText,
+                        () => RuleOutput.ComputeOutput(matchText, matchText));
+
+                    return new[] { match };
                 }
             }
 
             return RuleMatch.EmptyMatch;
-        }
-
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return text;
         }
 
         public override string ToString()

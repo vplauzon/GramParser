@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GramParserLib.Output
 {
-    internal class FunctionExtractor : IOutputExtractor
+    internal class FunctionOutput : IRuleOutput
     {
         #region Inner Types
         private interface IFunctionProxy
@@ -268,17 +268,17 @@ namespace GramParserLib.Output
         private static readonly IImmutableDictionary<string, IFunctionProxy>
             _functionMap = InitializeFunctions();
         private readonly IFunctionProxy _function;
-        private readonly IImmutableList<IOutputExtractor> _parameters;
+        private readonly IImmutableList<IRuleOutput> _parameters;
 
-        public FunctionExtractor(
+        public FunctionOutput(
             string functionName,
-            IEnumerable<IOutputExtractor> parameters)
+            IEnumerable<IRuleOutput> parameters)
         {
             if (!_functionMap.TryGetValue(functionName, out _function))
             {
                 throw new ParsingException($"Function '{functionName}' doesn't exist");
             }
-            _parameters = ImmutableArray<IOutputExtractor>
+            _parameters = ImmutableArray<IRuleOutput>
                 .Empty
                 .AddRange(parameters);
             if (_function.ParameterCount != null && _function.ParameterCount != _parameters.Count)
@@ -289,13 +289,10 @@ namespace GramParserLib.Output
             }
         }
 
-        object IOutputExtractor.ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
+        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
         {
             var parameterOutputs = from p in _parameters
-                                   select p.ExtractOutput(text, children, namedChildren);
+                                   select p.ComputeOutput(text, defaultOutput);
 
             return _function.Invoke(ImmutableList<object>.Empty.AddRange(parameterOutputs));
         }

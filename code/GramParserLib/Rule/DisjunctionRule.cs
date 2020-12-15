@@ -11,14 +11,14 @@ namespace GramParserLib.Rule
 
         public DisjunctionRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  ruleOutput,
                   hasInterleave,
                   isRecursive,
                   false,
@@ -40,38 +40,34 @@ namespace GramParserLib.Rule
 
                 foreach (var m in potentials)
                 {
-                    var subMatches = _rules.AddMatch(
-                        ImmutableList<(TaggedRule, RuleMatch)>.Empty,
-                        rule,
-                        m);
-
-                    yield return _rules.CreateMatch(
-                        this,
-                        m.Text,
-                        subMatches);
+                    if (_rules.HasNames)
+                    {
+                        yield return new RuleMatch(
+                            this,
+                            m.Text,
+                            () => RuleOutput.ComputeOutput(m.Text, m.ComputeOutput()));
+                    }
+                    else
+                    {
+                        yield return new RuleMatch(
+                            this,
+                            m.Text,
+                            () => RuleOutput.ComputeOutput(
+                                m.Text,
+                                MakeMap(rule.Tag, m.ComputeOutput())));
+                    }
                 }
             }
         }
 
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
+        private static IDictionary<string, object> MakeMap(string tag, object output)
         {
-            if (_rules.HasNames)
+            var dictionary = new Dictionary<string, object>(new[]
             {
-                var uniqueChild = namedChildren.First();
-                var subOutput = uniqueChild.Value.ComputeOutput();
-                var map = ImmutableDictionary<string, object>.Empty.Add(uniqueChild.Key, subOutput);
+                KeyValuePair.Create(tag, output)
+            });
 
-                return map;
-            }
-            else
-            {
-                var subOutput = children.First().ComputeOutput();
-
-                return subOutput;
-            }
+            return dictionary;
         }
 
         public override string ToString()

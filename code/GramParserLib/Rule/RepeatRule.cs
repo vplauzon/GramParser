@@ -7,13 +7,14 @@ namespace GramParserLib.Rule
 {
     internal class RepeatRule : RuleBase
     {
+        private static readonly object[] EMPTY_OUTPUT = new object[0];
         private readonly IRule _rule;
         private readonly int? _min;
         private readonly int? _max;
 
         public RepeatRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput outputExtractor,
             IRule rule,
             int? min,
             int? max,
@@ -55,19 +56,13 @@ namespace GramParserLib.Rule
             //  We are returning the matches in decreasing order of text length, so the empty one goes last
             if (!_min.HasValue || _min.Value == 0)
             {
-                yield return new RuleMatch(this, context.Text.Take(0));
+                var matchText = context.Text.Take(0);
+
+                yield return new RuleMatch(
+                    this,
+                    matchText,
+                    () => RuleOutput.ComputeOutput(matchText, EMPTY_OUTPUT));
             }
-        }
-
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            var outputs = from c in children
-                          select c.ComputeOutput();
-
-            return outputs.ToImmutableArray();
         }
 
         public override string ToString()
@@ -114,15 +109,26 @@ namespace GramParserLib.Rule
                 //  We are returning the matches in decreasing order of text length, so the "current" one goes last
                 if (IsRepeatCountInRange(iteration))
                 {
-                    var content = originalText.Take(newTotalMatchLength);
+                    var matchText = originalText.Take(newTotalMatchLength);
                     var completeMatch = new RuleMatch(
                         this,
-                        content,
-                        newChildrenMatches);
+                        matchText,
+                        () => ComputeOutput(matchText, newChildrenMatches));
 
                     yield return completeMatch;
                 }
             }
+        }
+
+        private object ComputeOutput(
+            SubString matchText,
+            ImmutableList<RuleMatch> newChildrenMatches)
+        {
+            var childrenOutputs = newChildrenMatches
+                .Select(m => m.ComputeOutput())
+                .ToArray();
+
+            return RuleOutput.ComputeOutput(matchText, childrenOutputs);
         }
 
         private bool IsRepeatCountInRange(int repeatCount)

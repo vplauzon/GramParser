@@ -7,7 +7,7 @@ namespace GramParserLib.Rule
 {
     internal class MatchAnyCharacterRule : RuleBase
     {
-        public MatchAnyCharacterRule(string ruleName, IOutputExtractor outputExtractor)
+        public MatchAnyCharacterRule(string ruleName, IRuleOutput outputExtractor)
             : base(ruleName, outputExtractor, false, false, true, false)
         {
         }
@@ -22,19 +22,14 @@ namespace GramParserLib.Rule
             }
             else
             {
-                return new[]
-                {
-                    new RuleMatch(this, text.Take(1))
-                };
-            }
-        }
+                var matchText = text.Take(1);
+                var match = new RuleMatch(
+                    this,
+                    matchText,
+                    () => RuleOutput.ComputeOutput(matchText, matchText));
 
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return text;
+                return new[] { match };
+            }
         }
 
         public override string ToString()

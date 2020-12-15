@@ -20,14 +20,6 @@ namespace GramParserLib.Rule
             return RuleMatch.EmptyMatch;
         }
 
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            throw new NotSupportedException("This should never be fired as this rule never match anything");
-        }
-
         public override string ToString()
         {
             return "(*Match None*)";

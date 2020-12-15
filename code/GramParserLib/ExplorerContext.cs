@@ -140,11 +140,7 @@ namespace GramParserLib
                     _depth - 1,
                     newExcepts,
                     newAmbiantRuleProperties);
-                var ruleMatches = rule
-                    .Match(newContext)
-                    .Select(m => newAmbiantRuleProperties.HasChildrenDetails
-                    ? m.AddInterleaveLength(interleaveLength)
-                    : m.AddInterleaveLength(interleaveLength).RemoveChildren());
+                var ruleMatches = rule.Match(newContext);
                 var uniqueRuleMatches = new UniqueRuleMatchEnumerable(ruleMatches);
 
 #if DEBUG
