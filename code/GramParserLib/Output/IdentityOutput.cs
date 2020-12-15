@@ -8,7 +8,7 @@ namespace GramParserLib.Output
     {
         object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
         {
-            return default;
+            return defaultOutput;
         }
     }
 }
