@@ -45,8 +45,6 @@ namespace GramParserLib.Rule
         public bool? IsRecursive { get => ReferencedRule.IsRecursive; }
 
         public bool IsTerminalRule { get => ReferencedRule.IsTerminalRule; }
-
-        public bool? HasChildrenDetails { get => ReferencedRule.HasChildrenDetails; }
         #endregion
 
         string IRule.RuleName => ReferencedRule.RuleName;

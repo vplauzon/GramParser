@@ -8,7 +8,7 @@ namespace GramParserLib.Rule
     internal class MatchAnyCharacterRule : RuleBase
     {
         public MatchAnyCharacterRule(string ruleName, IRuleOutput outputExtractor)
-            : base(ruleName, outputExtractor, false, false, true, false)
+            : base(ruleName, outputExtractor, false, false, true)
         {
         }
 

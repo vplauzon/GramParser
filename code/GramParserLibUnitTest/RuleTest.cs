@@ -186,7 +186,7 @@ namespace GramParserLibUnitTest
             var seq = new SequenceRule("seq", null, new[]
             {
                 new TaggedRule(new LiteralRule(null, null, "|")),
-                new TaggedRule("t", new LiteralRule(null, null, "a"), true)
+                new TaggedRule("t", new LiteralRule(null, null, "a"))
             });
             var rule = new RepeatRule("rep", null, seq, 1, null);
             var text = "  |a  |a   |a;";
@@ -259,19 +259,19 @@ namespace GramParserLibUnitTest
             //  a:Alice | s1:(b:Bob | c:Charles) | s2::(d:Darwin | e:Ernest)
             var subRule1 = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("b", new LiteralRule("Bob", null, "Bob"), true),
-                new TaggedRule("c", new LiteralRule("Charles", null, "Charles"), true)
+                new TaggedRule("b", new LiteralRule("Bob", null, "Bob")),
+                new TaggedRule("c", new LiteralRule("Charles", null, "Charles"))
             });
             var subRule2 = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("d", new LiteralRule("Darwin", null, "Darwin"), true),
-                new TaggedRule("e", new LiteralRule("Ernest", null, "Ernest"), true)
+                new TaggedRule("d", new LiteralRule("Darwin", null, "Darwin")),
+                new TaggedRule("e", new LiteralRule("Ernest", null, "Ernest"))
             });
             var rule = new DisjunctionRule("Disjunction", null, new[]
             {
-                new TaggedRule("a", new LiteralRule("Alice", null, "Alice"), true),
-                new TaggedRule("s1", subRule1, true),
-                new TaggedRule("s2", subRule2, false)
+                new TaggedRule("a", new LiteralRule("Alice", null, "Alice")),
+                new TaggedRule("s1", subRule1),
+                new TaggedRule("s2", subRule2)
             });
 
             for (int i = 0; i != samples.Length; ++i)
@@ -380,8 +380,8 @@ namespace GramParserLibUnitTest
         {
             var rule = new SequenceRule("Seq", null, new[]
             {
-                new TaggedRule("h", new LiteralRule(null, null, "Hi"), true),
-                new TaggedRule("b", new LiteralRule(null, null, "Bob"), true),
+                new TaggedRule("h", new LiteralRule(null, null, "Hi")),
+                new TaggedRule("b", new LiteralRule(null, null, "Bob")),
                 new TaggedRule(new LiteralRule(null, null, "!"))
             });
             var text = "HiBob!";
@@ -403,8 +403,8 @@ namespace GramParserLibUnitTest
         {
             var rule = new SequenceRule("Seq", null, new[]
             {
-                new TaggedRule("a", new RepeatRule(null, null, new LiteralRule(null, null, "a"), 1, null), true),
-                new TaggedRule("b", new RepeatRule(null, null, new LiteralRule(null, null, "b"), 1, null), false)
+                new TaggedRule("a", new RepeatRule(null, null, new LiteralRule(null, null, "a"), 1, null)),
+                new TaggedRule("b", new RepeatRule(null, null, new LiteralRule(null, null, "b"), 1, null))
             });
             var text = "aaaabb";
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();

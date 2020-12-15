@@ -13,7 +13,7 @@ namespace GramParserLib.Rule
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
         }
 
-        public TaggedRule(string tag, IRule rule, bool doKeepGrandChildren)
+        public TaggedRule(string tag, IRule rule)
         {
             if (tag == string.Empty)
             {

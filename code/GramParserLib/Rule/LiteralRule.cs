@@ -14,7 +14,7 @@ namespace GramParserLib.Rule
             string ruleName,
             IRuleOutput ruleOutput,
             IEnumerable<char> literal)
-            : base(ruleName, ruleOutput, false, false, true, false)
+            : base(ruleName, ruleOutput, false, false, true)
         {
             if (literal == null)
             {
@@ -28,7 +28,7 @@ namespace GramParserLib.Rule
             string ruleName,
             IRuleOutput outputExtractor,
             string literal)
-            : base(ruleName, outputExtractor, false, false, true, false)
+            : base(ruleName, outputExtractor, false, false, true)
         {
             if (literal == null)
             {

@@ -13,7 +13,7 @@ namespace GramParserLib.Rule
             IRuleOutput ruleOutput,
             char first,
             char last)
-            : base(ruleName, ruleOutput, false, true, true, false)
+            : base(ruleName, ruleOutput, false, true, true)
         {
             if (last < first)
             {

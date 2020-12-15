@@ -23,8 +23,7 @@ namespace GramParserLib.Rule
                   ruleOutput,
                   hasInterleave,
                   isRecursive,
-                  false,
-                  hasChildrenDetails)
+                  false)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));

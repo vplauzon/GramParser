@@ -12,19 +12,16 @@ namespace GramParserLib
             HasInterleave = true;
             IsRecursive = false;
             IsTerminalRule = false;
-            HasChildrenDetails = true;
         }
 
         private AmbiantRuleProperties(
             bool hasInterleave,
             bool isRecursive,
-            bool isTerminalRule,
-            bool hasChildrenDetails)
+            bool isTerminalRule)
         {
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
-            HasChildrenDetails = hasChildrenDetails;
         }
 
         public bool HasInterleave { get; }
@@ -33,15 +30,12 @@ namespace GramParserLib
 
         public bool IsTerminalRule { get; }
 
-        public bool HasChildrenDetails { get; }
-
         public AmbiantRuleProperties Merge(IRuleProperties properties)
         {
             return new AmbiantRuleProperties(
                 Merge(HasInterleave, properties.HasInterleave),
                 Merge(IsRecursive, properties.IsRecursive),
-                Merge(IsTerminalRule, properties.IsTerminalRule),
-                Merge(HasChildrenDetails, properties.HasChildrenDetails));
+                Merge(IsTerminalRule, properties.IsTerminalRule));
         }
 
         private bool Merge(bool currentProperty, bool? newProperty)
