@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GramParserLib.Output;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace GramParserLib.Rule
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            RuleOutput = ruleOutput;
+            RuleOutput = ruleOutput ?? new IdentityOutput();
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
