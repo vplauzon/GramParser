@@ -28,6 +28,11 @@ namespace GramParserLib.Rule
             }
 
             _rules = new TaggedRuleCollection(rules);
+            if (!_rules.DoAllHaveNames && _rules.DoAllNotHaveNames)
+            {
+                throw new ParsingException(
+                    "Can't have both named & unnamed rule match in one rule");
+            }
         }
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
@@ -38,7 +43,7 @@ namespace GramParserLib.Rule
 
                 foreach (var m in potentials)
                 {
-                    if (_rules.HasNames)
+                    if (_rules.DoAllHaveNames)
                     {
                         yield return new RuleMatch(
                             this,

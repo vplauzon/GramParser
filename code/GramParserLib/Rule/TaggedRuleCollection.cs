@@ -26,19 +26,14 @@ namespace GramParserLib.Rule
             var withoutNames = from r in _rules
                                where !r.HasTag
                                select r;
-            var hasWithNames = withNames.Any();
-            var hasWithoutNames = withoutNames.Any();
 
-            if (hasWithNames && hasWithoutNames)
-            {
-                throw new ParsingException(
-                    "Can't have both named & unnamed rule match in one rule");
-            }
-
-            HasNames = hasWithNames;
+            DoAllHaveNames = _rules.All(r => r.HasTag);
+            DoAllNotHaveNames = withoutNames.All(r => !r.HasTag);
         }
 
-        public bool HasNames { get; }
+        public bool DoAllHaveNames { get; }
+
+        public bool DoAllNotHaveNames { get; }
 
         #region IEnumerable<TaggedRule>
         public IEnumerator<TaggedRule> GetEnumerator()

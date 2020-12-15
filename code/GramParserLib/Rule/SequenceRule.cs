@@ -102,9 +102,10 @@ namespace GramParserLib.Rule
             SubString text,
             ImmutableList<(TaggedRule rule, RuleMatch match)> subMatches)
         {
-            if (_rules.HasNames)
+            if (!_rules.DoAllNotHaveNames)
             {
                 var components = from m in subMatches
+                                 where m.rule.HasTag
                                  select new
                                  {
                                      Name = m.rule.Tag,
