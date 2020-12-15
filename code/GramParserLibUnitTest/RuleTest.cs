@@ -412,9 +412,9 @@ namespace GramParserLibUnitTest
 
             Assert.AreEqual(2, output.Count(), "Fragments");
             Assert.AreEqual(
-                "aaaa", output["a"].ToString(), "Fragments text - a");
+                4, ToList(output["a"]).Count, "Fragments text - a");
             Assert.AreEqual(
-                "bb", output["b"].ToString(), "Fragments text - b");
+                2, ToList(output["b"]).Count(), "Fragments text - b");
         }
         #endregion
 
