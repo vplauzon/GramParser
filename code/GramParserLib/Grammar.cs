@@ -22,9 +22,7 @@ namespace GramParserLib
             }
 
             _ruleMap = ImmutableDictionary<string, IRule>.Empty.AddRange(ruleMap);
-            _interleaveRule = interleaveRule == null
-                ? null
-                : new RepeatRule(null, null, interleaveRule, null, null, false, false);
+            _interleaveRule = interleaveRule;
         }
 
         public IEnumerable<IRule> Rules { get { return _ruleMap.Values; } }

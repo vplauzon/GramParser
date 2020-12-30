@@ -182,11 +182,9 @@ namespace GramParserLib
         {
             if (UseInterleave())
             {
-                var interleaveMatch = _interleaveRule
-                    .Match(ForInterleave())
-                    .ArgMax(m => m.Text.Length);
+                var interleaveContext = ForInterleave();
 
-                return interleaveMatch == null ? 0 : interleaveMatch.Text.Length;
+                return MatchInterleave(interleaveContext);
             }
             else
             {
@@ -236,6 +234,35 @@ namespace GramParserLib
             else
             {
                 return _ruleExcepts;
+            }
+        }
+
+        private int MatchInterleave(ExplorerContext interleaveContext)
+        {
+            var interleaveMatches = _interleaveRule.Match(interleaveContext);
+            var maxMatch = (RuleMatch)null;
+            var maxLength = 0;
+
+            foreach (var match in interleaveMatches)
+            {
+                if (match.Text.Length > maxLength)
+                {
+                    maxMatch = match;
+                    maxLength = match.Text.Length;
+                }
+            }
+
+            if (maxLength == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var newInterleaveContext = interleaveContext.MoveForward(maxMatch);
+                //  Recursion
+                var restLength = MatchInterleave(newInterleaveContext);
+
+                return maxLength + restLength;
             }
         }
     }
