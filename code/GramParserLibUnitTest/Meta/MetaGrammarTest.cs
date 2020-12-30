@@ -6,7 +6,7 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Immutable;
 
-namespace GramParserLibUnitTest
+namespace GramParserLibUnitTest.Meta
 {
     [TestClass]
     public class MetaGrammarTest : BaseTest

@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 
-namespace GramParserLibUnitTest
+namespace GramParserLibUnitTest.Output
 {
     [TestClass]
     public class OutputMetaGrammarTest : BaseTest
