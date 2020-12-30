@@ -87,7 +87,7 @@ namespace GramParserLibUnitTest.Rule
                 new TaggedRule("t", new LiteralRule(null, null, "a"))
             });
             var rule = new RepeatRule("rep", null, seq, 1, null);
-            var text = "  |a  |a   |a";
+            var text = "|a  |  a   | a";
             var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
