@@ -239,30 +239,19 @@ namespace GramParserLib
 
         private int MatchInterleave(ExplorerContext interleaveContext)
         {
-            var interleaveMatches = _interleaveRule.Match(interleaveContext);
-            var maxMatch = (RuleMatch)null;
-            var maxLength = 0;
+            var interleaveMatch = _interleaveRule.Match(interleaveContext).FirstOrDefault();
 
-            foreach (var match in interleaveMatches)
-            {
-                if (match.Text.Length > maxLength)
-                {
-                    maxMatch = match;
-                    maxLength = match.Text.Length;
-                }
-            }
-
-            if (maxLength == 0)
+            if (interleaveMatch == null || interleaveMatch.Text.Length == 0)
             {
                 return 0;
             }
             else
             {
-                var newInterleaveContext = interleaveContext.MoveForward(maxMatch);
+                var newInterleaveContext = interleaveContext.MoveForward(interleaveMatch);
                 //  Recursion
-                var restLength = MatchInterleave(newInterleaveContext);
+                var remainingLength = MatchInterleave(newInterleaveContext);
 
-                return maxLength + restLength;
+                return interleaveMatch.Text.Length + remainingLength;
             }
         }
     }
