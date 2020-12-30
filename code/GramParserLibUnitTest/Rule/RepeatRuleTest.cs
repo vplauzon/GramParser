@@ -92,7 +92,7 @@ namespace GramParserLibUnitTest.Rule
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
-            Assert.AreEqual(text.Length - 1, match.Text.Length, "MatchLength");
+            Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(3, ToList(match.ComputeOutput()).Count(), "Contents");
         }
    }
