@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace GramParserLibUnitTest
 {
     [TestClass]
-    public class OutputMetaGrammarTest
+    public class OutputMetaGrammarTest : BaseTest
     {
         #region Identifiers
         [TestMethod]
@@ -223,28 +223,6 @@ namespace GramParserLibUnitTest
             Test("Function.Prepend.txt", samples);
         }
         #endregion
-
-        private string GetResource(string resourceName)
-        {
-            var assembly = this.GetType().GetTypeInfo().Assembly;
-            var fullResourceName = "GramParserLibUnitTest.Output." + resourceName;
-
-            using (var stream = assembly.GetManifestResourceStream(fullResourceName))
-            {
-                if (stream == null)
-                {
-                    throw new ArgumentException(
-                        $"Can't find resource file '{resourceName}'",
-                        nameof(resourceName));
-                }
-                using (var reader = new StreamReader(stream))
-                {
-                    var text = reader.ReadToEnd();
-
-                    return text;
-                }
-            }
-        }
 
         private void Test(
             string grammarFile,

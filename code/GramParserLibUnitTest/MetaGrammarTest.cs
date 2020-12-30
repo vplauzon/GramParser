@@ -9,7 +9,7 @@ using System.Collections.Immutable;
 namespace GramParserLibUnitTest
 {
     [TestClass]
-    public class MetaGrammarTest
+    public class MetaGrammarTest : BaseTest
     {
         #region Just parsing the grammar
         [TestMethod]
@@ -430,20 +430,6 @@ namespace GramParserLibUnitTest
             Assert.IsNotNull(grammar, "Grammar");
         }
         #endregion
-
-        private string GetResource(string resourceName)
-        {
-            var assembly = this.GetType().GetTypeInfo().Assembly;
-            var fullResourceName = "GramParserLibUnitTest.Meta." + resourceName;
-
-            using (var stream = assembly.GetManifestResourceStream(fullResourceName))
-            using (var reader = new StreamReader(stream))
-            {
-                var text = reader.ReadToEnd();
-
-                return text;
-            }
-        }
 
         private void Test(
             string grammarFile,
