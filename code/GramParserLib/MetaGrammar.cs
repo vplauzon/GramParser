@@ -63,7 +63,7 @@ namespace GramParserLib
                     else if (tag == "ruleDeclaration")
                     {
                         var ruleDeclarationMap = ToMap(subDeclaration);
-                        var ruleID = ruleDeclarationMap["id"].ToString();
+                        var ruleID = ((SubString)ruleDeclarationMap["id"]).ToString();
                         var parameterAssignationList = ToList(ruleDeclarationMap["params"]);
                         var ruleBodyOutputMap = ToMap(ruleDeclarationMap["rule"]);
                         var ruleBody = ToMap(ruleBodyOutputMap["body"]);
@@ -887,7 +887,7 @@ namespace GramParserLib
                 false);
             var identifier = new SequenceRule(
                 "identifier",
-                null,
+                new TextOutput(),
                 new[]
                 {
                     new TaggedRule(identifierPrefixChar),
@@ -905,7 +905,7 @@ namespace GramParserLib
                 false);
             var number = new RepeatRule(
                 "number",
-                null,
+                new TextOutput(),
                 new RangeRule(null, null, '0', '9'),
                 1,
                 null,

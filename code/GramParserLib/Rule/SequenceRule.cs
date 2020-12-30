@@ -113,14 +113,14 @@ namespace GramParserLib.Rule
                                  };
                 var map = components.ToImmutableDictionary(c => c.Name, c => c.Output);
 
-                return map;
+                return RuleOutput.ComputeOutput(text, map);
             }
             else
             {
                 var subOutputs = from m in subMatches
                                  select m.match.ComputeOutput();
 
-                return subOutputs.ToImmutableArray();
+                return RuleOutput.ComputeOutput(text, subOutputs.ToImmutableArray());
             }
         }
     }
