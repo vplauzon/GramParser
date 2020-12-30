@@ -42,17 +42,17 @@ namespace GramParserLib
             public GrammarCreator(RuleMatch match)
             {
                 IRule interleave = null;
-                var children = ToList(match.ComputeOutput());
+                var declarations = ToList(match.ComputeOutput());
 
-                foreach (var ruleMatch in children)
+                foreach (var declaration in declarations)
                 {
-                    var ruleMatchMap = ToMap(ruleMatch);
-                    var tag = ruleMatchMap.Keys.First();
-                    var subMatch = ruleMatchMap.Values.First();
+                    var declarationMap = ToMap(declaration);
+                    var tag = declarationMap.Keys.First();
+                    var subDeclaration = declarationMap.Values.First();
 
                     if (tag == "interleaveDeclaration")
                     {
-                        var ruleBody = ToMap(ToMap(subMatch).First().Value);
+                        var ruleBody = ToMap(ToMap(subDeclaration).First().Value);
 
                         interleave = CreateRule(
                             "#interleave",
@@ -62,13 +62,17 @@ namespace GramParserLib
                     }
                     else if (tag == "ruleDeclaration")
                     {
-                        var subMatchMap = ToMap(subMatch);
-                        var ruleID = subMatchMap["id"].ToString();
-                        var parameterAssignationList = ToList(subMatchMap["params"]);
-                        var ruleBodyOutput = ToMap(subMatchMap["rule"]);
-                        var ruleBody = ToMap(ruleBodyOutput["body"]);
-                        var output = ToMap(ruleBodyOutput["output"]);
-                        var rule = CreateRule(ruleID, parameterAssignationList, ruleBody, output);
+                        var ruleDeclarationMap = ToMap(subDeclaration);
+                        var ruleID = ruleDeclarationMap["id"].ToString();
+                        var parameterAssignationList = ToList(ruleDeclarationMap["params"]);
+                        var ruleBodyOutputMap = ToMap(ruleDeclarationMap["rule"]);
+                        var ruleBody = ToMap(ruleBodyOutputMap["body"]);
+                        var outputList = ToList(ruleBodyOutputMap["output"]);
+                        var outputDeclaration = outputList.FirstOrDefault();
+                        var outputBodyMap = outputDeclaration != null
+                            ? ToMap(ToMap(outputDeclaration)["output"])
+                            : null;
+                        var rule = CreateRule(ruleID, parameterAssignationList, ruleBody, outputBodyMap);
 
                         _ruleMap[ruleID] = rule;
                     }
@@ -268,7 +272,7 @@ namespace GramParserLib
 
             private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputMap)
             {
-                if (outputMap.Count == 0)
+                if (outputMap == null)
                 {
                     return null;
                 }
@@ -522,7 +526,7 @@ namespace GramParserLib
                     throw new ArgumentNullException(nameof(ruleBodyBodyMap));
                 }
 
-                var literal = ToMap(ruleBodyBodyMap.First().Value);
+                var literal = ToList(ruleBodyBodyMap.First().Value);
                 var characters = from l in literal
                                  let lMap = ToMap(l)
                                  let c = GetCharacter(lMap)
