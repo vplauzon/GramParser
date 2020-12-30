@@ -85,12 +85,11 @@ namespace GramParserLibUnitTest.Rule
                 new TaggedRule(new LiteralRule(null, null, "|")),
                 new TaggedRule("t", new LiteralRule(null, null, "a"))
             });
-            var text = "| a  ";
+            var text = "  | a  ";
             var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
             Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "seq");
-            Assert.AreEqual(2, match.Text.Length, "MatchLength");
             Assert.AreEqual(1, ToMap(match.ComputeOutput()).Count(), "Contents");
         }
     }

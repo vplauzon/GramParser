@@ -141,7 +141,8 @@ namespace GramParserLib
                     newExcepts,
                     newAmbiantRuleProperties);
                 var ruleMatches = rule.Match(newContext);
-                var uniqueRuleMatches = new UniqueRuleMatchEnumerable(ruleMatches);
+                var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
+                    .Select(m => m.AddInterleaveLength(interleaveLength));
 
 #if DEBUG
                 //  Useful when debugging and faster than a breakpoint condition
@@ -150,11 +151,11 @@ namespace GramParserLib
                 //}
 
                 //  No yield, easier to debug
-                var ruleMatchList = uniqueRuleMatches.ToArray();
+                var ruleMatchList = uniqueRuleMatchesWithInterleaves.ToArray();
 
                 return ruleMatchList;
 #else
-                return uniqueRuleMatches;
+                return uniqueRuleMatchesWithInterleaves;
 #endif
             }
             else
