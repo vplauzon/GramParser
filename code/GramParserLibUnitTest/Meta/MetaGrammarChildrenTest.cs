@@ -20,7 +20,7 @@ namespace GramParserLibUnitTest.Meta
         [TestMethod]
         public void ChildrenDisjunction()
         {
-            TestChildren("Children.Disjunction.txt", "aaaa", 1);
+            TestChildren("Children.Disjunction.txt", "aaaa", 4);
         }
 
         [TestMethod]
@@ -32,37 +32,21 @@ namespace GramParserLibUnitTest.Meta
         [TestMethod]
         public void ChildrenSubstraction()
         {
-            TestChildren("Children.Substraction.txt", "aaaa", 1);
+            TestChildren("Children.Substraction.txt", "aaaa", 4);
         }
 
         private void TestChildren(string resourceName, string text, int expectedChildren)
         {
             var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
+            var match = grammar.Match("main", text);
 
-            foreach (var rule in new[] { "with", "unspecified" })
-            {
-                var match = grammar.Match(rule, text);
+            Assert.IsNotNull(match, "Match");
 
-                Assert.IsNotNull(match, "Match - " + rule);
+            var output = ToList(match.ComputeOutput());
 
-                var output = match.ComputeOutput() as IImmutableList<object>;
-
-                Assert.IsNotNull(output, "Output null - " + rule);
-                Assert.AreEqual(expectedChildren, output.Count(), "#Children - " + rule);
-            }
-
-            {
-                var rule = "without";
-                var match = grammar.Match("without", text);
-
-                Assert.IsNotNull(match, "Match - " + rule);
-
-                var output = match.ComputeOutput() as IImmutableList<object>;
-
-                Assert.IsNotNull(output, "Output null - " + rule);
-                Assert.AreEqual(0, output.Count(), "#Children - " + rule);
-            }
+            Assert.IsNotNull(output, "Output null");
+            Assert.AreEqual(expectedChildren, output.Count(), "#Children");
         }
-   }
+    }
 }
