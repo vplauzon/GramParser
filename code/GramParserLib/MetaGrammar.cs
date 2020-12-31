@@ -425,7 +425,7 @@ namespace GramParserLib
             {
                 if (id.Equals("text"))
                 {
-                    return new TextOutput();
+                    return TextOutput.Instance;
                 }
                 else if (id.Equals("true"))
                 {
@@ -553,7 +553,8 @@ namespace GramParserLib
                         return '\\';
                     case "escapeHexa":
                         return (char)int.Parse(
-                            ToMap(subMatch).First().Value.ToString(),
+                            //  Skip the \x
+                            ((SubString)subMatch).ToString().Substring(2),
                             NumberStyles.HexNumber);
                     default:
                         throw new NotSupportedException(
@@ -717,7 +718,7 @@ namespace GramParserLib
             {
                 var headTag = ToMap(ruleBodyBody["t"]);
                 var head = ToMap(ruleBodyBody["head"]);
-                var tail = ToMap(ruleBodyBody["tail"]);
+                var tail = ToList(ruleBodyBody["tail"]);
                 var headRule = CreateTaggedRule(headTag, CreateRule(head));
                 var tailRules = from c in tail
                                 let cMap = ToMap(c)
@@ -790,8 +791,8 @@ namespace GramParserLib
             {
                 var ruleBodyOutput = ToMap(ruleBodyBody.First().Value);
                 var ruleBody = ToMap(ruleBodyOutput["body"]);
-                var output = ToMap(ruleBodyOutput["output"]);
-                var innerOutputExtractor = CreateOutputExtractor(output);
+                var outputList = ToList(ruleBodyOutput["output"]);
+                var innerOutputExtractor = CreateOutputExtractor(ToMap(outputList.FirstOrDefault()));
                 var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractor);
 
                 if (outputExtractor != null)
@@ -887,7 +888,7 @@ namespace GramParserLib
                 false);
             var identifier = new SequenceRule(
                 "identifier",
-                new TextOutput(),
+                TextOutput.Instance,
                 new[]
                 {
                     new TaggedRule(identifierPrefixChar),
@@ -905,7 +906,7 @@ namespace GramParserLib
                 false);
             var number = new RepeatRule(
                 "number",
-                new TextOutput(),
+                TextOutput.Instance,
                 new RangeRule(null, null, '0', '9'),
                 1,
                 null,
@@ -1532,7 +1533,7 @@ namespace GramParserLib
                 false);
             var escapeHexa = new SequenceRule(
                 null,
-                null,
+                TextOutput.Instance,
                 new[]
                 {
                     new TaggedRule(new LiteralRule(null, null, "\\x")),
