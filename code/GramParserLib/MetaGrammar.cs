@@ -162,10 +162,10 @@ namespace GramParserLib
                 string ruleID,
                 IImmutableList<object> parameterAssignationList,
                 IImmutableDictionary<string, object> ruleBody,
-                IImmutableDictionary<string, object> outputMatch)
+                IImmutableDictionary<string, object> outputBodyMap)
             {
                 var propertyBag = CreatePropertyBag(parameterAssignationList);
-                var outputExtractor = CreateOutputExtractor(outputMatch);
+                var outputExtractor = CreateOutputExtractor(outputBodyMap);
 
                 return CreateRule(ruleID, propertyBag, ruleBody, outputExtractor);
             }
@@ -253,17 +253,15 @@ namespace GramParserLib
                 }
             }
 
-            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputMap)
+            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputBodyMap)
             {
-                if (outputMap == null)
+                if (outputBodyMap == null)
                 {
                     return null;
                 }
                 else
                 {
-                    var outputBody = ToMap(ToMap(outputMap.First()).First().Value);
-
-                    return CreateOutputExtractorFromBody(outputBody);
+                    return CreateOutputExtractorFromBody(outputBodyMap);
                 }
             }
 
@@ -280,7 +278,7 @@ namespace GramParserLib
                     case "literal":
                         return CreateOutputExtractorFromLiteral(ToMap(tagValue));
                     case "number":
-                        return CreateOutputExtractorFromNumber(tagValue.ToString());
+                        return CreateOutputExtractorFromNumber(((SubString)tagValue).ToString());
                     case "array":
                         return CreateOutputExtractorFromArray(ToMap(tagValue));
                     case "object":
@@ -399,9 +397,12 @@ namespace GramParserLib
 
             private IRuleOutput CreateOutputExtractorFromLiteral(IImmutableDictionary<string, object> literal)
             {
-                var text = (SubString)literal.First().Value;
+                var characters = from l in ToList(literal.First().Value)
+                                 let lMap = ToMap(l)
+                                 let c = GetCharacter(lMap)
+                                 select c;
 
-                return new ConstantOutput(text);
+                return new ConstantOutput(new string(characters.ToArray()));
             }
 
             private IRuleOutput CreateOutputExtractorFromId(SubString id)
@@ -897,7 +898,7 @@ namespace GramParserLib
                 false);
             var doubleRule = new SequenceRule(
                 "double",
-                null,
+                TextOutput.Instance,
                 new[]
                 {
                     new TaggedRule(
