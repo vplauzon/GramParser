@@ -13,13 +13,11 @@ rule(interleave=false) character = normal::(. - ("\"" | "\r" | "\n" | "\\"))
 rule(interleave=false) quotedCharacter = "\"" c:character "\"";
 
 #	rules
-rule(interleave=false) noChildrenTag = id:(identifier)? "::";
-rule(interleave=false) withChildrenTag = id:(identifier)? ":";
+rule(interleave=false) withTag = id:(identifier) ":";
 rule(interleave=false) noTag = "";
-rule(interleave=false) tag = noChildrenTag:noChildrenTag | withChildrenTag:withChildrenTag
-	| noTag:noTag;
+rule(interleave=false) tag = noChildrenTag:noChildrenTag | withTag:withTag;
 rule(interleave=false) literal = "\"" l:character* "\"";
-rule(interleave=false, children=false) any = ".";
+rule(interleave=false) any = ".";
 rule(interleave=false) range = lower:quotedCharacter ".." upper:quotedCharacter;
 rule exactCardinality = "{" n:number "}";
 rule minMaxCardinality = minmax:("{" min:number "," max:number "}")

@@ -130,24 +130,7 @@ namespace GramParserLib
                 {
                     case "noTag":
                         return new TaggedRule(rule);
-                    case "noChildrenTag":
-                        {
-                            var id = ToMap(tagChild.Value);
-
-                            if (id.Count() == 0)
-                            {
-                                return new TaggedRule(null, rule);
-                            }
-                            else
-                            {
-                                var idText = (SubString)id.First().Value;
-
-                                return new TaggedRule(
-                                    idText.Length == 0 ? null : idText.ToString(),
-                                    rule);
-                            }
-                        }
-                    case "withChildrenTag":
+                    case "withTag":
                         {
                             var id = ToMap(tagChild.Value);
 
@@ -954,26 +937,12 @@ namespace GramParserLib
                 false);
 
             //  Rules
-            var noChildrenTag = new SequenceRule(
-                "noChildrenTag",
+            var withTag = new SequenceRule(
+                "withTag",
                 null,
                 new[]
                 {
-                    new TaggedRule(
-                        "id",
-                        new RepeatRule(null, null, identifier, 0, 1, false, false)),
-                    new TaggedRule(new LiteralRule(null, null, "::"))
-                },
-                false,
-                false);
-            var withChildrenTag = new SequenceRule(
-                "withChildrenTag",
-                null,
-                new[]
-                {
-                    new TaggedRule(
-                        "id",
-                        new RepeatRule(null, null, identifier, 0, 1, false, false)),
+                    new TaggedRule("id", identifier),
                     new TaggedRule(new LiteralRule(null, null, ":"))
                 },
                 false,
@@ -984,8 +953,7 @@ namespace GramParserLib
                 null,
                 new[]
                 {
-                    new TaggedRule("noChildrenTag", noChildrenTag),
-                    new TaggedRule("withChildrenTag", withChildrenTag),
+                    new TaggedRule("withTag", withTag),
                     new TaggedRule("noTag", noTag)
                 },
                 false,

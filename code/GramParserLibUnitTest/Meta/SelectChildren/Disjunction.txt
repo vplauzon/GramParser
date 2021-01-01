@@ -1,11 +1,5 @@
 ﻿rule a = "a"*;
 rule b = "b"*;
 
-rule both = :a | :b;
-rule bothATruncated = ::a | :b;
-rule bothBTruncated = :a | ::b;
-
-rule a = :a | b;
-rule aTruncated = ::a | b;
-rule b = a | :b;
-rule bTruncated = a | ::b;
+rule noTag = a | b;
+rule withTag = a:a | b:b;
