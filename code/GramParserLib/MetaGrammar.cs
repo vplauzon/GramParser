@@ -776,7 +776,11 @@ namespace GramParserLib
                 var ruleBodyOutput = ToMap(ruleBodyBody.First().Value);
                 var ruleBody = ToMap(ruleBodyOutput["body"]);
                 var outputList = ToList(ruleBodyOutput["output"]);
-                var innerOutputExtractor = CreateOutputExtractor(ToMap(outputList.FirstOrDefault()));
+                var outputDeclaration = outputList.FirstOrDefault();
+                var outputBodyMap = outputDeclaration != null
+                    ? ToMap(ToMap(outputDeclaration)["output"])
+                    : null;
+                var innerOutputExtractor = CreateOutputExtractor(outputBodyMap);
                 var innerRule = CreateRule(null, bag, ruleBody, innerOutputExtractor);
 
                 if (outputExtractor != null)
