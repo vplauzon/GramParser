@@ -1,2 +1,2 @@
 ﻿rule ainf = "a"*;
-rule main = a::ainf b:"b"*;
+rule main = a:ainf b:"b"*;
