@@ -1,7 +1,12 @@
 name:  Continuous Build / Test
 
 on:
-  push
+  push:
+    branches:
+      - master
+    paths:
+      - code/**
+      - .github/workflows/continuous-dev.yaml
 
 jobs:
   build:
@@ -13,7 +18,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 3.1.x
+    - name: Patch version
+      id:  patch-version
+      run: python3 deployment/manage-version.py deployment/app-version-prefix.txt code/GramParserWorkbench/AppVersion.cs ${{ github.run_number }} full-version.txt
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
     - name: Install dependencies
       run: dotnet restore code
