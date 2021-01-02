@@ -8,9 +8,11 @@ namespace GramParserLib.Rule
     internal class MatchAnyCharacterRule : RuleBase
     {
         public MatchAnyCharacterRule(string? ruleName, IRuleOutput? outputExtractor)
-            : base(ruleName, outputExtractor, false, false, true)
+            : base(ruleName, outputExtractor, false, false)
         {
         }
+
+        public override bool IsTerminalRule => true;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {

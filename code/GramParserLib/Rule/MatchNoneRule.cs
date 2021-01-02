@@ -11,9 +11,11 @@ namespace GramParserLib.Rule
 
         public static IRule Instance { get { return _instance; } }
 
-        private MatchNoneRule() : base(null, null, false, false, true)
+        private MatchNoneRule() : base(null, null, false, false)
         {
         }
+
+        public override bool IsTerminalRule => true;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {

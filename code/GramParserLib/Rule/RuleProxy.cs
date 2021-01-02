@@ -40,11 +40,11 @@ namespace GramParserLib.Rule
         }
 
         #region IRuleProperties
-        public bool? HasInterleave { get => ReferencedRule.HasInterleave; }
+        public bool? HasInterleave => ReferencedRule.HasInterleave;
 
-        public bool? IsRecursive { get => ReferencedRule.IsRecursive; }
+        public bool? IsRecursive => ReferencedRule.IsRecursive;
 
-        public bool IsTerminalRule { get => ReferencedRule.IsTerminalRule; }
+        public bool IsTerminalRule => ReferencedRule.IsTerminalRule;
         #endregion
 
         string? IRule.RuleName => ReferencedRule.RuleName;

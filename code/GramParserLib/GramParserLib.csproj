@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Authors>Vincent-Philippe Lauzon</Authors>
     <PackageProjectUrl>https://github.com/vplauzon/GramParser/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vplauzon/GramParser/</RepositoryUrl>

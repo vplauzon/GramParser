@@ -13,8 +13,7 @@ namespace GramParserLib.Rule
             string? ruleName,
             IRuleOutput? ruleOutput,
             bool? hasInterleave,
-            bool? isRecursive,
-            bool isTerminalRule)
+            bool? isRecursive)
         {
             if (ruleName == string.Empty)
             {
@@ -24,7 +23,6 @@ namespace GramParserLib.Rule
             RuleOutput = ruleOutput ?? IdentityOutput.Instance;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
-            IsTerminalRule = isTerminalRule;
         }
 
         #region IRuleProperties
@@ -32,7 +30,7 @@ namespace GramParserLib.Rule
 
         public bool? IsRecursive { get; }
 
-        public bool IsTerminalRule { get; }
+        public abstract bool IsTerminalRule { get; }
         #endregion
 
         public string? RuleName { get; private set; }

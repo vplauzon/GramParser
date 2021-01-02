@@ -19,8 +19,7 @@ namespace GramParserLib.Rule
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive,
-                  false)
+                  isRecursive)
         {
             if (rules == null || rules.Count() == 0)
             {
@@ -34,6 +33,8 @@ namespace GramParserLib.Rule
                     "Can't have both named & unnamed rule match in one rule");
             }
         }
+
+        public override bool IsTerminalRule => false;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
