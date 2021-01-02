@@ -9,7 +9,7 @@ on:
       - .github/workflows/continuous-dev.yaml
 
 env:
-  container-image:  gram-parser-workbench
+  IMAGE:  gram-parser-workbench
 
 jobs:
   build:
@@ -41,12 +41,12 @@ jobs:
       run:  docker login -u ${{ secrets.docker_login }} -p ${{ secrets.docker_token }}
     # See https://docs.docker.com/engine/reference/commandline/build/
     - name:  Docker Build
-      run:  docker build --file code/Dockerfile --tag ${{ secrets.docker_repo }}/${{ container-image }}:${{ steps.patch-version.outputs.full-version }} code/GramParserWorkbench/bin/release/netcoreapp3.1
+      run:  docker build --file code/Dockerfile --tag ${{ secrets.docker_repo }}/${{ IMAGE }}:${{ steps.patch-version.outputs.full-version }} code/GramParserWorkbench/bin/release/netcoreapp3.1
     # See https://docs.docker.com/engine/reference/commandline/push/
     - name:  Docker Push ${{ steps.patch-version.outputs.full-version }}
-      run:  docker push ${{ secrets.docker_repo }}/${{ container-image }}:${{ steps.patch-version.outputs.full-version }}
+      run:  docker push ${{ secrets.docker_repo }}/${{ IMAGE }}:${{ steps.patch-version.outputs.full-version }}
     # See https://docs.docker.com/engine/reference/commandline/tag/
     - name:  Docker Tag Dev
-      run:  docker tag ${{ secrets.docker_repo }}/${{ container-image }}:${{ steps.patch-version.outputs.full-version }} ${{ secrets.docker_repo }}/${{ container-image }}:dev
+      run:  docker tag ${{ secrets.docker_repo }}/${{ IMAGE }}:${{ steps.patch-version.outputs.full-version }} ${{ secrets.docker_repo }}/${{ IMAGE }}:dev
     - name:  Docker Push Dev
-      run:  docker push ${{ secrets.docker_repo }}/${{ container-image }}:dev
+      run:  docker push ${{ secrets.docker_repo }}/${{ IMAGE }}:dev
