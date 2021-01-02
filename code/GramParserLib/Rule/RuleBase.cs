@@ -20,7 +20,7 @@ namespace GramParserLib.Rule
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            RuleOutput = ruleOutput ?? new IdentityOutput();
+            RuleOutput = ruleOutput ?? IdentityOutput.Instance;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
         }

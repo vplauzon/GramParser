@@ -82,9 +82,9 @@ namespace GramParserLib
             ContextID = Guid.NewGuid().GetHashCode();
         }
 
-        public SubString Text { get => _text; }
+        public SubString Text => _text;
 
-        public int Depth { get => _depth; }
+        public int Depth => _depth;
 
         /// <summary>For debug purposes only.</summary>
         /// <remarks>

@@ -42,7 +42,7 @@ namespace GramParserLib
             return new SubString(new ArraySegment<char>(text.ToCharArray()));
         }
 
-        public static JsonConverter JsonConverter { get => new SubStringJsonConverter(); }
+        public static JsonConverter JsonConverter { get; } = new SubStringJsonConverter();
 
         public bool HasContent { get { return _segment.Any(); } }
 
