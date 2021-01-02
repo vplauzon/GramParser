@@ -8,11 +8,10 @@ WORKDIR /work
 COPY build-output/PasWebApi .
 
 # Make port 80 available to the world outside this container
-
 EXPOSE 80
 
 #	Define environment variables
 ENV TODO ""
 
 #	Run console app
-CMD ["dotnet", "PasWebApi.dll"]
+CMD ["dotnet", "GramParserWorkbench.dll"]
