@@ -11,7 +11,7 @@ namespace GramParserLib.Rule
 
         public static IRule Instance { get { return _instance; } }
 
-        private MatchNoneRule() : base(null, IdentityOutput.Instance, false, false, true)
+        private MatchNoneRule() : base(null, null, false, false, true)
         {
         }
 

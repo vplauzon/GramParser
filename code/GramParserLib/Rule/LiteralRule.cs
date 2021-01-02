@@ -12,7 +12,7 @@ namespace GramParserLib.Rule
 
         public LiteralRule(
             string? ruleName,
-            IRuleOutput ruleOutput,
+            IRuleOutput? ruleOutput,
             IEnumerable<char> literal)
             : base(ruleName, ruleOutput, false, false, true)
         {
@@ -26,7 +26,7 @@ namespace GramParserLib.Rule
 
         public LiteralRule(
             string? ruleName,
-            IRuleOutput outputExtractor,
+            IRuleOutput? outputExtractor,
             string literal)
             : base(ruleName, outputExtractor, false, false, true)
         {

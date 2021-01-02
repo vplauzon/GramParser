@@ -12,7 +12,7 @@ namespace GramParserLib.Rule
 
         public SubstractRule(
             string? ruleName,
-            IRuleOutput ruleOutput,
+            IRuleOutput? ruleOutput,
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,

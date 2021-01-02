@@ -11,7 +11,7 @@ namespace GramParserLib.Rule
 
         public DisjunctionRule(
             string? ruleName,
-            IRuleOutput ruleOutput,
+            IRuleOutput? ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null)

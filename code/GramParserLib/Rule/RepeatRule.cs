@@ -13,8 +13,8 @@ namespace GramParserLib.Rule
 
         public RepeatRule(
             string? ruleName,
-            IRuleOutput outputExtractor,
-            IRule rule,
+            IRuleOutput? outputExtractor,
+            IRule? rule,
             int? min,
             int? max,
             bool? hasInterleave = null,

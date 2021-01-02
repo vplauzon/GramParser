@@ -12,7 +12,7 @@ namespace GramParserLibUnitTest.Meta
         {
             var samples = new[]
             {
-                ("noTag", "aaa", (int?)3, (Dictionary<string, int>)null),
+                ("noTag", "aaa", (int?)3, (Dictionary<string, int>?)null),
                 ("noTag", "bb", 2, null),
                 ("noTag", "", 0, null),
 
@@ -40,7 +40,7 @@ namespace GramParserLibUnitTest.Meta
 
         private void TestSelectChildren(
             string resourceName,
-            (string ruleName, string text, int? childrenCount, Dictionary<string, int> childrenCountMap)[] samples)
+            (string ruleName, string text, int? childrenCount, Dictionary<string, int>? childrenCountMap)[] samples)
         {
             var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
@@ -49,7 +49,7 @@ namespace GramParserLibUnitTest.Meta
 
             foreach (var sample in samples)
             {
-                var match = grammar.Match(sample.ruleName, sample.text);
+                var match = grammar!.Match(sample.ruleName, sample.text);
                 var sampleName = $"{sample.ruleName}/{sample.text}";
 
                 Assert.IsNotNull(match, $"Match - {sampleName}");
