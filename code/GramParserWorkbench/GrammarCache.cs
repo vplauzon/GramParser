@@ -22,13 +22,13 @@ namespace GramParserWorkbench
         #region Inner Types
         private class CacheRecord
         {
-            public CacheRecord(Grammar grammar)
+            public CacheRecord(Grammar? grammar)
             {
                 Grammar = grammar;
                 LastAccessed = DateTime.Now;
             }
 
-            public Grammar Grammar { get; }
+            public Grammar? Grammar { get; }
             public DateTime LastAccessed { get; private set; }
 
             public void UpdateAccess()
@@ -45,7 +45,7 @@ namespace GramParserWorkbench
         private readonly static IDictionary<string, CacheRecord> _cache =
             new Dictionary<string, CacheRecord>();
 
-        public static Grammar ParseGrammar(string grammarText)
+        public static Grammar? ParseGrammar(string grammarText)
         {
             var grammar = GetCachedGrammar(grammarText);
 
@@ -63,11 +63,11 @@ namespace GramParserWorkbench
             }
         }
 
-        private static Grammar GetCachedGrammar(string grammarText)
+        private static Grammar? GetCachedGrammar(string grammarText)
         {
             lock (_cache)
             {
-                CacheRecord record;
+                CacheRecord? record;
 
                 if (_cache.TryGetValue(grammarText, out record))
                 {
@@ -82,7 +82,7 @@ namespace GramParserWorkbench
             }
         }
 
-        private static void PushInCache(string grammarText, Grammar grammar)
+        private static void PushInCache(string grammarText, Grammar? grammar)
         {
             var record = new CacheRecord(grammar);
 
