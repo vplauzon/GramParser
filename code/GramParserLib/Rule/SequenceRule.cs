@@ -98,7 +98,7 @@ namespace GramParserLib.Rule
             }
         }
 
-        private object ComputeOutput(
+        private object? ComputeOutput(
             SubString text,
             ImmutableList<(TaggedRule rule, RuleMatch match)> subMatches)
         {
@@ -114,7 +114,7 @@ namespace GramParserLib.Rule
 
                 return RuleOutput.ComputeOutput(
                     text,
-                    new Lazy<object>(() => components.ToImmutableDictionary(c => c.Name, c => c.Output)));
+                    new Lazy<object?>(() => components.ToImmutableDictionary(c => c.Name, c => c.Output)));
             }
             else
             {
@@ -122,7 +122,7 @@ namespace GramParserLib.Rule
                     .Select(m => m.match.ComputeOutput())
                     .ToImmutableArray();
 
-                return RuleOutput.ComputeOutput(text, new Lazy<object>(outputFactory));
+                return RuleOutput.ComputeOutput(text, new Lazy<object?>(outputFactory));
             }
         }
     }

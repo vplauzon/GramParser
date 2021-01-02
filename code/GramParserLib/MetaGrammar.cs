@@ -86,14 +86,14 @@ namespace GramParserLib
                 CreatedGrammar = new Grammar(_ruleMap, interleave ?? MatchNoneRule.Instance);
             }
 
-            private IImmutableList<object> ToList(object obj)
+            private IImmutableList<object> ToList(object? obj)
             {
-                return (IImmutableList<object>)obj;
+                return (IImmutableList<object>)(obj ?? throw new ArgumentNullException(nameof(obj)));
             }
 
-            private IImmutableDictionary<string, object> ToMap(object obj)
+            private IImmutableDictionary<string, object> ToMap(object? obj)
             {
-                return (IImmutableDictionary<string, object>)obj;
+                return (IImmutableDictionary<string, object>)(obj ?? throw new ArgumentNullException(nameof(obj)));
             }
 
             private void ResolveProxies()
@@ -1480,7 +1480,7 @@ namespace GramParserLib
             outputBodyProxy.ReferencedRule = outputBody;
 
             return new Grammar(
-                new Dictionary<string?, IRule>() { { main.RuleName, main } },
+                new Dictionary<string, IRule>() { { main.RuleName!, main } },
                 interleave);
         }
 

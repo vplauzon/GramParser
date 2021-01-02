@@ -43,7 +43,7 @@ namespace GramParserLib.Rule
                     var match = new RuleMatch(
                         this,
                         matchText,
-                        () => RuleOutput.ComputeOutput(matchText, new Lazy<object>(matchText)));
+                        () => RuleOutput.ComputeOutput(matchText, new Lazy<object?>(matchText)));
 
                     return new[] { match };
                 }

@@ -12,7 +12,7 @@ namespace GramParserLib.Output
             _constant = constant;
         }
 
-        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
+        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             return _constant;
         }

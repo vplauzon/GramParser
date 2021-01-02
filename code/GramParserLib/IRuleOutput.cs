@@ -7,6 +7,6 @@ namespace GramParserLib
 {
     public interface IRuleOutput
     {
-        object? ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput);
+        object? ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput);
     }
 }

@@ -49,7 +49,7 @@ namespace GramParserLib.Rule
                         primaryText,
                         () => RuleOutput.ComputeOutput(
                             primaryText,
-                            new Lazy<object>(() => primaryMatch.ComputeOutput())));
+                            new Lazy<object?>(() => primaryMatch.ComputeOutput())));
 
                     yield return match;
                 }
