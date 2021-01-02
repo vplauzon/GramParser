@@ -16,8 +16,7 @@ namespace GramParserLib.Rule
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
-            bool? hasChildrenDetails = null)
+            bool? isRecursive = null)
             : base(
                   ruleName,
                   ruleOutput,
