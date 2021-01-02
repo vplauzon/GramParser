@@ -11,18 +11,16 @@ namespace GramParserLib.Rule
 
         public SequenceRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
-            bool? hasChildrenDetails = null)
+            bool? isRecursive = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  ruleOutput,
                   hasInterleave,
                   isRecursive,
-                  false,
-                  hasChildrenDetails)
+                  false)
         {
             if (rules == null || !rules.Any())
             {
@@ -40,29 +38,7 @@ namespace GramParserLib.Rule
                 context,
                 context.Text,
                 0,
-                ImmutableList<(TaggedRule, RuleMatch)>.Empty);
-        }
-
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            if (_rules.HasNames)
-            {
-                var components = from c in namedChildren
-                                 select new { Name = c.Key, Output = c.Value.ComputeOutput() };
-                var map = components.ToImmutableDictionary(c => c.Name, c => c.Output);
-
-                return map;
-            }
-            else
-            {
-                var subOutputs = from c in children
-                                 select c.ComputeOutput();
-
-                return subOutputs.ToArray();
-            }
+                ImmutableList<(TaggedRule rule, RuleMatch match)>.Empty);
         }
 
         #region object methods
@@ -83,7 +59,7 @@ namespace GramParserLib.Rule
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
-            ImmutableList<(TaggedRule, RuleMatch)> matches)
+            ImmutableList<(TaggedRule rule, RuleMatch match)> matches)
         {
             var currentRule = rules.First();
             var remainingRules = rules.Skip(1);
@@ -92,7 +68,7 @@ namespace GramParserLib.Rule
             foreach (var match in potentials)
             {
                 var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
-                var newMatches = _rules.AddMatch(matches, currentRule, match);
+                var newMatches = matches.Add((currentRule, match));
 
                 if (remainingRules.Any())
                 {   //  Recurse
@@ -112,11 +88,41 @@ namespace GramParserLib.Rule
                 }   //  End recursion
                 else
                 {
-                    yield return _rules.CreateMatch(
+                    var matchText = originalText.Take(newTotalMatchLength);
+
+                    yield return new RuleMatch(
                         this,
-                        originalText.Take(newTotalMatchLength),
-                        newMatches);
+                        matchText,
+                        () => ComputeOutput(matchText, newMatches));
                 }
+            }
+        }
+
+        private object ComputeOutput(
+            SubString text,
+            ImmutableList<(TaggedRule rule, RuleMatch match)> subMatches)
+        {
+            if (!_rules.DoAllNotHaveNames)
+            {
+                var components = from m in subMatches
+                                 where m.rule.HasTag
+                                 select new
+                                 {
+                                     Name = m.rule.Tag,
+                                     Output = m.match.ComputeOutput()
+                                 };
+
+                return RuleOutput.ComputeOutput(
+                    text,
+                    new Lazy<object>(() => components.ToImmutableDictionary(c => c.Name, c => c.Output)));
+            }
+            else
+            {
+                Func<object> outputFactory = () => subMatches
+                    .Select(m => m.match.ComputeOutput())
+                    .ToImmutableArray();
+
+                return RuleOutput.ComputeOutput(text, new Lazy<object>(outputFactory));
             }
         }
     }

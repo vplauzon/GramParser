@@ -11,18 +11,16 @@ namespace GramParserLib.Rule
 
         public DisjunctionRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
-            bool? hasChildrenDetails = null)
+            bool? isRecursive = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  ruleOutput,
                   hasInterleave,
                   isRecursive,
-                  false,
-                  hasChildrenDetails)
+                  false)
         {
             if (rules == null || rules.Count() == 0)
             {
@@ -30,6 +28,11 @@ namespace GramParserLib.Rule
             }
 
             _rules = new TaggedRuleCollection(rules);
+            if (!_rules.DoAllHaveNames && !_rules.DoAllNotHaveNames)
+            {
+                throw new ParsingException(
+                    "Can't have both named & unnamed rule match in one rule");
+            }
         }
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
@@ -40,38 +43,35 @@ namespace GramParserLib.Rule
 
                 foreach (var m in potentials)
                 {
-                    var subMatches = _rules.AddMatch(
-                        ImmutableList<(TaggedRule, RuleMatch)>.Empty,
-                        rule,
-                        m);
-
-                    yield return _rules.CreateMatch(
-                        this,
-                        m.Text,
-                        subMatches);
+                    if (_rules.DoAllHaveNames)
+                    {
+                        yield return new RuleMatch(
+                            this,
+                            m.Text,
+                            () => RuleOutput.ComputeOutput(
+                                m.Text,
+                                new Lazy<object>(() => MakeMap(rule.Tag, m.ComputeOutput()))));
+                    }
+                    else
+                    {
+                        yield return new RuleMatch(
+                            this,
+                            m.Text,
+                            () => RuleOutput.ComputeOutput(
+                                m.Text,
+                                new Lazy<object>(() => m.ComputeOutput())));
+                    }
                 }
             }
         }
 
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
+        private static IImmutableDictionary<string, object> MakeMap(string tag, object output)
         {
-            if (_rules.HasNames)
-            {
-                var uniqueChild = namedChildren.First();
-                var subOutput = uniqueChild.Value.ComputeOutput();
-                var map = ImmutableDictionary<string, object>.Empty.Add(uniqueChild.Key, subOutput);
+            var dictionary = ImmutableDictionary<string, object>
+                .Empty
+                .Add(tag, output);
 
-                return map;
-            }
-            else
-            {
-                var subOutput = children.First().ComputeOutput();
-
-                return subOutput;
-            }
+            return dictionary;
         }
 
         public override string ToString()

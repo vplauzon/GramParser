@@ -140,12 +140,9 @@ namespace GramParserLib
                     _depth - 1,
                     newExcepts,
                     newAmbiantRuleProperties);
-                var ruleMatches = rule
-                    .Match(newContext)
-                    .Select(m => newAmbiantRuleProperties.HasChildrenDetails
-                    ? m.AddInterleaveLength(interleaveLength)
-                    : m.AddInterleaveLength(interleaveLength).RemoveChildren());
-                var uniqueRuleMatches = new UniqueRuleMatchEnumerable(ruleMatches);
+                var ruleMatches = rule.Match(newContext);
+                var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
+                    .Select(m => m.AddInterleaveLength(interleaveLength));
 
 #if DEBUG
                 //  Useful when debugging and faster than a breakpoint condition
@@ -154,11 +151,11 @@ namespace GramParserLib
                 //}
 
                 //  No yield, easier to debug
-                var ruleMatchList = uniqueRuleMatches.ToArray();
+                var ruleMatchList = uniqueRuleMatchesWithInterleaves.ToArray();
 
                 return ruleMatchList;
 #else
-                return uniqueRuleMatches;
+                return uniqueRuleMatchesWithInterleaves;
 #endif
             }
             else
@@ -186,11 +183,9 @@ namespace GramParserLib
         {
             if (UseInterleave())
             {
-                var interleaveMatch = _interleaveRule
-                    .Match(ForInterleave())
-                    .ArgMax(m => m.Text.Length);
+                var interleaveContext = ForInterleave();
 
-                return interleaveMatch == null ? 0 : interleaveMatch.Text.Length;
+                return MatchInterleave(interleaveContext);
             }
             else
             {
@@ -240,6 +235,24 @@ namespace GramParserLib
             else
             {
                 return _ruleExcepts;
+            }
+        }
+
+        private int MatchInterleave(ExplorerContext interleaveContext)
+        {
+            var interleaveMatch = _interleaveRule.Match(interleaveContext).FirstOrDefault();
+
+            if (interleaveMatch == null || interleaveMatch.Text.Length == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var newInterleaveContext = interleaveContext.MoveForward(interleaveMatch);
+                //  Recursion
+                var remainingLength = MatchInterleave(newInterleaveContext);
+
+                return interleaveMatch.Text.Length + remainingLength;
             }
         }
     }

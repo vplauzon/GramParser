@@ -45,22 +45,12 @@ namespace GramParserLib.Rule
         public bool? IsRecursive { get => ReferencedRule.IsRecursive; }
 
         public bool IsTerminalRule { get => ReferencedRule.IsTerminalRule; }
-
-        public bool? HasChildrenDetails { get => ReferencedRule.HasChildrenDetails; }
         #endregion
 
         string IRule.RuleName => ReferencedRule.RuleName;
 
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);
-
-        object IRule.ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return ReferencedRule.ExtractOutput(text, children, namedChildren);
-        }
 
         private bool HasNoRecursion(IRule value)
         {

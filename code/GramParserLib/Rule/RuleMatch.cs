@@ -8,24 +8,13 @@ namespace GramParserLib
 {
     public class RuleMatch
     {
-        public RuleMatch(IRule rule, SubString text)
-            : this(rule, text, text.Length, null, null)
-        {
-        }
+        private readonly Func<object> _outputCreator;
 
         public RuleMatch(
             IRule rule,
             SubString text,
-            IEnumerable<RuleMatch> children)
-            : this(rule, text, text.Length, children, null)
-        {
-        }
-
-        public RuleMatch(
-            IRule rule,
-            SubString text,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-            : this(rule, text, text.Length, null, namedChildren)
+            Func<object> outputCreator)
+            : this(rule, text, text.Length, outputCreator)
         {
         }
 
@@ -33,28 +22,17 @@ namespace GramParserLib
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            IEnumerable<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
+            Func<object> outputCreator)
         {
             if (lengthWithInterleaves < text.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(lengthWithInterleaves));
             }
-            if (children != null && namedChildren != null)
-            {
-                throw new ArgumentException(
-                    $"Both {nameof(children)} and {nameof(namedChildren)} can't be non-null");
-            }
 
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             Text = text;
             LengthWithInterleaves = lengthWithInterleaves;
-            Children = children != null
-                ? ImmutableList<RuleMatch>.Empty.AddRange(children)
-                : ImmutableList<RuleMatch>.Empty;
-            NamedChildren = namedChildren != null
-                ? namedChildren
-                : ImmutableDictionary<string, RuleMatch>.Empty;
+            _outputCreator = outputCreator;
         }
 
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
@@ -65,46 +43,11 @@ namespace GramParserLib
 
         public int LengthWithInterleaves { get; }
 
-        public IImmutableList<RuleMatch> Children { get; }
-            = ImmutableList<RuleMatch>.Empty;
-
-        public IImmutableDictionary<string, RuleMatch> NamedChildren { get; }
-            = ImmutableDictionary<string, RuleMatch>.Empty;
-
         public object ComputeOutput()
         {
-            var output = Rule.ExtractOutput(Text, Children, NamedChildren);
+            var output = _outputCreator();
 
-            return ExtractorHelper.StringAsString(output);
-        }
-
-        public RuleMatch ChangeRule(IRule rule)
-        {
-            if (rule == null)
-            {
-                throw new ArgumentNullException(nameof(rule));
-            }
-
-            if (object.ReferenceEquals(rule, Rule))
-            {
-                return this;
-            }
-            else
-            {
-                return !NamedChildren.Any()
-                    ? new RuleMatch(
-                        rule,
-                        Text,
-                        LengthWithInterleaves,
-                        Children,
-                        null)
-                    : new RuleMatch(
-                        rule,
-                        Text,
-                        LengthWithInterleaves,
-                        null,
-                        NamedChildren);
-            }
+            return output;
         }
 
         public RuleMatch AddInterleaveLength(int length)
@@ -120,27 +63,12 @@ namespace GramParserLib
             }
             else
             {
-                return !NamedChildren.Any()
-                    ? new RuleMatch(
-                        Rule,
-                        Text,
-                        LengthWithInterleaves + length,
-                        Children,
-                        null)
-                    : new RuleMatch(
-                        Rule,
-                        Text,
-                        LengthWithInterleaves + length,
-                        null,
-                        NamedChildren);
+                return new RuleMatch(
+                    Rule,
+                    Text,
+                    LengthWithInterleaves + length,
+                    _outputCreator);
             }
-        }
-
-        public RuleMatch RemoveChildren()
-        {
-            return !NamedChildren.Any() && !Children.Any()
-                ? this
-                : new RuleMatch(Rule, Text, LengthWithInterleaves, null, null);
         }
 
         #region object methods

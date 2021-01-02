@@ -131,4 +131,8 @@
     <ProjectReference Include="..\GramParserLib\GramParserLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Rule\" />
+  </ItemGroup>
+
 </Project>

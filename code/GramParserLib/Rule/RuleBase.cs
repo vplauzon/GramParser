@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GramParserLib.Output;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -8,26 +9,22 @@ namespace GramParserLib.Rule
 {
     internal abstract class RuleBase : IRule
     {
-        private readonly IOutputExtractor _outputExtractor;
-
         protected RuleBase(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             bool? hasInterleave,
             bool? isRecursive,
-            bool isTerminalRule,
-            bool? hasChildrenDetails)
+            bool isTerminalRule)
         {
             if (ruleName == string.Empty)
             {
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            _outputExtractor = outputExtractor;
+            RuleOutput = ruleOutput ?? new IdentityOutput();
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
-            HasChildrenDetails = hasChildrenDetails;
         }
 
         #region IRuleProperties
@@ -36,8 +33,6 @@ namespace GramParserLib.Rule
         public bool? IsRecursive { get; }
 
         public bool IsTerminalRule { get; }
-
-        public bool? HasChildrenDetails { get; }
         #endregion
 
         public string RuleName { get; private set; }
@@ -47,27 +42,9 @@ namespace GramParserLib.Rule
             return OnMatch(context);
         }
 
-        public object ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            if (_outputExtractor != null)
-            {
-                return _outputExtractor.ExtractOutput(text, children, namedChildren);
-            }
-            else
-            {
-                return DefaultExtractOutput(text, children, namedChildren);
-            }
-        }
+        protected IRuleOutput RuleOutput { get; }
 
         protected abstract IEnumerable<RuleMatch> OnMatch(ExplorerContext context);
-
-        protected abstract object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren);
 
         protected string ToString(IRule rule)
         {

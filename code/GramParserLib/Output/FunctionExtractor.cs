@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GramParserLib.Output
 {
-    internal class FunctionExtractor : IOutputExtractor
+    internal class FunctionOutput : IRuleOutput
     {
         #region Inner Types
         private interface IFunctionProxy
@@ -34,7 +34,9 @@ namespace GramParserLib.Output
 
             object IFunctionProxy.Invoke(IImmutableList<object> parameters)
             {
-                ValidateParameters(parameters);
+                var standardParameters = StandardizeParameters(parameters);
+
+                ValidateParameters(standardParameters);
 
                 return _function(parameters.Cast<T>());
             }
@@ -86,9 +88,11 @@ namespace GramParserLib.Output
 
             object IFunctionProxy.Invoke(IImmutableList<object> parameters)
             {
-                ValidateParameters(parameters);
+                var standardParameters = StandardizeParameters(parameters);
 
-                return Invoke(parameters);
+                ValidateParameters(standardParameters);
+
+                return Invoke(standardParameters);
             }
 
             protected abstract string FunctionName();
@@ -112,12 +116,12 @@ namespace GramParserLib.Output
                     types.Zip(
                         Enumerable.Range(1, parameters.Count),
                         (t, i) => (t, i)),
-                    (param, pair) => new
-                    {
-                        Parameter = param,
-                        Type = pair.t,
-                        Index = pair.i
-                    })
+                        (param, pair) => new
+                        {
+                            Parameter = param,
+                            Type = pair.t,
+                            Index = pair.i
+                        })
                               where p.Parameter != null
                               let isType = p.Parameter.GetType() == p.Type
                               || p.Parameter.GetType().IsInstanceOfType(p.Type)
@@ -237,7 +241,7 @@ namespace GramParserLib.Output
                 IEnumerator IEnumerable.GetEnumerator()
                 {
                     yield return _head;
-                    foreach(var element in _tail)
+                    foreach (var element in _tail)
                     {
                         yield return element;
                     }
@@ -251,7 +255,8 @@ namespace GramParserLib.Output
 
             object IFunctionProxy.Invoke(IImmutableList<object> parameters)
             {
-                var list = parameters[1] as IEnumerable;
+                var standardParameters = StandardizeParameters(parameters);
+                var list = standardParameters[1] as IEnumerable;
 
                 if (list == null)
                 {
@@ -260,7 +265,7 @@ namespace GramParserLib.Output
                         + "at parameter 1:  isn't a list");
                 }
 
-                return new PrependList(parameters[0], list);
+                return new PrependList(standardParameters[0], list);
             }
         }
         #endregion
@@ -268,17 +273,17 @@ namespace GramParserLib.Output
         private static readonly IImmutableDictionary<string, IFunctionProxy>
             _functionMap = InitializeFunctions();
         private readonly IFunctionProxy _function;
-        private readonly IImmutableList<IOutputExtractor> _parameters;
+        private readonly IImmutableList<IRuleOutput> _parameters;
 
-        public FunctionExtractor(
+        public FunctionOutput(
             string functionName,
-            IEnumerable<IOutputExtractor> parameters)
+            IEnumerable<IRuleOutput> parameters)
         {
             if (!_functionMap.TryGetValue(functionName, out _function))
             {
                 throw new ParsingException($"Function '{functionName}' doesn't exist");
             }
-            _parameters = ImmutableArray<IOutputExtractor>
+            _parameters = ImmutableArray<IRuleOutput>
                 .Empty
                 .AddRange(parameters);
             if (_function.ParameterCount != null && _function.ParameterCount != _parameters.Count)
@@ -289,24 +294,32 @@ namespace GramParserLib.Output
             }
         }
 
-        object IOutputExtractor.ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
             var parameterOutputs = from p in _parameters
-                                   select p.ExtractOutput(text, children, namedChildren);
+                                   select p.ComputeOutput(text, lazyDefaultOutput);
 
             return _function.Invoke(ImmutableList<object>.Empty.AddRange(parameterOutputs));
+        }
+
+        private static IImmutableList<object> StandardizeParameters(IImmutableList<object> parameters)
+        {
+            var standards = parameters
+                .Select(p => p.GetType() == typeof(SubString)
+                ? p.ToString()
+                : p)
+                .ToImmutableList();
+
+            return standards;
         }
 
         private static IImmutableDictionary<string, IFunctionProxy> InitializeFunctions()
         {
             var proxies = new IFunctionProxy[]
             {
-                new FixedFunctionProxyOneParam<SubString, bool>(Boolean),
-                new FixedFunctionProxyOneParam<SubString, int>(Integer),
-                new ScalableFunctionProxyBase<SubString, string>(Concat),
+                new FixedFunctionProxyOneParam<string, bool>(Boolean),
+                new FixedFunctionProxyOneParam<string, int>(Integer),
+                new ScalableFunctionProxyBase<string, string>(Concat),
                 new PrependFunctionProxy()
             };
             var pairs = from p in proxies
@@ -323,11 +336,11 @@ namespace GramParserLib.Output
         }
 
         #region Functions
-        private static int Integer(SubString text)
+        private static int Integer(string text)
         {
             int integer;
 
-            if (!int.TryParse(text.ToString(), out integer))
+            if (!int.TryParse(text, out integer))
             {
                 throw new ParsingException($"Can't parse '{text}' to an integer");
             }
@@ -335,11 +348,11 @@ namespace GramParserLib.Output
             return integer;
         }
 
-        private static bool Boolean(SubString text)
+        private static bool Boolean(string text)
         {
             bool boolean;
 
-            if (!bool.TryParse(text.ToString(), out boolean))
+            if (!bool.TryParse(text, out boolean))
             {
                 throw new ParsingException($"Can't parse '{text}' to a boolean");
             }
@@ -347,18 +360,9 @@ namespace GramParserLib.Output
             return boolean;
         }
 
-        private static string Concat(IEnumerable<SubString> texts)
+        private static string Concat(IEnumerable<string> texts)
         {
-            var capacity = texts.Sum(t => t.Length);
-            var builder = new StringBuilder(capacity);
-            var characters = texts.SelectMany(t => t);
-
-            foreach (var c in characters)
-            {
-                builder.Append(c);
-            }
-
-            return builder.ToString();
+            return string.Concat(texts);
         }
         #endregion
     }

@@ -11,7 +11,8 @@ namespace GramParserWorkbench.Models.Apis
             IsMatch = match != null;
             if (match != null)
             {
-                RuleMatch = new RuleMatchModel(match);
+                Rule = match.Rule.RuleName;
+                Text = match.Text.ToString();
                 Output = match.ComputeOutput();
             }
         }
@@ -20,7 +21,9 @@ namespace GramParserWorkbench.Models.Apis
 
         public bool IsMatch { get; set; }
 
-        public RuleMatchModel RuleMatch { get; }
+        public string Rule { get; }
+
+        public string Text { get; }
 
         public object Output { get; }
     }

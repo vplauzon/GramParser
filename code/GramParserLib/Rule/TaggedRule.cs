@@ -11,10 +11,9 @@ namespace GramParserLib.Rule
         public TaggedRule(IRule rule)
         {
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
-            MatchSelectionState = MatchSelection.Unspecified;
         }
 
-        public TaggedRule(string tag, IRule rule, bool doKeepGrandChildren)
+        public TaggedRule(string tag, IRule rule)
         {
             if (tag == string.Empty)
             {
@@ -23,9 +22,6 @@ namespace GramParserLib.Rule
 
             Tag = tag;
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
-            MatchSelectionState = doKeepGrandChildren
-                ? MatchSelection.GrandChildren
-                : MatchSelection.ChildrenOnly;
         }
 
         public static IEnumerable<TaggedRule> FromRules(params IRule[] rules)
@@ -47,26 +43,13 @@ namespace GramParserLib.Rule
 
         public IRule Rule { get; private set; }
 
-        public MatchSelection MatchSelectionState { get; }
-
         public override string ToString()
         {
             var rule = string.IsNullOrWhiteSpace(Rule.RuleName)
                     ? Rule.ToString()
                     : Rule.RuleName;
-
-            if (MatchSelectionState == MatchSelection.Unspecified)
-            {
-                return $"({rule})";
-            }
-            else
-            {
-                var colons = MatchSelectionState == MatchSelection.GrandChildren
-                    ? ":"
-                    : "::";
-
-                return $"{Tag}{colons}({rule})";
-            }
+            
+            return $"{Tag}:({rule})";
         }
     }
 }

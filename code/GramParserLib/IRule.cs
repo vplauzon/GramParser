@@ -11,10 +11,5 @@ namespace GramParserLib
         string RuleName { get; }
 
         IEnumerable<RuleMatch> Match(ExplorerContext context);
-
-        object ExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren);
     }
 }

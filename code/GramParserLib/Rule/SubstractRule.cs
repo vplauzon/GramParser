@@ -12,7 +12,7 @@ namespace GramParserLib.Rule
 
         public SubstractRule(
             string ruleName,
-            IOutputExtractor outputExtractor,
+            IRuleOutput ruleOutput,
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
@@ -20,11 +20,10 @@ namespace GramParserLib.Rule
             bool? hasChildrenDetails = null)
             : base(
                   ruleName,
-                  outputExtractor,
+                  ruleOutput,
                   hasInterleave,
                   isRecursive,
-                  false,
-                  hasChildrenDetails)
+                  false)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
@@ -48,19 +47,13 @@ namespace GramParserLib.Rule
                     var match = new RuleMatch(
                         this,
                         primaryText,
-                        new[] { primaryMatch });
+                        () => RuleOutput.ComputeOutput(
+                            primaryText,
+                            new Lazy<object>(() => primaryMatch.ComputeOutput())));
 
                     yield return match;
                 }
             }
-        }
-
-        protected override object DefaultExtractOutput(
-            SubString text,
-            IImmutableList<RuleMatch> children,
-            IImmutableDictionary<string, RuleMatch> namedChildren)
-        {
-            return children.First().ComputeOutput();
         }
 
         public override string ToString()
