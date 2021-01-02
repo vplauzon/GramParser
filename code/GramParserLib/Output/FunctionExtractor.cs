@@ -124,7 +124,7 @@ namespace GramParserLib.Output
                         })
                               where p.Parameter != null
                               let isType = p.Parameter.GetType() == p.Type
-                              || p.Parameter.GetType().IsInstanceOfType(p.Type)
+                              || p.Type.IsAssignableFrom(p.Parameter.GetType())
                               where !isType
                               select p;
                 var firstTypeViolation = isTypes.FirstOrDefault();
@@ -232,12 +232,12 @@ namespace GramParserLib.Output
         private class PrependFunctionProxy : IFunctionProxy
         {
             #region Inner Types
-            private class PrependList : IEnumerable
+            private class PrependList : IEnumerable<object?>
             {
-                private readonly object _head;
+                private readonly object? _head;
                 private readonly IEnumerable _tail;
 
-                public PrependList(object head, IEnumerable tail)
+                public PrependList(object? head, IEnumerable<object?> tail)
                 {
                     if (head == null)
                     {
@@ -252,6 +252,11 @@ namespace GramParserLib.Output
                 }
 
                 IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return ((IEnumerable<object?>)this).GetEnumerator();
+                }
+
+                IEnumerator<object?> IEnumerable<object?>.GetEnumerator()
                 {
                     yield return _head;
                     foreach (var element in _tail)
@@ -270,7 +275,7 @@ namespace GramParserLib.Output
             {
                 var standardParameters = StandardizeParameters(parameters);
                 var head = standardParameters[0];
-                var list = standardParameters[1] as IEnumerable;
+                var list = standardParameters[1] as IEnumerable<object?>;
 
                 if (head == null)
                 {
@@ -339,6 +344,9 @@ namespace GramParserLib.Output
             {
                 new FixedFunctionProxyOneParam<string, bool>(Boolean),
                 new FixedFunctionProxyOneParam<string, int>(Integer),
+                new FixedFunctionProxyOneParam<
+                    IImmutableList<object?>,
+                    IEnumerable<object?>>(Flatten),
                 new ScalableFunctionProxyBase<string, string>(Concat),
                 new PrependFunctionProxy()
             };
@@ -383,6 +391,16 @@ namespace GramParserLib.Output
         private static string Concat(IEnumerable<string> texts)
         {
             return string.Concat(texts);
+        }
+
+        private static IImmutableList<object?> Flatten(IEnumerable<object?> arrays)
+        {
+            var flatten = arrays
+                .Cast<IEnumerable<object?>>()
+                .SelectMany(i => i)
+                .ToImmutableArray<object?>();
+
+            return flatten;
         }
         #endregion
     }
