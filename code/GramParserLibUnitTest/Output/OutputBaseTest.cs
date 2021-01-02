@@ -50,7 +50,11 @@ namespace GramParserLibUnitTest.Output
 
         private static string StandardizeObject(object obj)
         {
-            var serialized = JsonSerializer.Serialize(obj);
+            var options = new JsonSerializerOptions();
+
+            options.Converters.Add(SubString.JsonConverter);
+
+            var serialized = JsonSerializer.Serialize(obj, options);
 
             if (serialized.StartsWith("{"))
             {

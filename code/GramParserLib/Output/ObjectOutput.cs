@@ -27,7 +27,7 @@ namespace GramParserLib.Output
                                    ValueExtractor = pair.Value,
                                    Value = pair.Value.ComputeOutput(text, defaultOutput)
                                }).ToArray();
-            var firstNullKey = outputPairs.FirstOrDefault(p => !(p.Key is SubString));
+            var firstNullKey = outputPairs.FirstOrDefault(p => !(p.Key is string));
 
             if (firstNullKey != null)
             {

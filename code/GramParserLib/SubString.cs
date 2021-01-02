@@ -2,11 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GramParserLib
 {
     public struct SubString : IEnumerable<char>
     {
+        #region Inner Types
+        private class SubStringJsonConverter : JsonConverter<SubString>
+        {
+            public override SubString Read(
+                ref Utf8JsonReader reader,
+                Type typeToConvert,
+                JsonSerializerOptions options)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(
+                Utf8JsonWriter writer,
+                SubString value,
+                JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+        #endregion
+
         private readonly ArraySegment<char> _segment;
 
         private SubString(ArraySegment<char> segment)
@@ -18,6 +41,8 @@ namespace GramParserLib
         {
             return new SubString(new ArraySegment<char>(text.ToCharArray()));
         }
+
+        public static JsonConverter JsonConverter { get => new SubStringJsonConverter(); }
 
         public bool HasContent { get { return _segment.Any(); } }
 
