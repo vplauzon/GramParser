@@ -83,6 +83,7 @@
     <None Remove="Output\This.txt" />
     <None Remove="Output\ThisArrays.txt" />
     <None Remove="TypedOutput\FunctionInvocation.txt" />
+    <None Remove="TypedOutput\RecursiveFunctionInvocation.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -122,6 +123,7 @@
     <EmbeddedResource Include="Output\Identifier\Text.txt" />
     <EmbeddedResource Include="Output\Object\Children.txt" />
     <EmbeddedResource Include="Output\Object\ConstantObjects.txt" />
+    <EmbeddedResource Include="TypedOutput\RecursiveFunctionInvocation.txt" />
     <EmbeddedResource Include="TypedOutput\FunctionInvocation.txt" />
   </ItemGroup>
 

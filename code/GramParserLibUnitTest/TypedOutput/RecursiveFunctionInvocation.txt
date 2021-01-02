@@ -1,0 +1,6 @@
+﻿rule id = ("a".."z")* => text;
+rule parameter = id:id | invocation:invocation;
+rule parameterList = head:parameter tail:("," param:parameter => param)* => prepend(head, tail);
+rule invocation = id:id "(" params:parameterList? ")" => { "functionName": id, "parameters": flatten(params) };
+
+rule main = invocation;

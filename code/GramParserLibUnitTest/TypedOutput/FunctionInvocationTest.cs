@@ -38,7 +38,7 @@ namespace GramParserLibUnitTest.TypedOutput
 
             Assert.AreEqual("g", output.FunctionName, "Function name");
             Assert.AreEqual(1, output.Parameters.Count, "# parameters");
-            Assert.AreEqual("x", output.Parameters.First(), "1st parameter");
+            Assert.AreEqual("x", output.Parameters[0], "1st parameter");
         }
 
         [TestMethod]
