@@ -11,8 +11,8 @@ namespace GramParserLib.Rule
         private readonly IRule _excluded;
 
         public SubstractRule(
-            string ruleName,
-            IRuleOutput ruleOutput,
+            string? ruleName,
+            IRuleOutput? ruleOutput,
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
@@ -49,7 +49,7 @@ namespace GramParserLib.Rule
                         primaryText,
                         () => RuleOutput.ComputeOutput(
                             primaryText,
-                            new Lazy<object>(() => primaryMatch.ComputeOutput())));
+                            new Lazy<object?>(() => primaryMatch.ComputeOutput())));
 
                     yield return match;
                 }

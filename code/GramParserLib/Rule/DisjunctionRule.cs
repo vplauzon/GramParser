@@ -10,8 +10,8 @@ namespace GramParserLib.Rule
         private readonly TaggedRuleCollection _rules;
 
         public DisjunctionRule(
-            string ruleName,
-            IRuleOutput ruleOutput,
+            string? ruleName,
+            IRuleOutput? ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
             bool? isRecursive = null)
@@ -51,7 +51,7 @@ namespace GramParserLib.Rule
                             m.Text,
                             () => RuleOutput.ComputeOutput(
                                 m.Text,
-                                new Lazy<object>(() => MakeMap(rule.Tag, m.ComputeOutput()))));
+                                new Lazy<object?>(() => MakeMap(rule.Tag, m.ComputeOutput()))));
                     }
                     else
                     {
@@ -60,15 +60,20 @@ namespace GramParserLib.Rule
                             m.Text,
                             () => RuleOutput.ComputeOutput(
                                 m.Text,
-                                new Lazy<object>(() => m.ComputeOutput())));
+                                new Lazy<object?>(() => m.ComputeOutput())));
                     }
                 }
             }
         }
 
-        private static IImmutableDictionary<string, object> MakeMap(string tag, object output)
+        private static IImmutableDictionary<string, object?> MakeMap(string? tag, object? output)
         {
-            var dictionary = ImmutableDictionary<string, object>
+            if(tag==null)
+            {
+                throw new NotSupportedException("Tag can't be null here");
+            }
+
+            var dictionary = ImmutableDictionary<string, object?>
                 .Empty
                 .Add(tag, output);
 

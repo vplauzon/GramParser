@@ -21,10 +21,10 @@ namespace GramParserWorkbench.Models.Apis
 
         public bool IsMatch { get; set; }
 
-        public string Rule { get; }
+        public string? Rule { get; }
 
-        public string Text { get; }
+        public string? Text { get; }
 
-        public object Output { get; }
+        public object? Output { get; }
     }
 }

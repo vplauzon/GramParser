@@ -39,11 +39,14 @@ namespace GramParserLibUnitTest.Meta
         {
             var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
-            var match = grammar.Match("main", text);
+            
+            Assert.IsNotNull(grammar, "Grammar");
+            
+            var match = grammar!.Match("main", text);
 
             Assert.IsNotNull(match, "Match");
 
-            var output = ToList(match.ComputeOutput());
+            var output = ToList(match!.ComputeOutput());
 
             Assert.IsNotNull(output, "Output null");
             Assert.AreEqual(expectedChildren, output.Count(), "#Children");

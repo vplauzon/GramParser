@@ -12,7 +12,7 @@ namespace GramParserLibUnitTest.Output
     {
         protected void Test(
             string grammarFile,
-            (bool isSuccess, string ruleName, string text, object expectedOutput)[] samples)
+            (bool isSuccess, string ruleName, string text, object? expectedOutput)[] samples)
         {
             var grammarText = GetResource(grammarFile);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
@@ -21,13 +21,13 @@ namespace GramParserLibUnitTest.Output
             for (int i = 0; i != samples.Length; ++i)
             {
                 (var isSuccess, var ruleName, var text, var expectedOutput) = samples[i];
-                var match = grammar.Match(ruleName, text);
+                var match = grammar!.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(text, match.Text.ToString(), $"Text - {i}");
+                    Assert.AreEqual(text, match!.Text.ToString(), $"Text - {i}");
 
                     if (match.ComputeOutput() == null)
                     {
@@ -48,7 +48,7 @@ namespace GramParserLibUnitTest.Output
             }
         }
 
-        private static string StandardizeObject(object obj)
+        private static string StandardizeObject(object? obj)
         {
             var options = new JsonSerializerOptions();
 

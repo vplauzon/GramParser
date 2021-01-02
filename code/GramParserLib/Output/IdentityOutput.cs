@@ -12,7 +12,7 @@ namespace GramParserLib.Output
 
         public static IRuleOutput Instance { get; } = new IdentityOutput();
 
-        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
+        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             return lazyDefaultOutput.Value;
         }

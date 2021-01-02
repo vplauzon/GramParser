@@ -7,7 +7,7 @@ namespace GramParserLib.Rule
 {
     internal class MatchAnyCharacterRule : RuleBase
     {
-        public MatchAnyCharacterRule(string ruleName, IRuleOutput outputExtractor)
+        public MatchAnyCharacterRule(string? ruleName, IRuleOutput? outputExtractor)
             : base(ruleName, outputExtractor, false, false)
         {
         }
@@ -28,7 +28,7 @@ namespace GramParserLib.Rule
                 var match = new RuleMatch(
                     this,
                     matchText,
-                    () => RuleOutput.ComputeOutput(matchText, new Lazy<object>(matchText)));
+                    () => RuleOutput.ComputeOutput(matchText, new Lazy<object?>(matchText)));
 
                 return new[] { match };
             }

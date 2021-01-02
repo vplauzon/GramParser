@@ -10,10 +10,10 @@ namespace GramParserLib.Rule
     {
         public TaggedRule(IRule rule)
         {
-            Rule = rule ?? throw new ArgumentNullException(nameof(rule));
+            Rule = rule;
         }
 
-        public TaggedRule(string tag, IRule rule)
+        public TaggedRule(string? tag, IRule rule)
         {
             if (tag == string.Empty)
             {
@@ -39,7 +39,7 @@ namespace GramParserLib.Rule
 
         public bool HasTag { get { return !string.IsNullOrWhiteSpace(Tag); } }
 
-        public string Tag { get; private set; }
+        public string? Tag { get; private set; }
 
         public IRule Rule { get; private set; }
 

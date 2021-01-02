@@ -16,7 +16,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "empty", "hi", new object()),
+                (true, "empty", "hi", (object?)new object()),
                 (true, "oneField", "hi", new { text="Hello" }),
                 (true, "twoFields", "hi", ImmutableDictionary<string, object>.Empty.Add("text", "Hello").Add("number", 42)),
                 (true, "threeFields", "hi", ImmutableDictionary<string, object>.Empty.Add("text", "Hello").Add("number", -42).Add("boolean", true))
@@ -30,7 +30,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "seq", "aaabb", (object)new{ a=new[]{"a","a","a" }, b=new[]{"b","b" } }),
+                (true, "seq", "aaabb", (object?)new{ a=new[]{"a","a","a" }, b=new[]{"b","b" } }),
                 (true, "dij", "aaa", new {a=new[]{"a","a","a" } }),
                 (true, "dij", "bbbb", new {b=new[]{"b","b","b", "b" } })
             };

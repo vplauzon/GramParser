@@ -44,14 +44,14 @@ namespace GramParserLib
         private static readonly RuleMatch[] EMPTY_RULE_MATCHES = new RuleMatch[0];
 
         private readonly SubString _text;
-        private readonly IRule _interleaveRule;
+        private readonly IRule? _interleaveRule;
         private readonly int _depth;
         private readonly ImmutableHashSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
         public ExplorerContext(
             SubString text,
-            IRule interleaveRule = null,
+            IRule? interleaveRule = null,
             int? depth = null)
             : this(
                   text,
@@ -64,7 +64,7 @@ namespace GramParserLib
 
         private ExplorerContext(
             SubString text,
-            IRule interleaveRule,
+            IRule? interleaveRule,
             int depth,
             ImmutableHashSet<IRule> ruleNameExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
@@ -215,7 +215,7 @@ namespace GramParserLib
                 _ambiantRuleProperties);
         }
 
-        private ImmutableHashSet<IRule> GetNewRuleExceptions(
+        private ImmutableHashSet<IRule>? GetNewRuleExceptions(
             AmbiantRuleProperties newAmbiantRuleProperties,
             IRule rule)
         {
@@ -240,19 +240,26 @@ namespace GramParserLib
 
         private int MatchInterleave(ExplorerContext interleaveContext)
         {
-            var interleaveMatch = _interleaveRule.Match(interleaveContext).FirstOrDefault();
-
-            if (interleaveMatch == null || interleaveMatch.Text.Length == 0)
+            if (_interleaveRule == null)
             {
                 return 0;
             }
             else
             {
-                var newInterleaveContext = interleaveContext.MoveForward(interleaveMatch);
-                //  Recursion
-                var remainingLength = MatchInterleave(newInterleaveContext);
+                var interleaveMatch = _interleaveRule.Match(interleaveContext).FirstOrDefault();
 
-                return interleaveMatch.Text.Length + remainingLength;
+                if (interleaveMatch == null || interleaveMatch.Text.Length == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    var newInterleaveContext = interleaveContext.MoveForward(interleaveMatch);
+                    //  Recursion
+                    var remainingLength = MatchInterleave(newInterleaveContext);
+
+                    return interleaveMatch.Text.Length + remainingLength;
+                }
             }
         }
     }
