@@ -19,8 +19,7 @@ namespace GramParserLib.Rule
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive,
-                  false)
+                  isRecursive)
         {
             if (rules == null || !rules.Any())
             {
@@ -29,6 +28,8 @@ namespace GramParserLib.Rule
 
             _rules = new TaggedRuleCollection(rules);
         }
+
+        public override bool IsTerminalRule => false;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {

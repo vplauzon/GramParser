@@ -23,8 +23,7 @@ namespace GramParserLib.Rule
                   ruleName,
                   outputExtractor,
                   hasInterleave,
-                  isRecursive,
-                  false)
+                  isRecursive)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)
@@ -35,6 +34,8 @@ namespace GramParserLib.Rule
             _min = min;
             _max = max;
         }
+
+        public override bool IsTerminalRule => false;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {

@@ -21,12 +21,13 @@ namespace GramParserLib.Rule
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive,
-                  false)
+                  isRecursive)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
         }
+
+        public override bool IsTerminalRule => false;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {

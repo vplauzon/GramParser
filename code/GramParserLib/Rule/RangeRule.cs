@@ -13,7 +13,7 @@ namespace GramParserLib.Rule
             IRuleOutput ruleOutput,
             char first,
             char last)
-            : base(ruleName, ruleOutput, false, true, true)
+            : base(ruleName, ruleOutput, false, true)
         {
             if (last < first)
             {
@@ -24,6 +24,8 @@ namespace GramParserLib.Rule
             First = first;
             Last = last;
         }
+
+        public override bool IsTerminalRule => true;
 
         public char First { get; }
 

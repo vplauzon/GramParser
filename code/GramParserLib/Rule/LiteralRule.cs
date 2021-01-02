@@ -14,7 +14,7 @@ namespace GramParserLib.Rule
             string ruleName,
             IRuleOutput ruleOutput,
             IEnumerable<char> literal)
-            : base(ruleName, ruleOutput, false, false, true)
+            : base(ruleName, ruleOutput, false, false)
         {
             if (literal == null)
             {
@@ -28,7 +28,7 @@ namespace GramParserLib.Rule
             string ruleName,
             IRuleOutput outputExtractor,
             string literal)
-            : base(ruleName, outputExtractor, false, false, true)
+            : base(ruleName, outputExtractor, false, false)
         {
             if (literal == null)
             {
@@ -37,6 +37,8 @@ namespace GramParserLib.Rule
 
             _literal = literal.ToCharArray();
         }
+
+        public override bool IsTerminalRule => true;
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
