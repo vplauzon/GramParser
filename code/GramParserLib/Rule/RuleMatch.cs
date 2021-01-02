@@ -3,11 +3,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using GramParserLib.Output;
+using System.Text.Json;
 
 namespace GramParserLib
 {
     public class RuleMatch
     {
+        private static readonly JsonSerializerOptions _defaultOptions = CreateDefaultOptions();
+
         private readonly Func<object?> _outputFactory;
 
         public RuleMatch(
@@ -48,6 +51,19 @@ namespace GramParserLib
             var output = _outputFactory();
 
             return output;
+        }
+
+        public T ComputeTypedOutput<T>(JsonSerializerOptions? options = null)
+        {
+            var output = _outputFactory();
+            var localOptions = new JsonSerializerOptions(options ?? _defaultOptions);
+
+            localOptions.Converters.Add(SubString.JsonConverter);
+
+            var serialized = JsonSerializer.Serialize(output, localOptions);
+            var typedOutput = JsonSerializer.Deserialize<T>(serialized, localOptions);
+
+            return typedOutput;
         }
 
         public RuleMatch AddInterleaveLength(int length)
@@ -106,6 +122,15 @@ namespace GramParserLib
             {
                 return text.ToString();
             }
+        }
+
+        private static JsonSerializerOptions CreateDefaultOptions()
+        {
+            var options = new JsonSerializerOptions();
+
+            options.PropertyNameCaseInsensitive = true;
+
+            return options;
         }
     }
 }
