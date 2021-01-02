@@ -75,6 +75,5 @@ else:
     writeAll(fullVersionPath, fullVersion)
 
     #   Output variable
-    print('Set the full version in Azure DevOps variable:')
-
-    print('##vso[task.setvariable variable=full-version;]%s' % (fullVersion))
+    print('Set the full version in GitHub Action output:')
+    print('##[set-output name=full-version;]%s' % (fullVersion))
