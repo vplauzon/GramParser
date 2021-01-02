@@ -1,1 +1,0 @@
-Only number of replica is supported as configurable value.

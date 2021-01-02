@@ -1,0 +1,25 @@
+name:  Shell Dev Deploy
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - deployment/gram-parser-infra.json
+      - .github/workflows/infra-deploy.yaml
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Azure Login
+      run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
+    - name: Ensure resource group exists
+      run: bash components/shell/deployment/create-group.sh kusto-x-dev eastus
+    - name: Deploy
+      run: |
+        cd components/shell/deployment
+        bash deploy-public-apps.sh kusto-x-dev

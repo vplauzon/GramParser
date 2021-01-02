@@ -1,0 +1,171 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "Unique ID": "[uniqueString(concat(resourceGroup().id, 'kusto-x'))]",
+        "Suffix": "[concat('kusto-x-', variables('Unique ID'))]",
+        "App Insights": "[concat('app-monitor-', variables('Suffix'))]",
+        "Log Analytics": "[concat('infra-monitor-', variables('Suffix'))]",
+        "Storage": "[concat('kustox', variables('Unique ID'))]",
+        "App Plan": "[concat('app-plan-', variables('Suffix'))]",
+        "Workbench Dev": "[concat('gram-parser-workbench-dev', variables('Suffix'))]",
+        "Workbench Prod": "[concat('gram-parser-workbench-prod', variables('Suffix'))]",
+        "Apps Config": [
+            {
+                "name": "[variables('Workbench Dev')]",
+                "containerImage": "vplauzon/gram-parser-workbench:dev",
+                "alwaysOn": true
+            },
+            {
+                "name": "[variables('Workbench Prod')]",
+                "containerImage": "vplauzon/gram-parser-workbench:prod",
+                "alwaysOn": true
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/components",
+            "name": "[variables('App Insights')]",
+            "apiVersion": "2015-05-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+            },
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "[variables('Log Analytics')]",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('Storage')]",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "isHnsEnabled": true,
+                "supportsHttpsTrafficOnly": true
+            },
+            "resources": [
+                {
+                    "apiVersion": "2019-04-01",
+                    "type": "blobServices/containers",
+                    "name": "[concat('default/something')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('Storage'))]"
+                    ],
+                    "properties": {
+                        "publicAccess": "None"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('App Plan')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "copy": {
+                "name": "app-loop",
+                "count": "[length(variables('Apps Config'))]",
+                "mode": "parallel"
+            },
+            "name": "[variables('Apps Config')[copyIndex()].name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]"
+            ],
+            "kind": "app,linux,container",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]",
+                "siteConfig": {
+                    "linuxFxVersion": "[concat('DOCKER|', variables('Apps Config')[copyIndex()].containerImage)]"
+                },
+                "clientAffinityEnabled": false
+            },
+            "resources": [
+                {
+                    "type": "config",
+                    "apiVersion": "2018-11-01",
+                    "name": "web",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('Apps Config')[copyIndex()].name)]"
+                    ],
+                    "properties": {
+                        "alwaysOn": "[variables('Apps Config')[copyIndex()].alwaysOn]",
+                        "ftpsState": "Disabled"
+                    }
+                },
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('Apps Config')[copyIndex()].name)]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('Storage'))]"
+                    ],
+                    "tags": {
+                        "displayName": "appsettings"
+                    },
+                    "properties": {
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('App Insights'))).InstrumentationKey]",
+                        "AzureStorageConnection": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('Storage'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('Storage')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                        "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
+                        "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+                        "APPINSIGHTS_PROFILERFEATURE_VERSION": "1.0.0",
+                        "DiagnosticServices_EXTENSION_VERSION": "~3",
+                        "APPINSIGHTS_SNAPSHOTFEATURE_VERSION": "1.0.0",
+                        "SnapshotDebugger_EXTENSION_VERSION": "~1",
+                        "InstrumentationEngine_EXTENSION_VERSION": "~1",
+                        "XDT_MicrosoftApplicationInsights_BaseExtensions": "disabled"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+    }
+}
