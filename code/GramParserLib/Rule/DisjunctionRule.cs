@@ -50,14 +50,16 @@ namespace GramParserLib.Rule
                             m.Text,
                             () => RuleOutput.ComputeOutput(
                                 m.Text,
-                                MakeMap(rule.Tag, m.ComputeOutput())));
+                                new Lazy<object>(() => MakeMap(rule.Tag, m.ComputeOutput()))));
                     }
                     else
                     {
                         yield return new RuleMatch(
                             this,
                             m.Text,
-                            () => RuleOutput.ComputeOutput(m.Text, m.ComputeOutput()));
+                            () => RuleOutput.ComputeOutput(
+                                m.Text,
+                                new Lazy<object>(() => m.ComputeOutput())));
                     }
                 }
             }

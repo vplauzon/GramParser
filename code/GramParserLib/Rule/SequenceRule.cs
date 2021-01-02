@@ -111,16 +111,18 @@ namespace GramParserLib.Rule
                                      Name = m.rule.Tag,
                                      Output = m.match.ComputeOutput()
                                  };
-                var map = components.ToImmutableDictionary(c => c.Name, c => c.Output);
 
-                return RuleOutput.ComputeOutput(text, map);
+                return RuleOutput.ComputeOutput(
+                    text,
+                    new Lazy<object>(() => components.ToImmutableDictionary(c => c.Name, c => c.Output)));
             }
             else
             {
-                var subOutputs = from m in subMatches
-                                 select m.match.ComputeOutput();
+                Func<object> outputFactory = () => subMatches
+                    .Select(m => m.match.ComputeOutput())
+                    .ToImmutableArray();
 
-                return RuleOutput.ComputeOutput(text, subOutputs.ToImmutableArray());
+                return RuleOutput.ComputeOutput(text, new Lazy<object>(outputFactory));
             }
         }
     }

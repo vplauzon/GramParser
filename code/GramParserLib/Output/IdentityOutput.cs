@@ -6,9 +6,9 @@ namespace GramParserLib.Output
 {
     internal class IdentityOutput : IRuleOutput
     {
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
-            return defaultOutput;
+            return lazyDefaultOutput.Value;
         }
     }
 }

@@ -14,10 +14,10 @@ namespace GramParserLib.Output
             _outputs = ImmutableList<IRuleOutput>.Empty.AddRange(extractors);
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
             var outputs = _outputs
-                .Select(o => o.ComputeOutput(text, defaultOutput))
+                .Select(o => o.ComputeOutput(text, lazyDefaultOutput))
                 .ToImmutableArray();
 
             return outputs;

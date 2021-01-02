@@ -58,7 +58,9 @@ namespace GramParserLib.Rule
                 yield return new RuleMatch(
                     this,
                     matchText,
-                    () => RuleOutput.ComputeOutput(matchText, ImmutableArray<object>.Empty));
+                    () => RuleOutput.ComputeOutput(
+                        matchText,
+                        new Lazy<object>(ImmutableArray<object>.Empty)));
             }
         }
 
@@ -121,11 +123,11 @@ namespace GramParserLib.Rule
             SubString matchText,
             ImmutableList<RuleMatch> newChildrenMatches)
         {
-            var childrenOutputs = newChildrenMatches
+            Func<object> outputFactory = () => newChildrenMatches
                 .Select(m => m.ComputeOutput())
                 .ToImmutableArray();
 
-            return RuleOutput.ComputeOutput(matchText, childrenOutputs);
+            return RuleOutput.ComputeOutput(matchText, new Lazy<object>(outputFactory));
         }
 
         private bool IsRepeatCountInRange(int repeatCount)

@@ -12,7 +12,7 @@ namespace GramParserLib.Output
 
         public static IRuleOutput Instance { get => new TextOutput(); }
 
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
             return text;
         }

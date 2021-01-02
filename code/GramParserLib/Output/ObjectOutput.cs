@@ -17,15 +17,15 @@ namespace GramParserLib.Output
                .AddRange(outputPairs);
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
             var outputPairs = (from pair in _outputPairs
                                select new
                                {
                                    KeyExtractor = pair.Key,
-                                   Key = pair.Key.ComputeOutput(text, defaultOutput),
+                                   Key = pair.Key.ComputeOutput(text, lazyDefaultOutput),
                                    ValueExtractor = pair.Value,
-                                   Value = pair.Value.ComputeOutput(text, defaultOutput)
+                                   Value = pair.Value.ComputeOutput(text, lazyDefaultOutput)
                                }).ToArray();
             var firstNullKey = outputPairs.FirstOrDefault(p => !(p.Key is string));
 

@@ -294,10 +294,10 @@ namespace GramParserLib.Output
             }
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
             var parameterOutputs = from p in _parameters
-                                   select p.ComputeOutput(text, defaultOutput);
+                                   select p.ComputeOutput(text, lazyDefaultOutput);
 
             return _function.Invoke(ImmutableList<object>.Empty.AddRange(parameterOutputs));
         }

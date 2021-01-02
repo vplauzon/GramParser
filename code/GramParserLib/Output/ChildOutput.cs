@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 
 namespace GramParserLib.Output
 {
@@ -11,9 +12,9 @@ namespace GramParserLib.Output
             _name = name;
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, object defaultOutput)
+        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
         {
-            var map = defaultOutput as IImmutableDictionary<string, object>;
+            var map = lazyDefaultOutput.Value as IImmutableDictionary<string, object>;
             object child;
 
             if (map == null)
