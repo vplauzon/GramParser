@@ -9,14 +9,14 @@ namespace GramParserLibUnitTest.TypedOutput
 {
     public class TypedOutputBaseTest : BaseTest
     {
-        protected T TestTypedOutput<T>(string resourceName)
+        protected T TestTypedOutput<T>(string resourceName, string text)
         {
             var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);
 
             Assert.IsNotNull(grammar, "Grammar couldn't get parsed");
 
-            var match = grammar!.Match(null, "f()");
+            var match = grammar!.Match(null, text);
 
             Assert.IsNotNull(match, "No match");
 
