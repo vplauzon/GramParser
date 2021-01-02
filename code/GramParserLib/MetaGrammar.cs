@@ -371,7 +371,7 @@ namespace GramParserLib
             private IEnumerable<object> ExtractOutputBodiesFromArray(IImmutableDictionary<string, object> listMap)
             {
                 var head = listMap["head"];
-                var tail = ToMap(listMap["tail"]);
+                var tail = ToList(listMap["tail"]);
                 var tailElements = from e in tail
                                    let eMap = ToMap(e)
                                    select eMap.First().Value;
