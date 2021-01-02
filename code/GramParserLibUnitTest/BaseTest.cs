@@ -8,14 +8,14 @@ namespace GramParserLibUnitTest
 {
     public class BaseTest
     {
-        protected IImmutableList<object> ToList(object output)
+        protected IImmutableList<object> ToList(object? output)
         {
-            return (IImmutableList<object>)output;
+            return (IImmutableList<object>)(output ?? throw new ArgumentNullException(nameof(output)));
         }
 
-        protected IImmutableDictionary<string, object> ToMap(object output)
+        protected IImmutableDictionary<string, object> ToMap(object? output)
         {
-            return (IImmutableDictionary<string, object>)output;
+            return (IImmutableDictionary<string, object>)(output ?? throw new ArgumentNullException(nameof(output)));
         }
 
         protected string GetResource(string resourceName)

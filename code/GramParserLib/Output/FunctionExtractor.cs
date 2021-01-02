@@ -16,7 +16,7 @@ namespace GramParserLib.Output
 
             int? ParameterCount { get; }
 
-            object Invoke(IImmutableList<object> parameters);
+            object? Invoke(IImmutableList<object?> parameters);
         }
 
         private class ScalableFunctionProxyBase<T, R> : IFunctionProxy
@@ -32,16 +32,16 @@ namespace GramParserLib.Output
 
             int? IFunctionProxy.ParameterCount => null;
 
-            object IFunctionProxy.Invoke(IImmutableList<object> parameters)
+            object? IFunctionProxy.Invoke(IImmutableList<object?> parameters)
             {
                 var standardParameters = StandardizeParameters(parameters);
 
                 ValidateParameters(standardParameters);
 
-                return _function(parameters.Cast<T>());
+                return _function(standardParameters.Cast<T>());
             }
 
-            private void ValidateParameters(IImmutableList<object> parameters)
+            private void ValidateParameters(IImmutableList<object?> parameters)
             {
                 var isTypes = from p in parameters.Zip(
                     Enumerable.Range(1, parameters.Count),
@@ -73,7 +73,7 @@ namespace GramParserLib.Output
                     {
                         throw new ParsingException(
                             $"Function '{((IFunctionProxy)this).FunctionName}' "
-                            + $" parameter {firstTypeViolation.Index}"
+                            + $" parameter {firstNullViolation.Index}"
                             + " can't be null");
                     }
                 }
@@ -86,7 +86,7 @@ namespace GramParserLib.Output
 
             int? IFunctionProxy.ParameterCount => GetParameterTypes().Length;
 
-            object IFunctionProxy.Invoke(IImmutableList<object> parameters)
+            object? IFunctionProxy.Invoke(IImmutableList<object?> parameters)
             {
                 var standardParameters = StandardizeParameters(parameters);
 
@@ -99,9 +99,9 @@ namespace GramParserLib.Output
 
             protected abstract Type[] GetParameterTypes();
 
-            protected abstract object Invoke(IImmutableList<object> parameters);
+            protected abstract object? Invoke(IImmutableList<object?> parameters);
 
-            private void ValidateParameters(IImmutableList<object> parameters)
+            private void ValidateParameters(IImmutableList<object?> parameters)
             {
                 var types = GetParameterTypes();
 
@@ -158,13 +158,14 @@ namespace GramParserLib.Output
                 return _emptyParams;
             }
 
-            protected override object Invoke(IImmutableList<object> parameters)
+            protected override object? Invoke(IImmutableList<object?> parameters)
             {
                 return _function();
             }
         }
 
         private class FixedFunctionProxyOneParam<T, R> : FixedFunctionProxyBase
+            where T : class?
         {
             private static readonly Type[] _params = new[] { typeof(T) };
             private readonly Func<T, R> _function;
@@ -184,9 +185,18 @@ namespace GramParserLib.Output
                 return _params;
             }
 
-            protected override object Invoke(IImmutableList<object> parameters)
+            protected override object? Invoke(IImmutableList<object?> parameters)
             {
-                return _function((T)parameters.First());
+                var firstParam = parameters.First();
+
+                if (firstParam == null)
+                {
+                    throw new NotSupportedException("Do not support null parameter");
+                }
+                else
+                {
+                    return _function((T)firstParam);
+                }
             }
         }
 
@@ -210,9 +220,12 @@ namespace GramParserLib.Output
                 return _params;
             }
 
-            protected override object Invoke(IImmutableList<object> parameters)
+            protected override object? Invoke(IImmutableList<object?> parameters)
             {
-                return _function((T1)parameters[0], (T2)parameters[1]);
+                var p1 = (T1)parameters[0] ?? throw new NotSupportedException("Do not support null parameter");
+                var p2 = (T2)parameters[1] ?? throw new NotSupportedException("Do not support null parameter");
+
+                return _function(p1, p2);
             }
         }
 
@@ -253,11 +266,18 @@ namespace GramParserLib.Output
 
             int? IFunctionProxy.ParameterCount => 2;
 
-            object IFunctionProxy.Invoke(IImmutableList<object> parameters)
+            object? IFunctionProxy.Invoke(IImmutableList<object?> parameters)
             {
                 var standardParameters = StandardizeParameters(parameters);
+                var head = standardParameters[0];
                 var list = standardParameters[1] as IEnumerable;
 
+                if (head == null)
+                {
+                    throw new ParsingException(
+                        $"Function '{((IFunctionProxy)this).FunctionName}' has wrong argument "
+                        + "at parameter 0:  isn't a head");
+                }
                 if (list == null)
                 {
                     throw new ParsingException(
@@ -265,7 +285,7 @@ namespace GramParserLib.Output
                         + "at parameter 1:  isn't a list");
                 }
 
-                return new PrependList(standardParameters[0], list);
+                return new PrependList(head, list);
             }
         }
         #endregion
@@ -294,18 +314,18 @@ namespace GramParserLib.Output
             }
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
+        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             var parameterOutputs = from p in _parameters
                                    select p.ComputeOutput(text, lazyDefaultOutput);
 
-            return _function.Invoke(ImmutableList<object>.Empty.AddRange(parameterOutputs));
+            return _function.Invoke(ImmutableList<object?>.Empty.AddRange(parameterOutputs));
         }
 
-        private static IImmutableList<object> StandardizeParameters(IImmutableList<object> parameters)
+        private static IImmutableList<object?> StandardizeParameters(IImmutableList<object?> parameters)
         {
             var standards = parameters
-                .Select(p => p.GetType() == typeof(SubString)
+                .Select(p => (p != null && p.GetType() == typeof(SubString))
                 ? p.ToString()
                 : p)
                 .ToImmutableList();

@@ -33,7 +33,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "main", "a", (object)"d"),
+                (true, "main", "a", (object?)"d"),
                 (true, "main", "b", "d")
             };
 

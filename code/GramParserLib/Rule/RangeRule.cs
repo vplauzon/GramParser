@@ -9,8 +9,8 @@ namespace GramParserLib.Rule
     internal class RangeRule : RuleBase
     {
         public RangeRule(
-            string ruleName,
-            IRuleOutput ruleOutput,
+            string? ruleName,
+            IRuleOutput? ruleOutput,
             char first,
             char last)
             : base(ruleName, ruleOutput, false, true, true)
@@ -43,7 +43,7 @@ namespace GramParserLib.Rule
                     var match = new RuleMatch(
                         this,
                         matchText,
-                        () => RuleOutput.ComputeOutput(matchText, new Lazy<object>(matchText)));
+                        () => RuleOutput.ComputeOutput(matchText, new Lazy<object?>(matchText)));
 
                     return new[] { match };
                 }

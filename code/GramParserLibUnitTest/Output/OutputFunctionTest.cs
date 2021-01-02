@@ -16,7 +16,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "oneParam", "Hello", (object)42 ),
+                (true, "oneParam", "Hello", (object?)42 ),
                 (true, "manyParams", "Hello", "HiMyNameIsMax")
             };
 
@@ -28,7 +28,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "singleDigit", "0", (object)0),
+                (true, "singleDigit", "0", (object?)0),
                 (true, "singleDigit", "4", 4),
                 (true, "singleDigit", "9", 9),
                 (true, "manyDigits", "12", 12),
@@ -45,7 +45,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "bool", "true", (object)true),
+                (true, "bool", "true", (object?)true),
                 (true, "bool", "false", (object)false)
             };
 
@@ -57,7 +57,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "int", "74", (object)74)
+                (true, "int", "74", (object?)74)
             };
 
             Test("Function.WithTextFunctions.txt", samples);
@@ -68,7 +68,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "list", "a", (object)new[]{"a"}),
+                (true, "list", "a", (object?)new[]{"a"}),
                 (true, "list", "a,b", (object)new[]{"a", "b"}),
                 (true, "list", "a,b,c", (object)new[]{"a", "b", "c"})
             };

@@ -41,7 +41,7 @@ namespace GramParserLib
 
             public GrammarCreator(RuleMatch match)
             {
-                IRule interleave = null;
+                IRule? interleave = null;
                 var declarations = ToList(match.ComputeOutput());
 
                 foreach (var declaration in declarations)
@@ -83,17 +83,17 @@ namespace GramParserLib
                 }
 
                 ResolveProxies();
-                CreatedGrammar = new Grammar(_ruleMap, interleave);
+                CreatedGrammar = new Grammar(_ruleMap, interleave ?? MatchNoneRule.Instance);
             }
 
-            private IImmutableList<object> ToList(object obj)
+            private IImmutableList<object> ToList(object? obj)
             {
-                return (IImmutableList<object>)obj;
+                return (IImmutableList<object>)(obj ?? throw new ArgumentNullException(nameof(obj)));
             }
 
-            private IImmutableDictionary<string, object> ToMap(object obj)
+            private IImmutableDictionary<string, object> ToMap(object? obj)
             {
-                return (IImmutableDictionary<string, object>)obj;
+                return (IImmutableDictionary<string, object>)(obj ?? throw new ArgumentNullException(nameof(obj)));
             }
 
             private void ResolveProxies()
@@ -162,7 +162,7 @@ namespace GramParserLib
                 string ruleID,
                 IImmutableList<object> parameterAssignationList,
                 IImmutableDictionary<string, object> ruleBody,
-                IImmutableDictionary<string, object> outputBodyMap)
+                IImmutableDictionary<string, object>? outputBodyMap)
             {
                 var propertyBag = CreatePropertyBag(parameterAssignationList);
                 var outputExtractor = CreateOutputExtractor(outputBodyMap);
@@ -171,10 +171,10 @@ namespace GramParserLib
             }
 
             private IRule CreateRule(
-                string ruleID,
+                string? ruleID,
                 PropertyBag propertyBag,
                 IImmutableDictionary<string, object> ruleBody,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var ruleBodyTag = ruleBody.First().Key;
                 var ruleBodyBody = ruleBody.First().Value;
@@ -253,7 +253,7 @@ namespace GramParserLib
                 }
             }
 
-            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputBodyMap)
+            private IRuleOutput? CreateOutputExtractor(IImmutableDictionary<string, object>? outputBodyMap)
             {
                 if (outputBodyMap == null)
                 {
@@ -462,7 +462,7 @@ namespace GramParserLib
             }
 
             private IRule CreateRuleReference(
-                string ruleID,
+                string? ruleID,
                 SubString ruleName,
                 PropertyBag propertyBag)
             {
@@ -500,10 +500,10 @@ namespace GramParserLib
             }
 
             private IRule CreateLiteral(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBodyMap,
                 PropertyBag propertyBag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 if (ruleBodyBodyMap is null)
                 {
@@ -565,18 +565,18 @@ namespace GramParserLib
             }
 
             private IRule CreateAnyCharacter(
-                string ruleID,
+                string? ruleID,
                 PropertyBag propertyBag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 return new MatchAnyCharacterRule(ruleID, outputExtractor);
             }
 
             private IRule CreateRange(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag propertyBag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var lower = ToMap(ToMap(ruleBodyBody["lower"]).First().Value);
                 var upper = ToMap(ToMap(ruleBodyBody["upper"]).First().Value);
@@ -587,10 +587,10 @@ namespace GramParserLib
             }
 
             private IRule CreateRepeat(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var subRuleBody = ToMap(ruleBodyBody["rule"]);
                 var cardinality = ToMap(ruleBodyBody["cardinality"]);
@@ -695,10 +695,10 @@ namespace GramParserLib
             }
 
             private IRule CreateDisjunction(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var headTag = ToMap(ruleBodyBody["t"]);
                 var head = ToMap(ruleBodyBody["head"]);
@@ -722,10 +722,10 @@ namespace GramParserLib
             }
 
             private IRule CreateSequence(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var head = ruleBodyBody["head"];
                 var tail = ToList(ruleBodyBody["tail"]);
@@ -748,10 +748,10 @@ namespace GramParserLib
             }
 
             private IRule CreateSubstract(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var primary = ToMap(ruleBodyBody["primary"]);
                 var excluded = ToMap(ruleBodyBody["excluded"]);
@@ -768,10 +768,10 @@ namespace GramParserLib
             }
 
             private IRule CreateBracket(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
-                IRuleOutput outputExtractor)
+                IRuleOutput? outputExtractor)
             {
                 var ruleBodyOutput = ToMap(ruleBodyBody.First().Value);
                 var ruleBody = ToMap(ruleBodyOutput["body"]);
@@ -806,7 +806,7 @@ namespace GramParserLib
 
         private static readonly Grammar _metaSet = CreateMetaGrammar();
 
-        public static Grammar ParseGrammar(SubString text)
+        public static Grammar? ParseGrammar(SubString text)
         {
             var match = _metaSet.Match(MAIN_RULE, text);
 
@@ -907,7 +907,12 @@ namespace GramParserLib
                 {
                     new TaggedRule(
                         null,
-                        new RepeatRule(null, null, new LiteralRule(null, null, "-"), null, 1)),
+                        new RepeatRule(
+                            null,
+                            null,
+                            new LiteralRule(null, null, "-"),
+                            null,
+                            1)),
                     new TaggedRule(
                         null,
                         new RepeatRule(null, null, number, null, null)),
@@ -981,7 +986,13 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule("lower", quotedCharacter),
-                    new TaggedRule(new RepeatRule(null, null, new LiteralRule(null, null, "."),2,2)),
+                    new TaggedRule(
+                        new RepeatRule(
+                            null,
+                            null,
+                            new LiteralRule(null, null, "."),
+                            2,
+                            2)),
                     new TaggedRule("upper", quotedCharacter)
                 },
                 false,
@@ -1156,7 +1167,14 @@ namespace GramParserLib
                 null,
                 new[]
                 {
-                    new TaggedRule(new RepeatRule(null, null, interleave, 1, null, false, false)),
+                    new TaggedRule(new RepeatRule(
+                        null,
+                        null,
+                        interleave,
+                        1,
+                        null,
+                        false,
+                        false)),
                     new TaggedRule("s", innerSequenceable)
                 },
                 hasInterleave: false,
@@ -1462,7 +1480,7 @@ namespace GramParserLib
             outputBodyProxy.ReferencedRule = outputBody;
 
             return new Grammar(
-                new Dictionary<string, IRule>() { { main.RuleName, main } },
+                new Dictionary<string, IRule>() { { main.RuleName!, main } },
                 interleave);
         }
 

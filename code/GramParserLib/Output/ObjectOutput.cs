@@ -17,7 +17,7 @@ namespace GramParserLib.Output
                .AddRange(outputPairs);
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
+        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             var outputPairs = (from pair in _outputPairs
                                select new

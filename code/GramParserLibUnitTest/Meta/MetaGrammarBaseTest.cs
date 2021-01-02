@@ -21,13 +21,13 @@ namespace GramParserLibUnitTest.Meta
             for (int i = 0; i != samples.Length; ++i)
             {
                 (var isSuccess, var ruleName, var text) = samples[i];
-                var match = grammar.Match(ruleName, text);
+                var match = grammar!.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 
                 if (isSuccess)
                 {
-                    Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
+                    Assert.AreEqual(text, match!.Text.ToString(), $"Content - {i}");
                 }
             }
         }

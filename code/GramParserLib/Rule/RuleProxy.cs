@@ -7,7 +7,7 @@ namespace GramParserLib.Rule
 {
     internal class RuleProxy : IRule
     {
-        private IRule _referencedRule = null;
+        private IRule? _referencedRule = null;
 
         public IRule ReferencedRule
         {
@@ -47,7 +47,7 @@ namespace GramParserLib.Rule
         public bool IsTerminalRule { get => ReferencedRule.IsTerminalRule; }
         #endregion
 
-        string IRule.RuleName => ReferencedRule.RuleName;
+        string? IRule.RuleName => ReferencedRule.RuleName;
 
         IEnumerable<RuleMatch> IRule.Match(ExplorerContext context)
             => ReferencedRule.Match(context);

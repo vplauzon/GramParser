@@ -11,8 +11,8 @@ namespace GramParserLib.Rule
         private readonly char[] _literal;
 
         public LiteralRule(
-            string ruleName,
-            IRuleOutput ruleOutput,
+            string? ruleName,
+            IRuleOutput? ruleOutput,
             IEnumerable<char> literal)
             : base(ruleName, ruleOutput, false, false, true)
         {
@@ -25,8 +25,8 @@ namespace GramParserLib.Rule
         }
 
         public LiteralRule(
-            string ruleName,
-            IRuleOutput outputExtractor,
+            string? ruleName,
+            IRuleOutput? outputExtractor,
             string literal)
             : base(ruleName, outputExtractor, false, false, true)
         {
@@ -52,7 +52,7 @@ namespace GramParserLib.Rule
                     matchText,
                     () => RuleOutput.ComputeOutput(
                         matchText,
-                        new Lazy<object>(() => matchText)));
+                        new Lazy<object?>(() => matchText)));
 
                 return new[] { match };
             }

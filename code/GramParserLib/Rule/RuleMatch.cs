@@ -8,13 +8,13 @@ namespace GramParserLib
 {
     public class RuleMatch
     {
-        private readonly Func<object> _outputCreator;
+        private readonly Func<object?> _outputFactory;
 
         public RuleMatch(
             IRule rule,
             SubString text,
-            Func<object> outputCreator)
-            : this(rule, text, text.Length, outputCreator)
+            Func<object?> outputFactory)
+            : this(rule, text, text.Length, outputFactory)
         {
         }
 
@@ -22,7 +22,7 @@ namespace GramParserLib
             IRule rule,
             SubString text,
             int lengthWithInterleaves,
-            Func<object> outputCreator)
+            Func<object?> outputFactory)
         {
             if (lengthWithInterleaves < text.Length)
             {
@@ -32,7 +32,7 @@ namespace GramParserLib
             Rule = rule ?? throw new ArgumentNullException(nameof(rule));
             Text = text;
             LengthWithInterleaves = lengthWithInterleaves;
-            _outputCreator = outputCreator;
+            _outputFactory = outputFactory;
         }
 
         public static RuleMatch[] EmptyMatch { get; } = new RuleMatch[0];
@@ -43,9 +43,9 @@ namespace GramParserLib
 
         public int LengthWithInterleaves { get; }
 
-        public object ComputeOutput()
+        public object? ComputeOutput()
         {
-            var output = _outputCreator();
+            var output = _outputFactory();
 
             return output;
         }
@@ -67,7 +67,7 @@ namespace GramParserLib
                     Rule,
                     Text,
                     LengthWithInterleaves + length,
-                    _outputCreator);
+                    _outputFactory);
             }
         }
 

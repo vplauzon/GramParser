@@ -16,7 +16,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (false, "literal", "a", (object)null),
+                (false, "literal", "a", (object?)null),
                 (true, "literal", "ab", "ab"),
                 (false, "repeat", "a", null),
                 (true, "repeat", "", ""),
@@ -37,7 +37,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "justA", "aaabbbb", (object)new[]{"a","a","a" }),
+                (true, "justA", "aaabbbb", (object?)new[]{"a","a","a" }),
                 (true, "justA", "aaa", (object)new[]{"a","a","a" }),
                 (true, "justA", "abbbb", (object)new[]{"a" }),
                 (true, "justA", "bbbb", new object[0]),
@@ -54,7 +54,7 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "list", "a", (object)new object[0]),
+                (true, "list", "a", (object?)new object[0]),
                 (true, "list", "a,b", (object)new []{ "b" }),
                 (true, "list", "a,b,c", (object)new []{ "b", "c" })
             };

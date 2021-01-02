@@ -10,8 +10,8 @@ namespace GramParserLib.Rule
     internal abstract class RuleBase : IRule
     {
         protected RuleBase(
-            string ruleName,
-            IRuleOutput ruleOutput,
+            string? ruleName,
+            IRuleOutput? ruleOutput,
             bool? hasInterleave,
             bool? isRecursive,
             bool isTerminalRule)
@@ -21,7 +21,7 @@ namespace GramParserLib.Rule
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            RuleOutput = ruleOutput ?? new IdentityOutput();
+            RuleOutput = ruleOutput ?? IdentityOutput.Instance;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
@@ -35,7 +35,7 @@ namespace GramParserLib.Rule
         public bool IsTerminalRule { get; }
         #endregion
 
-        public string RuleName { get; private set; }
+        public string? RuleName { get; private set; }
 
         public IEnumerable<RuleMatch> Match(ExplorerContext context)
         {

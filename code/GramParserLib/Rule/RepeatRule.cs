@@ -12,9 +12,9 @@ namespace GramParserLib.Rule
         private readonly int? _max;
 
         public RepeatRule(
-            string ruleName,
-            IRuleOutput outputExtractor,
-            IRule rule,
+            string? ruleName,
+            IRuleOutput? outputExtractor,
+            IRule? rule,
             int? min,
             int? max,
             bool? hasInterleave = null,
@@ -60,7 +60,7 @@ namespace GramParserLib.Rule
                     matchText,
                     () => RuleOutput.ComputeOutput(
                         matchText,
-                        new Lazy<object>(ImmutableArray<object>.Empty)));
+                        new Lazy<object?>(ImmutableArray<object>.Empty)));
             }
         }
 
@@ -119,7 +119,7 @@ namespace GramParserLib.Rule
             }
         }
 
-        private object ComputeOutput(
+        private object? ComputeOutput(
             SubString matchText,
             ImmutableList<RuleMatch> newChildrenMatches)
         {
@@ -127,7 +127,7 @@ namespace GramParserLib.Rule
                 .Select(m => m.ComputeOutput())
                 .ToImmutableArray();
 
-            return RuleOutput.ComputeOutput(matchText, new Lazy<object>(outputFactory));
+            return RuleOutput.ComputeOutput(matchText, new Lazy<object?>(outputFactory));
         }
 
         private bool IsRepeatCountInRange(int repeatCount)

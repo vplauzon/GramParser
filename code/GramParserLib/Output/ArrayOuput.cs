@@ -14,7 +14,7 @@ namespace GramParserLib.Output
             _outputs = ImmutableList<IRuleOutput>.Empty.AddRange(extractors);
         }
 
-        object IRuleOutput.ComputeOutput(SubString text, Lazy<object> lazyDefaultOutput)
+        object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             var outputs = _outputs
                 .Select(o => o.ComputeOutput(text, lazyDefaultOutput))
