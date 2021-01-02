@@ -65,8 +65,13 @@ namespace GramParserLib.Rule
             }
         }
 
-        private static IImmutableDictionary<string, object> MakeMap(string tag, object output)
+        private static IImmutableDictionary<string, object> MakeMap(string? tag, object output)
         {
+            if(tag==null)
+            {
+                throw new NotSupportedException("Tag can't be null here");
+            }
+
             var dictionary = ImmutableDictionary<string, object>
                 .Empty
                 .Add(tag, output);

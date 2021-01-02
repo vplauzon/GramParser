@@ -38,7 +38,7 @@ namespace GramParserLib.Output
 
                 ValidateParameters(standardParameters);
 
-                return _function(parameters.Cast<T>());
+                return _function(standardParameters.Cast<T>());
             }
 
             private void ValidateParameters(IImmutableList<object> parameters)
@@ -73,7 +73,7 @@ namespace GramParserLib.Output
                     {
                         throw new ParsingException(
                             $"Function '{((IFunctionProxy)this).FunctionName}' "
-                            + $" parameter {firstTypeViolation.Index}"
+                            + $" parameter {firstNullViolation.Index}"
                             + " can't be null");
                     }
                 }
@@ -212,7 +212,10 @@ namespace GramParserLib.Output
 
             protected override object Invoke(IImmutableList<object> parameters)
             {
-                return _function((T1)parameters[0], (T2)parameters[1]);
+                var p1 = (T1)parameters[0];
+                var p2 = (T2)parameters[1];
+
+                return _function(p1, p2);
             }
         }
 
