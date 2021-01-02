@@ -1,4 +1,4 @@
-name:  Shell Dev Deploy
+name:  Azure Deploy
 
 on:
   push:
