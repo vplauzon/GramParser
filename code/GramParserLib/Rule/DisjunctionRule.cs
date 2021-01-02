@@ -10,7 +10,7 @@ namespace GramParserLib.Rule
         private readonly TaggedRuleCollection _rules;
 
         public DisjunctionRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,

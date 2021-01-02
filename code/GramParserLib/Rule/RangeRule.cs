@@ -9,7 +9,7 @@ namespace GramParserLib.Rule
     internal class RangeRule : RuleBase
     {
         public RangeRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput ruleOutput,
             char first,
             char last)

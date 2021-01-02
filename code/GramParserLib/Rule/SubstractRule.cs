@@ -11,7 +11,7 @@ namespace GramParserLib.Rule
         private readonly IRule _excluded;
 
         public SubstractRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput ruleOutput,
             IRule primary,
             IRule excluded,

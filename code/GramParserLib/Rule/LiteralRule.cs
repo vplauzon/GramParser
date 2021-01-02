@@ -11,7 +11,7 @@ namespace GramParserLib.Rule
         private readonly char[] _literal;
 
         public LiteralRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput ruleOutput,
             IEnumerable<char> literal)
             : base(ruleName, ruleOutput, false, false, true)
@@ -25,7 +25,7 @@ namespace GramParserLib.Rule
         }
 
         public LiteralRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput outputExtractor,
             string literal)
             : base(ruleName, outputExtractor, false, false, true)

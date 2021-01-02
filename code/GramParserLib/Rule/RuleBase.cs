@@ -11,7 +11,7 @@ namespace GramParserLib.Rule
     {
         protected RuleBase(
             string? ruleName,
-            IRuleOutput? ruleOutput,
+            IRuleOutput ruleOutput,
             bool? hasInterleave,
             bool? isRecursive,
             bool isTerminalRule)
@@ -21,7 +21,7 @@ namespace GramParserLib.Rule
                 throw new ArgumentNullException(nameof(ruleName));
             }
             RuleName = ruleName;
-            RuleOutput = ruleOutput ?? new IdentityOutput();
+            RuleOutput = ruleOutput;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;

@@ -41,7 +41,7 @@ namespace GramParserLib
 
             public GrammarCreator(RuleMatch match)
             {
-                IRule interleave = null;
+                IRule? interleave = null;
                 var declarations = ToList(match.ComputeOutput());
 
                 foreach (var declaration in declarations)
@@ -58,7 +58,7 @@ namespace GramParserLib
                             "#interleave",
                             PropertyBag.Default,
                             ruleBody,
-                            null);
+                            IdentityOutput.Instance);
                     }
                     else if (tag == "ruleDeclaration")
                     {
@@ -83,7 +83,7 @@ namespace GramParserLib
                 }
 
                 ResolveProxies();
-                CreatedGrammar = new Grammar(_ruleMap, interleave);
+                CreatedGrammar = new Grammar(_ruleMap, interleave ?? MatchNoneRule.Instance);
             }
 
             private IImmutableList<object> ToList(object obj)
@@ -155,14 +155,14 @@ namespace GramParserLib
 
             private IRule CreateRule(IImmutableDictionary<string, object> ruleBody)
             {
-                return CreateRule(null, PropertyBag.Default, ruleBody, null);
+                return CreateRule(null, PropertyBag.Default, ruleBody, IdentityOutput.Instance);
             }
 
             private IRule CreateRule(
                 string ruleID,
                 IImmutableList<object> parameterAssignationList,
                 IImmutableDictionary<string, object> ruleBody,
-                IImmutableDictionary<string, object> outputBodyMap)
+                IImmutableDictionary<string, object>? outputBodyMap)
             {
                 var propertyBag = CreatePropertyBag(parameterAssignationList);
                 var outputExtractor = CreateOutputExtractor(outputBodyMap);
@@ -171,7 +171,7 @@ namespace GramParserLib
             }
 
             private IRule CreateRule(
-                string ruleID,
+                string? ruleID,
                 PropertyBag propertyBag,
                 IImmutableDictionary<string, object> ruleBody,
                 IRuleOutput outputExtractor)
@@ -253,11 +253,11 @@ namespace GramParserLib
                 }
             }
 
-            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object> outputBodyMap)
+            private IRuleOutput CreateOutputExtractor(IImmutableDictionary<string, object>? outputBodyMap)
             {
                 if (outputBodyMap == null)
                 {
-                    return null;
+                    return IdentityOutput.Instance;
                 }
                 else
                 {
@@ -462,7 +462,7 @@ namespace GramParserLib
             }
 
             private IRule CreateRuleReference(
-                string ruleID,
+                string? ruleID,
                 SubString ruleName,
                 PropertyBag propertyBag)
             {
@@ -500,7 +500,7 @@ namespace GramParserLib
             }
 
             private IRule CreateLiteral(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBodyMap,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
@@ -565,7 +565,7 @@ namespace GramParserLib
             }
 
             private IRule CreateAnyCharacter(
-                string ruleID,
+                string? ruleID,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
             {
@@ -573,7 +573,7 @@ namespace GramParserLib
             }
 
             private IRule CreateRange(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag propertyBag,
                 IRuleOutput outputExtractor)
@@ -587,7 +587,7 @@ namespace GramParserLib
             }
 
             private IRule CreateRepeat(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
@@ -695,7 +695,7 @@ namespace GramParserLib
             }
 
             private IRule CreateDisjunction(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
@@ -722,7 +722,7 @@ namespace GramParserLib
             }
 
             private IRule CreateSequence(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
@@ -748,7 +748,7 @@ namespace GramParserLib
             }
 
             private IRule CreateSubstract(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
@@ -768,7 +768,7 @@ namespace GramParserLib
             }
 
             private IRule CreateBracket(
-                string ruleID,
+                string? ruleID,
                 IImmutableDictionary<string, object> ruleBodyBody,
                 PropertyBag bag,
                 IRuleOutput outputExtractor)
@@ -806,7 +806,7 @@ namespace GramParserLib
 
         private static readonly Grammar _metaSet = CreateMetaGrammar();
 
-        public static Grammar ParseGrammar(SubString text)
+        public static Grammar? ParseGrammar(SubString text)
         {
             var match = _metaSet.Match(MAIN_RULE, text);
 
@@ -826,52 +826,52 @@ namespace GramParserLib
         private static Grammar CreateMetaGrammar()
         {
             //  Comments & interleaves
-            var carriageReturn = new DisjunctionRule("#carriageReturn", null, TaggedRule.FromRules(
-                new LiteralRule(null, null, "\r"),
-                new LiteralRule(null, null, "\n")), false, false);
+            var carriageReturn = new DisjunctionRule("#carriageReturn", IdentityOutput.Instance, TaggedRule.FromRules(
+                new LiteralRule(null, IdentityOutput.Instance, "\r"),
+                new LiteralRule(null, IdentityOutput.Instance, "\n")), false, false);
             var commentContentChar = new SubstractRule(
                 "#commentContentChar",
-                null,
-                new MatchAnyCharacterRule(null, null),
+                IdentityOutput.Instance,
+                new MatchAnyCharacterRule(null, IdentityOutput.Instance),
                 carriageReturn,
                 false);
             var commentContent =
-                new RepeatRule(null, null, commentContentChar, null, null, false, false);
+                new RepeatRule(null, IdentityOutput.Instance, commentContentChar, null, null, false, false);
             var comment = new SequenceRule(
                 "comment",
-                null,
+                IdentityOutput.Instance,
                 TaggedRule.FromRules(
-                    new LiteralRule(null, null, "#"),
+                    new LiteralRule(null, IdentityOutput.Instance, "#"),
                     commentContent),
                 false,
                 false);
             var interleave = new DisjunctionRule(
                 "$interleave$",
-                null,
+                IdentityOutput.Instance,
                 TaggedRule.FromRules(
-                    new LiteralRule(null, null, " "),
-                    new LiteralRule(null, null, "\r"),
-                    new LiteralRule(null, null, "\n"),
-                    new LiteralRule(null, null, "\t"),
+                    new LiteralRule(null, IdentityOutput.Instance, " "),
+                    new LiteralRule(null, IdentityOutput.Instance, "\r"),
+                    new LiteralRule(null, IdentityOutput.Instance, "\n"),
+                    new LiteralRule(null, IdentityOutput.Instance, "\t"),
                     comment),
                 false,
                 false);
             //  Tokens
             var identifierPrefixChar = new DisjunctionRule(
                 null,
-                null,
+                IdentityOutput.Instance,
                 TaggedRule.FromRules(
-                    new RangeRule(null, null, 'a', 'z'),
-                    new RangeRule(null, null, 'A', 'Z')),
+                    new RangeRule(null, IdentityOutput.Instance, 'a', 'z'),
+                    new RangeRule(null, IdentityOutput.Instance, 'A', 'Z')),
                 false,
                 false);
             var identifierSuffixChar = new DisjunctionRule(
                 null,
-                null,
+                IdentityOutput.Instance,
                 TaggedRule.FromRules(
-                    new RangeRule(null, null, 'a', 'z'),
-                    new RangeRule(null, null, 'A', 'Z'),
-                    new RangeRule(null, null, '0', '9')),
+                    new RangeRule(null, IdentityOutput.Instance, 'a', 'z'),
+                    new RangeRule(null, IdentityOutput.Instance, 'A', 'Z'),
+                    new RangeRule(null, IdentityOutput.Instance, '0', '9')),
                 false,
                 false);
             var identifier = new SequenceRule(
@@ -883,7 +883,7 @@ namespace GramParserLib
                     new TaggedRule(
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             identifierSuffixChar,
                             null,
                             null,
@@ -895,7 +895,7 @@ namespace GramParserLib
             var number = new RepeatRule(
                 "number",
                 TextOutput.Instance,
-                new RangeRule(null, null, '0', '9'),
+                new RangeRule(null, IdentityOutput.Instance, '0', '9'),
                 1,
                 null,
                 false,
@@ -907,22 +907,27 @@ namespace GramParserLib
                 {
                     new TaggedRule(
                         null,
-                        new RepeatRule(null, null, new LiteralRule(null, null, "-"), null, 1)),
+                        new RepeatRule(
+                            null,
+                            IdentityOutput.Instance,
+                            new LiteralRule(null, IdentityOutput.Instance, "-"),
+                            null,
+                            1)),
                     new TaggedRule(
                         null,
-                        new RepeatRule(null, null, number, null, null)),
+                        new RepeatRule(null, IdentityOutput.Instance, number, null, null)),
                     new TaggedRule(
                         null,
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             new SequenceRule(
                                 null,
-                                null,
+                                IdentityOutput.Instance,
                                 new[]
                                 {
-                                    new TaggedRule(new LiteralRule(null, null, ".")),
-                                    new TaggedRule(new RepeatRule(null, null, number, 1, null))
+                                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ".")),
+                                    new TaggedRule(new RepeatRule(null, IdentityOutput.Instance, number, 1, null))
                                 }),
                             0,
                             1))
@@ -931,12 +936,12 @@ namespace GramParserLib
             var character = GetCharacterRule();
             var quotedCharacter = new SequenceRule(
                 "quotedCharacter",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "\"")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\"")),
                     new TaggedRule("l", character),
-                    new TaggedRule(new LiteralRule(null, null, "\""))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\""))
                 },
                 false,
                 false);
@@ -944,18 +949,18 @@ namespace GramParserLib
             //  Rules
             var withTag = new SequenceRule(
                 "withTag",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("id", identifier),
-                    new TaggedRule(new LiteralRule(null, null, ":"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ":"))
                 },
                 false,
                 false);
-            var noTag = new LiteralRule("noTag", null, string.Empty);
+            var noTag = new LiteralRule("noTag", IdentityOutput.Instance, string.Empty);
             var tag = new DisjunctionRule(
                 "tag",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("withTag", withTag),
@@ -965,92 +970,98 @@ namespace GramParserLib
                 false);
             var literal = new SequenceRule(
                 "literal",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "\"")),
-                    new TaggedRule("l", new RepeatRule(null, null, character, null, null)),
-                    new TaggedRule(new LiteralRule(null, null, "\""))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\"")),
+                    new TaggedRule("l", new RepeatRule(null, IdentityOutput.Instance, character, null, null)),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\""))
                 },
                 false,
                 false);
-            var any = new LiteralRule("any", null, ".");
+            var any = new LiteralRule("any", IdentityOutput.Instance, ".");
             var range = new SequenceRule(
                 "range",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("lower", quotedCharacter),
-                    new TaggedRule(new RepeatRule(null, null, new LiteralRule(null, null, "."),2,2)),
+                    new TaggedRule(
+                        new RepeatRule(
+                            null,
+                            IdentityOutput.Instance,
+                            new LiteralRule(null, IdentityOutput.Instance, "."),
+                            2,
+                            2)),
                     new TaggedRule("upper", quotedCharacter)
                 },
                 false,
                 false);
             var exactCardinality = new SequenceRule(
                 "exactCardinality",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "{")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "{")),
                     new TaggedRule("n", number),
-                    new TaggedRule(new LiteralRule(null, null, "}"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "}"))
                 },
                 hasInterleave: true);
             var minMaxCardinality = new DisjunctionRule(
                 "minMaxCardinality",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule(
                         "minmax",
                         new SequenceRule(
                             "#minmax",
-                            null,
+                            IdentityOutput.Instance,
                             new[]
                             {
-                                new TaggedRule(new LiteralRule(null, null, "{")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "{")),
                                 new TaggedRule("min", number),
-                                new TaggedRule(new LiteralRule(null, null, ",")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
                                 new TaggedRule("max", number),
-                                new TaggedRule(new LiteralRule(null, null, "}"))
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "}"))
                             },
                             isRecursive: false)),
                     new TaggedRule(
                         "min",
                         new SequenceRule(
                             "#minmax",
-                            null,
+                            IdentityOutput.Instance,
                             new[]
                             {
-                                new TaggedRule(new LiteralRule(null, null, "{")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "{")),
                                 new TaggedRule("min", number),
-                                new TaggedRule(new LiteralRule(null, null, ",")),
-                                new TaggedRule(new LiteralRule(null, null, "}"))
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "}"))
                             },
                             isRecursive: false)),
                     new TaggedRule(
                         "max",
                         new SequenceRule(
                             "#minmax",
-                            null,
+                            IdentityOutput.Instance,
                             new[]
                             {
-                                new TaggedRule(new LiteralRule(null, null, "{")),
-                                new TaggedRule(new LiteralRule(null, null, ",")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "{")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
                                 new TaggedRule("max", number),
-                                new TaggedRule(new LiteralRule(null, null, "}"))
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "}"))
                             },
                             isRecursive: false))
                 },
                 hasInterleave: true);
             var cardinality = new DisjunctionRule(
                 "cardinality",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule("star", new LiteralRule(null, null, "*")),
-                    new TaggedRule("plus", new LiteralRule(null, null, "+")),
-                    new TaggedRule("question", new LiteralRule(null, null, "?")),
+                    new TaggedRule("star", new LiteralRule(null, IdentityOutput.Instance, "*")),
+                    new TaggedRule("plus", new LiteralRule(null, IdentityOutput.Instance, "+")),
+                    new TaggedRule("question", new LiteralRule(null, IdentityOutput.Instance, "?")),
                     new TaggedRule("exact", exactCardinality),
                     new TaggedRule("minMax", minMaxCardinality)
                 },
@@ -1059,17 +1070,17 @@ namespace GramParserLib
             var ruleBodyOutputProxy = new RuleProxy();
             var bracket = new SequenceRule(
                 "bracket",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "(")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "(")),
                     new TaggedRule("r", ruleBodyOutputProxy),
-                    new TaggedRule(new LiteralRule(null, null, ")"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ")"))
                 },
                 hasInterleave: true);
             var repeatable = new DisjunctionRule(
                 "repeatable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1081,7 +1092,7 @@ namespace GramParserLib
                 isRecursive: false);
             var repeat = new SequenceRule(
                 "repeat",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("rule", repeatable),
@@ -1091,7 +1102,7 @@ namespace GramParserLib
                 isRecursive: false);
             var disjunctionable = new DisjunctionRule(
                 "disjunctionable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1105,20 +1116,20 @@ namespace GramParserLib
                 isRecursive: false);
             var disjunction = new SequenceRule(
                 "disjunction",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("t", tag),
                     new TaggedRule("head", disjunctionable),
                     new TaggedRule("tail", new RepeatRule(
                         null,
-                        null,
+                        IdentityOutput.Instance,
                         new SequenceRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             new[]
                             {
-                                new TaggedRule(new LiteralRule(null, null, "|")),
+                                new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "|")),
                                 new TaggedRule("t", tag),
                                 new TaggedRule("d", disjunctionable)
                             }),
@@ -1129,7 +1140,7 @@ namespace GramParserLib
                 isRecursive: false);
             var sequenceable = new DisjunctionRule(
                 "sequenceable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1143,7 +1154,7 @@ namespace GramParserLib
                 isRecursive: false);
             var innerSequenceable = new SequenceRule(
                 "innerSequenceable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("t", tag),
@@ -1153,29 +1164,36 @@ namespace GramParserLib
                 isRecursive: false);
             var tailSequenceable = new SequenceRule(
                 "tailSequenceable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new RepeatRule(null, null, interleave, 1, null, false, false)),
+                    new TaggedRule(new RepeatRule(
+                        null,
+                        IdentityOutput.Instance,
+                        interleave,
+                        1,
+                        null,
+                        false,
+                        false)),
                     new TaggedRule("s", innerSequenceable)
                 },
                 hasInterleave: false,
                 isRecursive: false);
             var sequence = new SequenceRule(
                 "sequence",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("head", innerSequenceable),
                     new TaggedRule(
                         "tail",
-                        new RepeatRule(null, null, tailSequenceable, 1, null, hasInterleave:false))
+                        new RepeatRule(null, IdentityOutput.Instance, tailSequenceable, 1, null, hasInterleave:false))
                 },
                 hasInterleave: false,
                 isRecursive: false);
             var substractable = new DisjunctionRule(
                 "substractable",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1189,7 +1207,7 @@ namespace GramParserLib
                 isRecursive: false);
             var substracted = new DisjunctionRule(
                 "substracted",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1201,18 +1219,18 @@ namespace GramParserLib
                 isRecursive: false);
             var substract = new SequenceRule(
                 "substract",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("primary", substractable),
-                    new TaggedRule(new LiteralRule(null, null, "-")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "-")),
                     new TaggedRule("excluded", substracted)
                 },
                 hasInterleave: true,
                 isRecursive: false);
             var ruleBody = new DisjunctionRule(
                 "ruleBody",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("ruleRef", identifier),
@@ -1231,7 +1249,7 @@ namespace GramParserLib
             var outputBodyProxy = new RuleProxy();
             var outputArrayList = new SequenceRule(
                 "outputArrayList",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("head", outputBodyProxy),
@@ -1239,13 +1257,13 @@ namespace GramParserLib
                         "tail",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             new SequenceRule(
                                 null,
-                                null,
+                                IdentityOutput.Instance,
                                 new []
                                 {
-                                    new TaggedRule(new LiteralRule(null, null, ",")),
+                                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
                                     new TaggedRule("element", outputBodyProxy)
                                 }),
                             null,
@@ -1254,24 +1272,24 @@ namespace GramParserLib
                 hasInterleave: true);
             var outputArray = new SequenceRule(
                 "outputArray",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "[")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "[")),
                     new TaggedRule(
                         "list",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             outputArrayList,
                             null,
                             1)),
-                    new TaggedRule(new LiteralRule(null, null, "]"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "]"))
                 },
                 hasInterleave: true);
             var outputObjectFieldKey = new DisjunctionRule(
                 "outputObjectFieldKey",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("id", identifier),
@@ -1280,17 +1298,17 @@ namespace GramParserLib
                 hasInterleave: true);
             var outputObjectFieldPair = new SequenceRule(
                 "outputObjectFieldPair",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("key", outputObjectFieldKey),
-                    new TaggedRule(new LiteralRule(null, null, ":")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ":")),
                     new TaggedRule("value", outputBodyProxy)
                 },
                 hasInterleave: true);
             var outputObjectFieldList = new SequenceRule(
                 "outputObjectFieldList",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("head", outputObjectFieldPair),
@@ -1298,13 +1316,13 @@ namespace GramParserLib
                         "tail",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             new SequenceRule(
                                 null,
-                                null,
+                                IdentityOutput.Instance,
                                 new []
                                 {
-                                    new TaggedRule(new LiteralRule(null, null, ",")),
+                                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
                                     new TaggedRule("element", outputObjectFieldPair)
                                 }),
                             null,
@@ -1313,42 +1331,42 @@ namespace GramParserLib
                 hasInterleave: true);
             var outputObject = new SequenceRule(
                 "outputObject",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "{")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "{")),
                     new TaggedRule(
                         "list",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             outputObjectFieldList,
                             null,
                             1)),
-                    new TaggedRule(new LiteralRule(null, null, "}"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "}"))
                 },
                 hasInterleave: true);
             var outputFunction = new SequenceRule(
                 "outputFunction",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("id", identifier),
-                    new TaggedRule(new LiteralRule(null, null, "(")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "(")),
                     new TaggedRule(
                         "list",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             outputArrayList,
                             null,
                             1)),
-                    new TaggedRule(new LiteralRule(null, null, ")"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ")"))
                 },
                 hasInterleave: true);
             var outputBody = new DisjunctionRule(
                 "outputBody",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("id", identifier),
@@ -1362,93 +1380,93 @@ namespace GramParserLib
                 isRecursive: true);
             var outputDeclaration = new SequenceRule(
                 "outputDeclaration",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "=>")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "=>")),
                     new TaggedRule("output", outputBody)
                 },
                 hasInterleave: true);
             var ruleBodyOutput = new SequenceRule(
                 "ruleBodyOutput",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("body", ruleBody),
                     new TaggedRule(
                         "output",
-                        new RepeatRule(null, null, outputDeclaration, 0, 1))
+                        new RepeatRule(null, IdentityOutput.Instance, outputDeclaration, 0, 1))
                 },
                 hasInterleave: true);
 
             //  Rule declarations
             var interleaveDeclaration = new SequenceRule(
                 "interleaveDeclaration",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "interleave")),
-                    new TaggedRule(new LiteralRule(null, null, "=")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "interleave")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "=")),
                     new TaggedRule("body", ruleBody),
-                    new TaggedRule(new LiteralRule(null, null, ";"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ";"))
                 });
             var boolean = new DisjunctionRule(
                 "boolean",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule("true", null, "true")),
-                    new TaggedRule(new LiteralRule("false", null, "false"))
+                    new TaggedRule(new LiteralRule("true", IdentityOutput.Instance, "true")),
+                    new TaggedRule(new LiteralRule("false", IdentityOutput.Instance, "false"))
                 });
             var parameterAssignation = new SequenceRule(
                 "parameterAssignation",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("id", identifier),
-                    new TaggedRule(new LiteralRule(null, null, "=")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "=")),
                     new TaggedRule("value", boolean),
                 });
             var innerParameterAssignationList = new SequenceRule(
                 null,
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, ",")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ",")),
                     new TaggedRule("pa", parameterAssignation)
                 });
             var parameterAssignationList = new SequenceRule(
                 "parameterAssignationList",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "(")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "(")),
                     new TaggedRule("head", parameterAssignation),
                     new TaggedRule("tail", new RepeatRule(
                         null,
-                        null,
+                        IdentityOutput.Instance,
                         innerParameterAssignationList,
                         null,
                         null)),
-                    new TaggedRule(new LiteralRule(null, null, ")"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ")"))
                 });
             var ruleDeclaration = new SequenceRule(
                 "ruleDeclaration",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "rule")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "rule")),
                     new TaggedRule(
                         "params",
-                        new RepeatRule(null, null, parameterAssignationList, 0, 1)),
+                        new RepeatRule(null, IdentityOutput.Instance, parameterAssignationList, 0, 1)),
                     new TaggedRule("id", identifier),
-                    new TaggedRule(new LiteralRule(null, null, "=")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "=")),
                     new TaggedRule("rule", ruleBodyOutput),
-                    new TaggedRule(new LiteralRule(null, null, ";"))
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, ";"))
                 });
             var declaration = new DisjunctionRule(
                 "declaration",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("interleaveDeclaration", interleaveDeclaration),
@@ -1456,13 +1474,13 @@ namespace GramParserLib
                 });
 
             //  Main rule
-            var main = new RepeatRule("main", null, declaration, 1, null, isRecursive: false);
+            var main = new RepeatRule("main", IdentityOutput.Instance, declaration, 1, null, isRecursive: false);
 
             ruleBodyOutputProxy.ReferencedRule = ruleBodyOutput;
             outputBodyProxy.ReferencedRule = outputBody;
 
             return new Grammar(
-                new Dictionary<string, IRule>() { { main.RuleName, main } },
+                new Dictionary<string?, IRule>() { { main.RuleName, main } },
                 interleave);
         }
 
@@ -1470,36 +1488,36 @@ namespace GramParserLib
         {
             var normal = new SubstractRule(
                 null,
-                null,
-                new MatchAnyCharacterRule(null, null),
+                IdentityOutput.Instance,
+                new MatchAnyCharacterRule(null, IdentityOutput.Instance),
                 new DisjunctionRule(
                     null,
-                    null,
+                    IdentityOutput.Instance,
                     TaggedRule.FromRules(new[]
                     {
-                        new LiteralRule(null, null, "\""),
-                        new LiteralRule(null, null, "\r"),
-                        new LiteralRule(null, null, "\n"),
-                        new LiteralRule(null, null, "\\")
+                        new LiteralRule(null, IdentityOutput.Instance, "\""),
+                        new LiteralRule(null, IdentityOutput.Instance, "\r"),
+                        new LiteralRule(null, IdentityOutput.Instance, "\n"),
+                        new LiteralRule(null, IdentityOutput.Instance, "\\")
                     }),
                     false,
                     false),
                 false,
                 false);
-            var escapeQuote = new LiteralRule(null, null, "\\\"");
-            var escapeBackslash = new LiteralRule(null, null, "\\\\");
+            var escapeQuote = new LiteralRule(null, IdentityOutput.Instance, "\\\"");
+            var escapeBackslash = new LiteralRule(null, IdentityOutput.Instance, "\\\\");
             var escapeLetter = new SequenceRule(
                 null,
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "\\")),
-                    new TaggedRule("l", new DisjunctionRule(null, null, TaggedRule.FromRules(new[]
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\\")),
+                    new TaggedRule("l", new DisjunctionRule(null, IdentityOutput.Instance, TaggedRule.FromRules(new[]
                     {
-                        new LiteralRule(null, null, "n"),
-                        new LiteralRule(null, null, "r"),
-                        new LiteralRule(null, null, "t"),
-                        new LiteralRule(null, null, "v")
+                        new LiteralRule(null, IdentityOutput.Instance, "n"),
+                        new LiteralRule(null, IdentityOutput.Instance, "r"),
+                        new LiteralRule(null, IdentityOutput.Instance, "t"),
+                        new LiteralRule(null, IdentityOutput.Instance, "v")
                     })))
                 },
                 false,
@@ -1509,20 +1527,20 @@ namespace GramParserLib
                 TextOutput.Instance,
                 new[]
                 {
-                    new TaggedRule(new LiteralRule(null, null, "\\x")),
+                    new TaggedRule(new LiteralRule(null, IdentityOutput.Instance, "\\x")),
                     new TaggedRule(
                         "h",
                         new RepeatRule(
                             null,
-                            null,
+                            IdentityOutput.Instance,
                             new DisjunctionRule(
                                 null,
-                                null,
+                                IdentityOutput.Instance,
                                 TaggedRule.FromRules(new[]
                                 {
-                                    new RangeRule(null, null, '0', '9'),
-                                    new RangeRule(null, null, 'a', 'f'),
-                                    new RangeRule(null, null, 'A', 'F')
+                                    new RangeRule(null, IdentityOutput.Instance, '0', '9'),
+                                    new RangeRule(null, IdentityOutput.Instance, 'a', 'f'),
+                                    new RangeRule(null, IdentityOutput.Instance, 'A', 'F')
                                 }),
                                 false,
                                 false),
@@ -1535,7 +1553,7 @@ namespace GramParserLib
                 false);
             var character = new DisjunctionRule(
                 "character",
-                null,
+                IdentityOutput.Instance,
                 new[]
                 {
                     new TaggedRule("normal", normal),

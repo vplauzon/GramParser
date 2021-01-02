@@ -12,7 +12,7 @@ namespace GramParserLib.Rule
         private readonly int? _max;
 
         public RepeatRule(
-            string ruleName,
+            string? ruleName,
             IRuleOutput outputExtractor,
             IRule rule,
             int? min,
