@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - code/**
-      - .github/workflows/continuous-dev.yaml
 
 env:
   IMAGE:  gram-parser-workbench

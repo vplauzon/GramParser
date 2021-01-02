@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS final
 WORKDIR /work
 
 #	Copy package
-COPY build-output/PasWebApi .
+COPY . .
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
