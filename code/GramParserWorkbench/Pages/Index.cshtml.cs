@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GramParserLib;
+using GramParserWorkbench.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,8 +15,8 @@ namespace GramParserWorkbench.Pages
         private readonly TelemetryClient _telemetryClient;
 
         public string ParsingApiUrl { get; set; }
-        
-        public string FullVersion { get; set; }
+
+        public string ParserVersion => AppVersionHelper.ParserVersion;
 
         public string InstrumentationKey { get; set; }
 
@@ -23,7 +25,6 @@ namespace GramParserWorkbench.Pages
             _telemetryClient = telemetryClient;
 
             ParsingApiUrl = "api/single";
-            FullVersion = AppVersion.FullVersion;
             InstrumentationKey = _telemetryClient.InstrumentationKey;
         }
 

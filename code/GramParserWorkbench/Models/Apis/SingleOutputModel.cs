@@ -17,7 +17,7 @@ namespace GramParserWorkbench.Models.Apis
             }
         }
 
-        public string ApiVersion { get { return AppVersion.FullVersion; } }
+        public string ApiVersion => AppVersionHelper.ParserVersion;
 
         public bool IsMatch { get; set; }
 
