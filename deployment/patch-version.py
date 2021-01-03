@@ -41,6 +41,7 @@ else:
     #   Add patch to the version
     version=document.getElementsByTagName('Version')[0]
     version.firstChild.nodeValue += "." + patchNumber + suffix
+    fullVersion = version.firstChild.nodeValue
 
     #   Output project
     print('Nuget project content:')
@@ -49,4 +50,4 @@ else:
 
     #   Output variable
     print('Set the full version in GitHub Action output:')
-    print('##[set-output name=full-version;]%s' % (version.firstChild.nodeValue))
+    print('##[set-output name=full-version;]%s' % fullVersion)
