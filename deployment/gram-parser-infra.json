@@ -11,13 +11,13 @@
         "App Plan": "[concat('app-plan-', variables('Suffix'))]",
         "Apps Config": [
             {
-                "name": "[concat('gram-parser-workbench-dev-', variables('Suffix'))]",
+                "name": "[concat('workbench-dev-', variables('Suffix'))]",
                 "targetEnv": "dev",
                 "containerImage": "vplauzon/gram-parser-workbench:dev",
                 "alwaysOn": true
             },
             {
-                "name": "[concat('gram-parser-workbench-pre-prod-', variables('Suffix'))]",
+                "name": "[concat('workbench-pre-prod-', variables('Suffix'))]",
                 "targetEnv": "pre-prod",
                 "containerImage": "vplauzon/gram-parser-workbench:pre-prod",
                 "alwaysOn": true
