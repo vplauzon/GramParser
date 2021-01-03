@@ -120,14 +120,12 @@
                     "apiVersion": "2015-08-01",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('Apps Config')[copyIndex()].name)]",
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('Storage'))]"
                     ],
                     "tags": {
                         "displayName": "appsettings"
                     },
                     "properties": {
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('App Insights'))).InstrumentationKey]",
-                        "AzureStorageConnection": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('Storage'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('Storage')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
                         "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
                         "XDT_MicrosoftApplicationInsights_Mode": "recommended",
                         "APPINSIGHTS_PROFILERFEATURE_VERSION": "1.0.0",
