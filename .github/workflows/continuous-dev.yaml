@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
+    # Declare the target environment where to deploy container image
     - name: Declare name of environment
       id:  environment-name
       run: |
@@ -32,7 +33,7 @@ jobs:
           targetEnv="$branch"
         fi
         echo "Export target environment (targetEnv) '$targetEnv'"
-        echo"##[set-output name=targetEnv;]$targetEnv"
+        echo "##[set-output name=targetEnv;]$targetEnv"
     # Patch the version of the library package with this run number
     - name: Patch version
       id:  patch-version
