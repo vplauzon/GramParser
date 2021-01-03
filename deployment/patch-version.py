@@ -47,3 +47,6 @@ else:
     print(document.toxml())
     writeXml(document, nugetPath)
 
+    #   Output variable
+    print('Set the full version in GitHub Action output:')
+    print('##[set-output name=full-version;]%s' % (version.firstChild.nodeValue))
