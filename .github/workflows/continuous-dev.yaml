@@ -77,6 +77,6 @@ jobs:
       run:  |
         targetEnv=${{ steps.environment-name.outputs.targetEnv }}
         echo "Target environment:  '$targetEnv'"
-        name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv==$targetEnv].name")
+        name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
         az webapp restart --name $name -g $rg
