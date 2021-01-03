@@ -30,7 +30,10 @@ jobs:
       run: dotnet build code --configuration Release --no-restore
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
     - name: Test
-      run: dotnet test code --no-restore --verbosity normal
+      run: dotnet test code --configuration Release --no-restore --verbosity normal
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
+    - name: .NET Publish Web App
+      run: dotnet publish code/GramParserWorkbench --configuration Release --no-restore --output workbench-pack
 
     # Docker stuff
     # See https://docs.docker.com/engine/reference/commandline/login/
@@ -38,7 +41,7 @@ jobs:
       run:  docker login -u ${{ secrets.docker_login }} -p ${{ secrets.docker_token }}
     # See https://docs.docker.com/engine/reference/commandline/build/
     - name:  Docker Build
-      run:  docker build --file code/Dockerfile --tag ${{ secrets.docker_repo }}/$IMAGE:${{ steps.patch-version.outputs.full-version }} code/GramParserWorkbench/bin/Release/netcoreapp3.1
+      run:  docker build --file code/Dockerfile --tag ${{ secrets.docker_repo }}/$IMAGE:${{ steps.patch-version.outputs.full-version }} workbench-pack
     # See https://docs.docker.com/engine/reference/commandline/push/
     - name:  Docker Push ${{ steps.patch-version.outputs.full-version }}
       run:  docker push ${{ secrets.docker_repo }}/$IMAGE:${{ steps.patch-version.outputs.full-version }}
