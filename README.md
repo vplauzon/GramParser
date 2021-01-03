@@ -1,6 +1,6 @@
 # Parser as a Service
 
-![Continuous Build / Test](https://github.com/vplauzon/ParserAsServiceApi/workflows/Continuous%20Build%20/%20Test/badge.svg)
+![Continuous Build / Test for dev](https://github.com/vplauzon/GramParser/workflows/Continuous%20Build%20/%20Test%20for%20dev/badge.svg)
 
 See the <span style="background:yellow">[following blog article](http://todefine.com)</span> introducing it.
 
