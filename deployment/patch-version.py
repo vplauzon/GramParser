@@ -21,7 +21,6 @@ else:
     patchNumber = sys.argv[2]
     isAlpha = sys.argv[3]=='true'
 
-    nugetPath = os.path.dirname(path)+"/nuget.csproj"
     if isAlpha:
         suffix = '-alpha'
     else:
@@ -29,7 +28,6 @@ else:
 
     print ('Text file:  %s' % (path))
     print ('Patch Number:  %s' % (patchNumber))
-    print ('Nuget path:  %s' % (nugetPath))
 
     #   Load XML and print out
     document = md.parse(path)
@@ -48,7 +46,7 @@ else:
     #   Output project
     print('Nuget project content:')
     print(document.toxml())
-    writeXml(document, nugetPath)
+    writeXml(document, path)
 
     #   Output variable
     print('Set the full version in GitHub Action output:  %s' % fullVersion)
