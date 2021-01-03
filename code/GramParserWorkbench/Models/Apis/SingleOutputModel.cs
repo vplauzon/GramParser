@@ -13,7 +13,8 @@ namespace GramParserWorkbench.Models.Apis
             {
                 Rule = match.Rule.RuleName;
                 Text = match.Text.ToString();
-                Output = match.ComputeOutput();
+                //  To force SubString to be serialized into strings
+                Output = match.ComputeTypedOutput<object>();
             }
         }
 
