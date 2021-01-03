@@ -20,8 +20,7 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Patch version
-      id:  patch-version
-      run: python3 deployment/manage-version.py deployment/app-version-prefix.txt code/GramParserWorkbench/AppVersion.cs ${{ github.run_number }} full-version.txt
+      run: python3 deployment/patch-version.py code/GramParserLib/GramParserLib.csproj ${{ github.run_number }} ${{ github.event.inputs.alpha }}
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
     - name: Install dependencies
       run: dotnet restore code
