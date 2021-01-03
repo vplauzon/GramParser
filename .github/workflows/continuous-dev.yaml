@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - pre-prod
 
 env:
   IMAGE:  gram-parser-workbench
@@ -19,10 +20,19 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
-    - name: Declare some variables
+    - name: Declare name of environment
+      id:  environment-name
       run: |
-        echo "Ref:  ${GITHUB_REF}"
-        echo "+ head:  ${GITHUB_REF#refs/heads/}"
+        branch=$(echo "${GITHUB_REF#refs/heads/}")
+        echo "Current branch is '$branch'"
+        if [ "$branch" = "master" ]
+        then
+          targetEnv="dev"
+        else
+          targetEnv="$branch"
+        fi
+        echo "Export target environment (targetEnv) '$targetEnv'"
+        echo"##[set-output name=targetEnv;]$targetEnv"
     # Patch the version of the library package with this run number
     - name: Patch version
       id:  patch-version
