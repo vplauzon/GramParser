@@ -8,6 +8,9 @@ on:
       - deployment/gram-parser-infra.json
       - .github/workflows/infra-deploy.yaml
 
+env:
+  rg:  gram-parser
+
 jobs:
   deploy:
 
@@ -18,8 +21,8 @@ jobs:
     - name: Azure Login
       run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
     - name: Ensure resource group exists
-      run: bash components/shell/deployment/create-group.sh kusto-x-dev eastus
+      run: bash components/shell/deployment/create-group.sh $rg eastus
     - name: Deploy
       run: |
-        cd components/shell/deployment
-        bash deploy-public-apps.sh kusto-x-dev
+        cd deployment
+        bash deploy-gram-parser-infra.sh $rg
