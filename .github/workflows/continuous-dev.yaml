@@ -67,10 +67,10 @@ jobs:
     - name:  Docker Push target environment
       run:  docker push ${{ secrets.docker_repo }}/$IMAGE:${{ steps.environment-name.outputs.targetEnv }}
 
-      # Restart web site logic
-      # Login
-      - name: Azure Login
-        run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
-      # Restart web site
-      # - name: Restart web site
-      #   run:  |
+    # Restart web site logic
+    # Login
+    - name: Azure Login
+      run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
+    # Restart web site
+    # - name: Restart web site
+    #   run:  |
