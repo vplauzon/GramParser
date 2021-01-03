@@ -17,12 +17,13 @@
                 "name": "[variables('Workbench Dev')]",
                 "containerImage": "vplauzon/gram-parser-workbench:dev",
                 "alwaysOn": true
-            },
-            {
-                "name": "[variables('Workbench Prod')]",
-                "containerImage": "vplauzon/gram-parser-workbench:prod",
-                "alwaysOn": true
             }
+            // ,
+            // {
+            //     "name": "[variables('Workbench Prod')]",
+            //     "containerImage": "vplauzon/gram-parser-workbench:prod",
+            //     "alwaysOn": true
+            // }
         ]
     },
     "resources": [
