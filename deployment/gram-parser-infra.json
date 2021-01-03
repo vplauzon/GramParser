@@ -5,25 +5,23 @@
     },
     "variables": {
         "Unique ID": "[uniqueString(concat(resourceGroup().id, 'kusto-x'))]",
-        "Suffix": "[concat('kusto-x-', variables('Unique ID'))]",
+        "Suffix": "[concat('gram-parser-', variables('Unique ID'))]",
         "App Insights": "[concat('app-monitor-', variables('Suffix'))]",
         "Log Analytics": "[concat('infra-monitor-', variables('Suffix'))]",
-        "Storage": "[concat('kustox', variables('Unique ID'))]",
         "App Plan": "[concat('app-plan-', variables('Suffix'))]",
-        "Workbench Dev": "[concat('gram-parser-workbench-dev', variables('Suffix'))]",
-        "Workbench Prod": "[concat('gram-parser-workbench-prod', variables('Suffix'))]",
         "Apps Config": [
             {
-                "name": "[variables('Workbench Dev')]",
+                "name": "[concat('gram-parser-workbench-dev', variables('Suffix'))]",
+                "targetEnv": "dev",
                 "containerImage": "vplauzon/gram-parser-workbench:dev",
                 "alwaysOn": true
+            },
+            {
+                "name": "[concat('gram-parser-workbench-pre-prod', variables('Suffix'))]",
+                "targetEnv": "pre-prod",
+                "containerImage": "vplauzon/gram-parser-workbench:pre-prod",
+                "alwaysOn": true
             }
-            // ,
-            // {
-            //     "name": "[variables('Workbench Prod')]",
-            //     "containerImage": "vplauzon/gram-parser-workbench:prod",
-            //     "alwaysOn": true
-            // }
         ]
     },
     "resources": [
@@ -52,33 +50,6 @@
                 }
             },
             "dependsOn": [
-            ]
-        },
-        {
-            "apiVersion": "2019-06-01",
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('Storage')]",
-            "location": "[resourceGroup().location]",
-            "kind": "StorageV2",
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "properties": {
-                "isHnsEnabled": true,
-                "supportsHttpsTrafficOnly": true
-            },
-            "resources": [
-                {
-                    "apiVersion": "2019-04-01",
-                    "type": "blobServices/containers",
-                    "name": "[concat('default/something')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('Storage'))]"
-                    ],
-                    "properties": {
-                        "publicAccess": "None"
-                    }
-                }
             ]
         },
         {
@@ -119,6 +90,9 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]"
             ],
+            "tags": {
+                "targetEnv": "variables('Apps Config')[copyIndex()].targetEnv)]"
+            },
             "kind": "app,linux,container",
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]",

@@ -18,8 +18,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    # Login
     - name: Azure Login
       run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
+    # Deploy
     - name: Deploy
       run: |
         cd deployment
