@@ -49,5 +49,5 @@ else:
     writeXml(document, nugetPath)
 
     #   Output variable
-    print('Set the full version in GitHub Action output:')
+    print('Set the full version in GitHub Action output:  %s' % fullVersion)
     print('##[set-output name=full-version;]%s' % fullVersion)
