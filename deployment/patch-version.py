@@ -14,6 +14,8 @@ if len(sys.argv) != 4:
     print("1-File path")
     print("2-Patch number")
     print("3-Alpha (true or false)")
+
+    exit(1)
 else:
     path = sys.argv[1]
     patchNumber = sys.argv[2]
