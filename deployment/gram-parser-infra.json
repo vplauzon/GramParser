@@ -21,6 +21,12 @@
                 "targetEnv": "staging",
                 "containerImage": "vplauzon/gram-parser-workbench:staging",
                 "alwaysOn": true
+            },
+            {
+                "name": "[concat('workbench-', variables('Suffix'))]",
+                "targetEnv": "prod",
+                "containerImage": "vplauzon/gram-parser-workbench:prod",
+                "alwaysOn": true
             }
         ]
     },
