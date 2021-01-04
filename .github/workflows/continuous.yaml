@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - pre-prod
+      - staging
       - prod
 
 env:

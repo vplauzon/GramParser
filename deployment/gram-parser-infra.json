@@ -17,9 +17,9 @@
                 "alwaysOn": true
             },
             {
-                "name": "[concat('workbench-pre-prod-', variables('Suffix'))]",
-                "targetEnv": "pre-prod",
-                "containerImage": "vplauzon/gram-parser-workbench:pre-prod",
+                "name": "[concat('workbench-staging-', variables('Suffix'))]",
+                "targetEnv": "staging",
+                "containerImage": "vplauzon/gram-parser-workbench:staging",
                 "alwaysOn": true
             }
         ]
