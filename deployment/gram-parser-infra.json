@@ -128,9 +128,9 @@
                         "[resourceId('Microsoft.Web/sites', variables('Apps Config')[copyIndex()].name)]"
                     ],
                     "tags": {
-                        "displayName": "appsettings"
                     },
                     "properties": {
+                        "WORKBENCH_ENVIRONMENT": "[variables('Apps Config')[copyIndex()].targetEnv]",
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('App Insights'))).InstrumentationKey]",
                         "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
                         "XDT_MicrosoftApplicationInsights_Mode": "recommended",

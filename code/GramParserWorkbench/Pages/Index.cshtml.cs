@@ -20,6 +20,10 @@ namespace GramParserWorkbench.Pages
 
         public string InstrumentationKey { get; set; }
 
+        public string WorkbenchEnvironment => Environment.GetEnvironmentVariable("WORKBENCH_ENVIRONMENT") ?? "dev";
+
+        public string TitleQualification => WorkbenchEnvironment == "prod" ? "" : $" ({WorkbenchEnvironment})";
+
         public IndexModel(TelemetryClient telemetryClient)
         {
             _telemetryClient = telemetryClient;
