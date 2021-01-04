@@ -1,4 +1,4 @@
-name:  Continuous Build / Test for dev
+name:  Continuous Build / Test
 
 on:
   push:
