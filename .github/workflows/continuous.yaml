@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - pre-prod
+      - prod
 
 env:
   IMAGE:  gram-parser-workbench
