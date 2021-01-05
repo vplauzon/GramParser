@@ -1,8 +1,12 @@
-﻿function startScript(parsingApiUrl) {
+﻿function startScript(parsingApiUrl, environment) {
     var grammar = document.getElementById('grammarText');
     var sample = document.getElementById('sampleText');
     var analysis = document.getElementById('analysisText');
+    var body = document.getElementsByTagName("BODY")[0];
 
+    //  Setup environment
+    body.env = environment;
+    //  Setup hooks
     grammar.oninput = function () {
         onAnalysisInputChanged(grammar, sample, analysis, parsingApiUrl);
     };

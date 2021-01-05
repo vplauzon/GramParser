@@ -2,6 +2,14 @@
     height: 100%;
 }
 
+body[env="dev"] {
+    background-color: gray;
+}
+
+body[env="staging"] {
+    background-color: lightblue;
+}
+
 header {
     height: 3%;
     text-align: center;
