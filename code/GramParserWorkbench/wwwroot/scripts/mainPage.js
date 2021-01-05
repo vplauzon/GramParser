@@ -3,9 +3,11 @@
     var sample = document.getElementById('sampleText');
     var analysis = document.getElementById('analysisText');
     var body = document.getElementsByTagName("BODY")[0];
+    var envAttribute = document.createAttribute("env");
 
     //  Setup environment
-    body.env = environment;
+    envAttribute.value = environment;
+    body.setAttributeNode(envAttribute);
     //  Setup hooks
     grammar.oninput = function () {
         onAnalysisInputChanged(grammar, sample, analysis, parsingApiUrl);
