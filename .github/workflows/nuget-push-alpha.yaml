@@ -14,7 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      ref:  prod
+      with:
+        ref:  prod
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
