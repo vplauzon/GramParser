@@ -12,4 +12,4 @@ A typical workflow would be to develop grammar using the workbench.  We can then
 
 GramParser is based on the defunct project 'M' from Microsoft, circa 2008.  The workbench takes inspiration from the three columns M editor.
 
-Formal documentation is [available here](documentation).  A [quickstart](documentation/quickstart) giving a quick tour of capabilities.
+Formal documentation is [available here](documentation).  A [quickstart](documentation/quickstart.md) giving a quick tour of capabilities.
