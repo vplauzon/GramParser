@@ -1,6 +1,8 @@
 # Quickstart:  Implementing a DSL
 
-Let's say we want to implement a simple DSL.  We want to be able to read a configuration file of the form:
+Let's implement a simple DSL using [GramParser](https://github.com/vplauzon/GramParser).
+
+We want to be able to read a configuration file of the form:
 
 ```Python
 location = Canada
@@ -23,79 +25,84 @@ Let's say we can describe sample texts (in English) as follow:
   * Config elements can be either one element or multiple elements separated with commas
 * Configurations typically occupy different line but that isn't necessary the case
 
-Let's try to implement this with PAS.  Let's fire up the [Workbench](https://pasworkbench.azurewebsites.net/).
+Let's try to implement this with GramParser.  Let's fire up the [Workbench](https://workbench-gram-parser-jlv6prl7bdhpu.azurewebsites.net/).
 
-![Starting state for the Workbench UI](documentation/images/Workbench-start.png "Workbench UI")
+![Starting state for the Workbench UI](images/workbench-start.png "Workbench UI")
 
-The Workbench UI has three columns:  the grammar, the sample text and the analysis.  We defined the grammar in the first one, we input some sample text in the second and the third one gets populated automatically by applying the grammar on the sample text.
+The Workbench UI has three columns:
+
+1. Grammar
+1. Sample text
+1. Analysis
+
+We defined the grammar in the first column.  We input some sample text in the second column.  The third one gets populated automatically by applying the grammar on the sample text.
 
 ### Parsing a word
 
-Let's start simple by parsing words.  Let's input the following in the *Grammar* text area:
+Let's start simple by parsing words.  Let's input the following in the *Grammar* text area (it should be there by default the first time we open the workbench):
 
 ```Python
-rule main = ("a".."z")*;
+#  Sample:
+rule main = ("a".."z" | "A".."Z")*;
 ```
 
-A grammar is a set of rules.  The *main* rule is the one that gets fire to parse text, but it can refer to other rules in more complex scenarios.
+A grammar is a set of rules.  The *main* rule is the one that gets fired to parse text. Using the NuGet package we can use different rule than the *main*.
 
-Here our grammar stipulate that anything between "a" and "z" is ok and can be repeated (arbitrarily long).  The '*' marks the repetition.
+Here our grammar stipulate that anything between "a" and "z" or "A" and "Z" is ok and can be repeated (arbitrarily long).  The '*' marks the repetition.
 
-and let's type ```test``` in the *Sample Text* area.  The *Analysis* should display the following:
+Let's type ```abc``` in the *Sample Text* area (this should be there by default the first time we open the workbench).  The *Analysis* should display the following:
 
 ```JSON
 200:  {
-  "apiVersion": "0.0.95.72",
-  "ruleMatch": {
-    "rule": "main",
-    "text": "test",
-    "children": [
-      {
-        "text": "t"
-      },
-      {
-        "text": "e"
-      },
-      {
-        "text": "s"
-      },
-      {
-        "text": "t"
-      }
-    ]
-  }
+  "apiVersion": "0.4.1.17",
+  "isMatch": true,
+  "rule": "main",
+  "text": "abc",
+  "output": [
+    "a",
+    "b",
+    "c"
+  ]
 }
 ```
 
-The sample ```test``` does match our grammar:  it is a repetition of letters.
+The sample ```abc``` does match our grammar:  it is a repetition of letters.
 
 The **200** at the beginning of the analysis simply indicates the API HTTP status code.  **200** is HTTP for OK.
 
-The ``ruleMatch`` element contains parsing information.  It is a hierarchical representation of the match that occured.  At the first level, we see the rule ``main`` was the one doing the match on the text ``test``.  We then see via the element ``children`` each sub rule that was fired.  Those sub rules do not have names so we only see the text it matched, i.e. each letter.  The main rule was ``("a".."z")*``.  The sub rule was ``"a".."z"``.
+We see ``isMatch`` as *true* which indicates parsing was successful.  We see ``rule`` is *main*, i.e. that was the rule matched.
 
-Let's keep going.  If we change the *Sample Text* for ``TEST``, we'll see the *Analysis* turn red with the following message:
+The ``output`` element contains parsing information.  In this case, it is simply a list of characters that were parsed.
+
+Let's keep going.  If we change the *Sample Text* for ``abc1``, we'll see the *Analysis* turn red with the following message:
 
 ```JSON
-400:  Text cannot be matched by grammar
+200:  {
+  "apiVersion": "0.4.1.17",
+  "isMatch": false,
+  "rule": null,
+  "text": null,
+  "output": null
+}
 ```
 
-This is because our grammar recognizes only lower-case letters.  Let's fix that:
+This is because our grammar recognizes only letters, not numbers.  Let's fix that:
 
 ```Python
-rule main = ("a".."z" | "A".."Z")+;
+rule main = ("a".."z" | "A".."Z" | "0".."9")+;
 ```
 
 We did a few modifications.
 
 First we changed the '\*' for a '+'.  '+' indicates repeats of one or more while '\*' indicates repeats of **zero** or more.  That means '\*' accepts empty strings, which we do not want in this case.
 
-Second we included upper case letters.  We use '|' to separate both lower-case and upper-case rule.  It basically is a 'or':  either upper-case or lower-case.
+Second we included numbers.  We use '|' to separate the sub rules.  It basically is a 'or':  either upper-case or lower-case or numbers.
 
-We can now parse ``TEST`` but also ``TesT``.
+We can now parse ``abc1``.
 
 ### Multiple rules
 
-We would need to model identifiers, i.e. strings starting with a letter but following with either letter, numbers or '-'.  We could cram that into one rule, but let's use multiple rules:
+We would need to model identifiers, i.e. strings starting with a letter but following with either letter, numbers or '-'.  We could pack that into one rule, but let's use multiple rules to improve readability:
 
 ```Python
 rule alpha = "a".."z" | "A".."Z";
@@ -105,7 +112,7 @@ rule main = alpha alphaNumeric*;
 
 The first rule defines letters-only while the second leverages the first and adds numbers and '-'.
 
-The main rule builds a *sequence*, i.e. different rules following each other:  first we match a letter then we match a repeat of alpha-numeric characters.  Notice we went back to '\*' since we force to have one character (a letter) first.
+The main rule builds a [sequence](primitives/sequence.md), i.e. different rules following each other:  first we match a letter then we match a repeat of alpha-numeric characters.  Notice we went back to '\*' since we force to have one character (a letter) first.
 
 We can now match text such as ``test``, ``test2``, ``Test3-4`` but not ``6test`` (which starts with a numeric).
 
@@ -245,7 +252,7 @@ This drastically reduce the result verbosity and hence size.
 }
 ```
 
-We can therefore control the verbosity of the analysis returned by the API.  Some parser have special keywords for those, refering to *tokens* for the rules returning no details.  PAS threats them just as rules and we can define where we want details.  In general we want to breakdown where we need the sub information.  In this case, having each character individually is just noise.
+We can therefore control the verbosity of the analysis returned by the API.  Some parser have special keywords for those, refering to *tokens* for the rules returning no details.  GramParser threats them just as rules and we can define where we want details.  In general we want to breakdown where we need the sub information.  In this case, having each character individually is just noise.
 
 For more information about controlling verbosity , see this [article about children details](documentation/children.md).
 
@@ -295,7 +302,7 @@ We nicely tease out the information we need, i.e. the key and the element, while
 
 Before we add rules, it is important to notice an important limitation of our grammar:  it doesn't allow for spaces.  If we input ``location= Canada`` as sample text, our grammar won't match anything.
 
-We could go manually add them in the sequence, but it gets tedious real quick.  Instead, we'll use a native feature of *PAS*, **interleaves**.
+We could go manually add them in the sequence, but it gets tedious real quick.  Instead, we'll use a native feature of *GramParser*, **interleaves**.
 
 Interleave is a special rule that defines what consist of meaningless spaces in our grammar.
 
@@ -475,17 +482,17 @@ We see that we didn't need to define an end-of-line such as a ';' (as in C# / Ja
 
 ###  Using the API
 
-In order to integrate with PAS directly, we can use the public API.  For queries similar to the ones performed by the workbench, we can use the API at https://pas-api.azurewebsites.net/v0/analysis.
+In order to integrate with GramParser directly, we can use the public API.  For queries similar to the ones performed by the workbench, we can use the API at https://GramParser-api.azurewebsites.net/v0/analysis.
 
 The protocol is pretty straightforward.  We do an HTTP POST on that URL with a JSON payload including the grammar and the text to parse.  We then receive the analysis we see in the workbench (i.e. JSON-based) as returned payload.
 
 For instance, the following request
 
 ```
-POST https://pas-api.azurewebsites.net/v0/analysis HTTP/1.1
+POST https://GramParser-api.azurewebsites.net/v0/analysis HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-Host: pas-api.azurewebsites.net
+Host: GramParser-api.azurewebsites.net
 Content-Length: 66
 
 {
@@ -509,10 +516,10 @@ This is a public API, available without firewall and without authentication.
 
 ###  Next steps
 
-We did a quick tour of the features of PAS.  We didn't look at everything though.
+We did a quick tour of the features of GramParser.  We didn't look at everything though.
 
 There are a few more nuances in the grammar language, for instance recursivity wasn't covered here.
 
 Similarly the API has other forms not explored here.
 
-We suggest to go through the [online documentation](documentation/README.md) to learn more about PAS.
+We suggest to go through the [online documentation](documentation/README.md) to learn more about GramParser.
