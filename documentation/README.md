@@ -1,12 +1,12 @@
-# Parser as a Service - Online Documentation
+# GramParser - Online Documentation
 
-Parser as a Service (PAS) is a grammar-based parser running as a REST service.  It allows you to implement Domain Specific Languages (DSLs).
+GramParser is a grammar-based parser that can be embedded in any .NET & .NET Core application / API.  It allows you to implement Domain Specific Languages (DSLs).
 
-A [Quickstart is available here](../README.md).
+A [tutorial is available here](tutorial.md).
 
-## PAS grammar primitives
+## GramParser primitives
 
-Here are the primitives in PAS grammar:
+Here are the primitives in GramParser grammar:
 
 * [Literal](primitives/literal.md)
 * [Range](primitives/range.md)
