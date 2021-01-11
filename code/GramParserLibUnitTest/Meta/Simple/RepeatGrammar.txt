@@ -1,10 +1,12 @@
 ﻿rule a = "a"*;
 rule ab = "ab"*;
 rule abc = "abc"*;
-rule optional = "Hi"?;
+#	Single quote
+rule optional = 'Hi'?;
 rule atLeast = "ab"+;
 rule exact3 = "abc"{3};
-rule between34 = "def"{3,4};
+#	Single quote
+rule between34 = 'def'{3,4};
 rule min = "gh"{2,};
 rule max = "ij"{,3};
 rule minmax = "kl"{2,4};
