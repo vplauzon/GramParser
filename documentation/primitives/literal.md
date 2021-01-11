@@ -1,4 +1,4 @@
-# Grammar Primitives:  literal
+# Literal rule
 
 Literals are simple strings.
 
@@ -8,7 +8,7 @@ For instance, the follow grammar:
 rule main = "bob";
 ```
 
-will match one and only one sample text:  *bob*.
+will match **one and only one** sample text:  `bob`.
 
 Literal is of course a fundamental primitive and is typically combined with other primitives.
 
@@ -23,6 +23,8 @@ Literal allow for escaping characters:
 |\t|Horizontal tab|
 |\v|Vertical tab|
 |\\\\|Backslash|
+|\\'|Single quote|
+|\\"|Double quote|
 |\xhh|ASCII character in heradecimal notation|
 
 ---

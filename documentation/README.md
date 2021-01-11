@@ -9,24 +9,28 @@ A [tutorial is available here](tutorial.md).
 Here are the primitives in GramParser grammar:
 
 * [Literal](primitives/literal.md)
-* [Range](primitives/range.md)
 * [Any](primitives/any.md)
+* [Range](primitives/range.md)
 * [Repeat](primitives/repeat.md)
 * [Disjunction](primitives/disjunction.md)
 * [Sequence](primitives/sequence.md)
 * [Substract](primitives/substract.md)
 * [Bracket](primitives/bracket.md)
 
-### Grammar Concepts
+### Transforming Output
+
+* [Outputs](output)
+* [text](output/text.md)
+
+### GramParser Concepts
 
 Here are grammar concepts transversals to different rules:
 
 * [Interleaves](interleave.md)
 * [Referencing rules](referencing.md)
-* [Children details](children.md)
 * [Recursivity](recursivity.md)
 
-## PAS API
+## GramParser NuGet Package
 
 ...  Work in progress...
 
