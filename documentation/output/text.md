@@ -25,3 +25,5 @@ will mach "aaabcbcbc345" and output the "aaabcbcbc345" as opposed to the default
       "5"
     ]
   ]`.
+
+[Go back to online documentation](../README.md)

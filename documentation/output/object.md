@@ -10,3 +10,6 @@ Array|`rule main = "hi" => [1,2];`|"hi"|`[1,2]`
 Array|`rule main = a:"a"* b:"b"* => [a,b];`|"aabbb"|`[ ["a", "a"],["b", "b", "b"] ]`
 Array|`rule main = a:("a"* => text) b:("b"* => text) => [a,b];`|"aabbb"|`["aa", "bbb"]`
 Object|`rule main = a:("a"* => text) b:("b"* => text) => { "myProperty":a, b:a };`|"aabbb"|`{ "myProperty": "aa", "bbb": "aa" }`
+
+---
+[Go back to online documentation](../README.md)

@@ -14,3 +14,5 @@ Integer|`rule main = .* => 42;`|`42`
 Integer|`rule main = .* => -72;`|`72`
 Real|`rule main = .* => -42.42;`|`42.42`
 
+---
+[Go back to online documentation](../README.md)
