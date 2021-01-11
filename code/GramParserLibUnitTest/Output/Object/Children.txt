@@ -1,2 +1,3 @@
 ﻿rule seq = a:"a"* b:"b"* => {"a":a, "b":b};
 rule dij = a:"a"* | b:"b"*;
+rule varProperty = a:("a"* => text) b:("b"* => text) => { "myProperty":a, b:a };

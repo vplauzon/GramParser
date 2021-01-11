@@ -32,10 +32,11 @@ namespace GramParserLibUnitTest.Output
             {
                 (true, "seq", "aaabb", (object?)new{ a=new[]{"a","a","a" }, b=new[]{"b","b" } }),
                 (true, "dij", "aaa", new {a=new[]{"a","a","a" } }),
-                (true, "dij", "bbbb", new {b=new[]{"b","b","b", "b" } })
+                (true, "dij", "bbbb", new {b=new[]{"b","b","b", "b" } }),
+                (true, "varProperty", "aabbb", new {bbb="aa", myProperty="aa"})
             };
 
             Test("Object.Children.txt", samples);
         }
-   }
+    }
 }
