@@ -1,4 +1,4 @@
-# Grammar Primitives:  repeat
+# Repeat rule
 
 Repeat is a composite rule allowing the repetition of a given rule.
 

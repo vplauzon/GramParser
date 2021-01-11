@@ -1,6 +1,6 @@
 # Range rule
 
-Range define a range of literals.  For instance, the following grammar:
+Range rule define a range of characters.  For instance, the following grammar:
 
 ```Python
 rule main = "a".."c";
@@ -8,7 +8,7 @@ rule main = "a".."c";
 
 accepts *a*, *b* & *c*.
 
-Ranges leverages [literals](literal.md) and therefore accepts the same escaping sequence.
+Ranges accepts the same escaping sequence as [literals](literal.md).  Similarly, characters can be single or double quoted in a range rule.
 
 ---
 [Go back to online documentation](../README.md)
