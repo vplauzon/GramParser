@@ -30,7 +30,7 @@ namespace GramParserLib.Rule
             if (!_rules.DoAllHaveNames && !_rules.DoAllNotHaveNames)
             {
                 throw new ParsingException(
-                    "Can't have both named & unnamed rule match in one rule");
+                    "Can't have both named & unnamed rule match in one disjunction rule");
             }
         }
 

@@ -18,5 +18,15 @@ rule main = "abc"* | "d" | "e"+ | "f";
 
 ## Tagging
 
+Either all sub rules must be tagged or none.
+
+For instance, the first 2 rules are legal while the last one isn't:
+
+```Python
+rule rule1 = "a" | "b" | "c";
+rule rule2 = a:"a" | b:"b" | c:"c";
+rule rule3 = a:"a" | "b" | "c";
+```
+
 ---
 [Go back to online documentation](../README.md)
