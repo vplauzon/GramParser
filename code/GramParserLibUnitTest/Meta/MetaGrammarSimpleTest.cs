@@ -36,7 +36,9 @@ namespace GramParserLibUnitTest.Meta
                 (true, "F", "F"),
                 (false, "F", "f"),
                 (true, "zero", "0"),
-                (false, "zero", "1")
+                (false, "zero", "1"),
+                (true, "escapeSingleQuote", "your's"),
+                (true, "escapeDoubleQuote", "\"kinda\""),
             };
 
             Test("Simple.LiteralGrammar.txt", samples);
