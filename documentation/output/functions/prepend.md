@@ -12,16 +12,22 @@ This function is useful when we implement a list-match with the head/tail patter
 
 ```Python
 rule identifier = ("a".."z")* => text;
+rule list = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
+rule parameters = "(" l:list ")" => l;
 
-rule main = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
+rule main = id:identifier p:parameters? => {"id":id, "params":flatten(p) };
 ```
 
-would match the text "a,b,c,def" with an output of `[
-    "a",
-    "b",
-    "c",
-    "def"
-  ]`.
+would match the text "aaa(b,z)" with an output of `{
+    "params": [
+      "b",
+      "z"
+    ],
+    "id": "aaa"
+  }` and the text "aaa" with the output `{
+    "params": [],
+    "id": "aaa"
+  }`.
 
 ---
 [Go back to online documentation](../../README.md)

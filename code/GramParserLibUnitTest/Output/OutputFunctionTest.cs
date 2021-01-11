@@ -12,7 +12,7 @@ namespace GramParserLibUnitTest.Output
     public class OutputFunctionTest : OutputBaseTest
     {
         [TestMethod]
-        public void ConstantFunctions()
+        public void ConstantFunction()
         {
             var samples = new[]
             {
@@ -24,7 +24,7 @@ namespace GramParserLibUnitTest.Output
         }
 
         [TestMethod]
-        public void IntegerFunctions()
+        public void IntegerFunction()
         {
             var samples = new[]
             {
@@ -41,7 +41,7 @@ namespace GramParserLibUnitTest.Output
         }
 
         [TestMethod]
-        public void BooleanFunctions()
+        public void BooleanFunction()
         {
             var samples = new[]
             {
@@ -53,7 +53,7 @@ namespace GramParserLibUnitTest.Output
         }
 
         [TestMethod]
-        public void WithTextFunctions()
+        public void WithTextFunction()
         {
             var samples = new[]
             {
@@ -64,7 +64,7 @@ namespace GramParserLibUnitTest.Output
         }
 
         [TestMethod]
-        public void PrependFunctions()
+        public void PrependFunction()
         {
             var samples = new[]
             {
@@ -75,5 +75,5 @@ namespace GramParserLibUnitTest.Output
 
             Test("Function.Prepend.txt", samples);
         }
-   }
+    }
 }
