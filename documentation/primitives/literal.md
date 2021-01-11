@@ -39,7 +39,7 @@ Literal allow for escaping characters:
 |\\\\ |Backslash|
 |\\'|Single quote|
 |\\"|Double quote|
-|\xhh|ASCII character in heradecimal notation|
+|\xhh (e.g. \xa2, \x9B)|ASCII character in heradecimal notation|
 
 ## Default Output
 
