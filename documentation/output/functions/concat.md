@@ -1,4 +1,4 @@
-# Concat Output functions
+# Concat Output function
 
 We can concat different strings together.
 
