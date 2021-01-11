@@ -36,7 +36,7 @@ Literal allow for escaping characters:
 |\r|Carriage Return|
 |\t|Horizontal tab|
 |\v|Vertical tab|
-|\\\\|Backslash|
+|\\\\ |Backslash|
 |\\'|Single quote|
 |\\"|Double quote|
 |\xhh|ASCII character in heradecimal notation|
