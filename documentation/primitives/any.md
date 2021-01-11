@@ -1,4 +1,4 @@
-# Grammar Primitives:  any
+# Any rule
 
 Any rule accepts all characters.
 

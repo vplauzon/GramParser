@@ -1,4 +1,4 @@
-# Grammar Primitives:  range
+# Range rule
 
 Range define a range of literals.  For instance, the following grammar:
 
