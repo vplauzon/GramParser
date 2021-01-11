@@ -3,3 +3,5 @@
 rule c = 'c';
 rule F = "F";
 rule zero = "0";
+rule escapeSingleQuote = 'your\'s';
+rule escapeDoubleQuote = "\"kinda\"";
