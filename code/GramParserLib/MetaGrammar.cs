@@ -934,8 +934,18 @@ namespace GramParserLib
                 },
                 false);
             var character = GetCharacterRule();
-            var quotedCharacter = new SequenceRule(
-                "quotedCharacter",
+            var singleQuotedCharacter = new SequenceRule(
+                "singleQuotedCharacter",
+                null,
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, null, "'")),
+                    new TaggedRule("l", character),
+                    new TaggedRule(new LiteralRule(null, null, "'"))
+                },
+                false);
+            var doubleQuotedCharacter = new SequenceRule(
+                "doubleQuotedCharacter",
                 null,
                 new[]
                 {
@@ -943,7 +953,15 @@ namespace GramParserLib
                     new TaggedRule("l", character),
                     new TaggedRule(new LiteralRule(null, null, "\""))
                 },
-                false,
+                false);
+            var quotedCharacter = new DisjunctionRule(
+                "quotedCharacter",
+                null,
+                new[]
+                {
+                    new TaggedRule(singleQuotedCharacter),
+                    new TaggedRule(doubleQuotedCharacter)
+                },
                 false);
 
             //  Rules
@@ -968,8 +986,18 @@ namespace GramParserLib
                 },
                 false,
                 false);
-            var literal = new SequenceRule(
-                "literal",
+            var singleQuotedLiteral = new SequenceRule(
+                "singleQuotedLiteral",
+                null,
+                new[]
+                {
+                    new TaggedRule(new LiteralRule(null, null, "'")),
+                    new TaggedRule("l", new RepeatRule(null, null, character, null, null)),
+                    new TaggedRule(new LiteralRule(null, null, "'"))
+                },
+                false);
+            var doubleQuotedLiteral = new SequenceRule(
+                "doubleQuotedLiteral",
                 null,
                 new[]
                 {
@@ -977,7 +1005,15 @@ namespace GramParserLib
                     new TaggedRule("l", new RepeatRule(null, null, character, null, null)),
                     new TaggedRule(new LiteralRule(null, null, "\""))
                 },
-                false,
+                false);
+            var literal = new DisjunctionRule(
+                "literal",
+                null,
+                new[]
+                {
+                    new TaggedRule(singleQuotedLiteral),
+                    new TaggedRule(doubleQuotedLiteral)
+                },
                 false);
             var any = new LiteralRule("any", null, ".");
             var range = new SequenceRule(

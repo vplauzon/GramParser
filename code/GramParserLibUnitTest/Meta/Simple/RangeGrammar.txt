@@ -1,3 +1,5 @@
 ﻿rule ac = "a".."c";
-rule DG = "D".."G";
-rule num = "0".."9";
+#	First is using single quote
+rule DG = 'D'.."G";
+#	Second is using single quote
+rule num = "0"..'9';
