@@ -1,4 +1,5 @@
-﻿rule ab = "a" | "b";
-rule abc = "a" | "b" | "c";
+﻿#	Include single quotes
+rule ab = 'a' | 'b';
+rule abc = "a" | 'b' | "c";
 rule abcd = "a" | "b" | "c" | "d";
 rule hiBob = "Hi" | "Bob";

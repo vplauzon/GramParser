@@ -942,7 +942,9 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule(new LiteralRule(null, null, "'")),
-                    new TaggedRule("l", character),
+                    new TaggedRule(
+                        "c",
+                        new SubstractRule(null, null, character, new LiteralRule(null, null, "'"))),
                     new TaggedRule(new LiteralRule(null, null, "'"))
                 },
                 false);
@@ -952,7 +954,9 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule(new LiteralRule(null, null, "\"")),
-                    new TaggedRule("l", character),
+                    new TaggedRule(
+                        "c",
+                        new SubstractRule(null, null, character, new LiteralRule(null, null, "\""))),
                     new TaggedRule(new LiteralRule(null, null, "\""))
                 },
                 false);
@@ -994,7 +998,14 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule(new LiteralRule(null, null, "'")),
-                    new TaggedRule("l", new RepeatRule(null, null, character, null, null)),
+                    new TaggedRule(
+                        "l",
+                        new RepeatRule(
+                            null,
+                            null,
+                            new SubstractRule(null, null, character, new LiteralRule(null, null, "'")),
+                            null,
+                            null)),
                     new TaggedRule(new LiteralRule(null, null, "'"))
                 },
                 false);
@@ -1004,7 +1015,14 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule(new LiteralRule(null, null, "\"")),
-                    new TaggedRule("l", new RepeatRule(null, null, character, null, null)),
+                    new TaggedRule(
+                        "l",
+                        new RepeatRule(
+                            null,
+                            null,
+                            new SubstractRule(null, null, character, new LiteralRule(null, null, "\"")),
+                            null,
+                            null)),
                     new TaggedRule(new LiteralRule(null, null, "\""))
                 },
                 false);
@@ -1533,9 +1551,10 @@ namespace GramParserLib
                     null,
                     TaggedRule.FromRules(new[]
                     {
-                        new LiteralRule(null, null, "\""),
                         new LiteralRule(null, null, "\r"),
                         new LiteralRule(null, null, "\n"),
+                        new LiteralRule(null, null, "\t"),
+                        new LiteralRule(null, null, "\v"),
                         new LiteralRule(null, null, "\\")
                     }),
                     false,
