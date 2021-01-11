@@ -41,5 +41,16 @@ Literal allow for escaping characters:
 |\\"|Double quote|
 |\xhh|ASCII character in heradecimal notation|
 
+## Default Output
+
+A litteral outputs the litteral it matches.  For instance, the following rule:
+
+```Python
+rule main = "bob";
+```
+
+will match `bob` and output `"bob"`.
+
+
 ---
 [Go back to online documentation](../README.md)

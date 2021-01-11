@@ -18,6 +18,16 @@ rule main = . - "a";
 
 will accept any one-character sample text, except the letter *a*.
 
+## Default Output
+
+Any rule outputs the character it matches.  For instance, the following rule:
+
+```Python
+rule main = .;
+```
+
+will match `a` and output `"a"`.
+
 ---
 
 [Go back to online documentation](../README.md)

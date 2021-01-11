@@ -1,6 +1,6 @@
-# Grammar Primitives:  substract
+# Substract rule
 
-Substract is a composite rule allowing to include the match of a rule while excluding the ones of another rule.
+Substract rule is a composite rule allowing to include the match of a rule while excluding the ones of another rule.
 
 For instance, the follow grammar:
 
@@ -35,6 +35,16 @@ rule main = .* - ("fail" | "failure");
 ```
 
 The latter form is **more efficient** than the recursion to evaluate so **we recommend using it**.
+
+## Default Output
+
+Substract rule outputs the output of primary sub rule.  For instance, the following rule:
+
+```Python
+rule main = ("a" | "b" | "c") - "b";
+```
+
+would match "a" and outputs `"a"`.
 
 ---
 [Go back to online documentation](../README.md)
