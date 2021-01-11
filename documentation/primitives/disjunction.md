@@ -35,7 +35,7 @@ Disjunction rule outputs the output of the matching sub rule.
 
 If tagging is used the output is a single-property object with the matching tag as property.
 
-Here are different examples of possibilities:
+Here are different examples:
 
 Grammar|Text|Output
 -|-|-
