@@ -531,7 +531,9 @@ namespace GramParserLib
                         return ((SubString)subMatch).First();
                     case "escapeLetter":
                         return GetEscapeLetter(((SubString)ToMap(subMatch).First().Value).First());
-                    case "escapeQuote":
+                    case "escapeSingleQuote":
+                        return '\'';
+                    case "escapeDoubleQuote":
                         return '\"';
                     case "escapeBackslash":
                         return '\\';
@@ -1540,7 +1542,8 @@ namespace GramParserLib
                     false),
                 false,
                 false);
-            var escapeQuote = new LiteralRule(null, null, "\\\"");
+            var escapeSingleQuote = new LiteralRule(null, null, "\\'");
+            var escapeDoubleQuote = new LiteralRule(null, null, "\\\"");
             var escapeBackslash = new LiteralRule(null, null, "\\\\");
             var escapeLetter = new SequenceRule(
                 null,
@@ -1593,7 +1596,8 @@ namespace GramParserLib
                 new[]
                 {
                     new TaggedRule("normal", normal),
-                    new TaggedRule("escapeQuote", escapeQuote),
+                    new TaggedRule("escapeSingleQuote", escapeSingleQuote),
+                    new TaggedRule("escapeDoubleQuote", escapeDoubleQuote),
                     new TaggedRule("escapeBackslash", escapeBackslash),
                     new TaggedRule("escapeLetter", escapeLetter),
                     new TaggedRule("escapeHexa", escapeHexa)
