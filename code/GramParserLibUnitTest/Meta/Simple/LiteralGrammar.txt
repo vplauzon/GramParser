@@ -1,4 +1,5 @@
 ﻿rule a = "a";
-rule c = "c";
+#	Single quote
+rule c = 'c';
 rule F = "F";
 rule zero = "0";

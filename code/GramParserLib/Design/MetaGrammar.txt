@@ -18,7 +18,9 @@ rule(interleave=false) quotedCharacter = singleQuotedCharacter | doubleQuotedCha
 rule(interleave=false) withTag = id:(identifier) ":";
 rule(interleave=false) noTag = "";
 rule(interleave=false) tag = noChildrenTag:noChildrenTag | withTag:withTag;
-rule(interleave=false) literal = "\"" l:character* "\"";
+rule(interleave=false) singleQuotedLiteral = "'" l:character* "'";
+rule(interleave=false) doubleQuotedLiteral = '"' l:character* '"';
+rule(interleave=false) literal = singleQuotedLiteral | doubleQuotedLiteral;
 rule(interleave=false) any = ".";
 rule(interleave=false) range = lower:quotedCharacter ".." upper:quotedCharacter;
 rule exactCardinality = "{" n:number "}";
