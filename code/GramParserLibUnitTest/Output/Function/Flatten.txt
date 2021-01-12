@@ -1,0 +1,1 @@
+﻿rule flat = a:"a"+ b:"b"+ => flatten([a, b]);
