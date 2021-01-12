@@ -96,7 +96,11 @@ namespace GramParserLibUnitTest.Output
             {
                 (true, "optional", "a=b", (object?)"="),
                 (true, "optional", "aaa=bbbbb", "="),
-                (true, "optional", "aabb", null)
+                (true, "optional", "aabb", null),
+                (true, "first", "aaa", "a"),
+                (true, "first", "aa", "a"),
+                (true, "first", "a", "a"),
+                (true, "first", "", null)
             };
 
             Test("Function.FirstOrNull.txt", samples);

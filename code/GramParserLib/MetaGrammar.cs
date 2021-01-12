@@ -411,6 +411,10 @@ namespace GramParserLib
                 {
                     return TextOutput.Instance;
                 }
+                else if (id.Equals("output"))
+                {
+                    return DefaultOutput.Instance;
+                }
                 else if (id.Equals("true"))
                 {
                     return new ConstantOutput(true);

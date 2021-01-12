@@ -14,11 +14,12 @@ This function is useful with optional match.  For instance, the following gramma
 
 ```Python
 rule identifier = ("a".."z")* => text;
+rule idList = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
 
-rule main = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
+rule main = functionName:identifier (("(" l:idList ")" => l)? => flatten(output));
 ```
 
-would match the text "a,b,c,def" with an output of `[
+would match the text "f()" with an output of `[
     "a",
     "b",
     "c",
