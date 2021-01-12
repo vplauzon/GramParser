@@ -33,6 +33,7 @@
     <None Remove="Meta\Children\*.txt" />
     <None Remove="Meta\SelectChildren\*.txt" />
     <None Remove="Meta\Simple\*.txt" />
+    <None Remove="Output\AdHoc\*.txt" />
     <None Remove="Output\Array\*.txt" />
     <None Remove="Output\Constant\*.txt" />
     <None Remove="Output\Function\*.txt" />
@@ -46,6 +47,7 @@
     <EmbeddedResource Include="Meta\Children\*.txt" />
     <EmbeddedResource Include="Meta\SelectChildren\*.txt" />
     <EmbeddedResource Include="Meta\Simple\*.txt" />
+    <EmbeddedResource Include="Output\AdHoc\*.txt" />
     <EmbeddedResource Include="Output\Array\*.txt" />
     <EmbeddedResource Include="Output\Constant\*.txt" />
     <EmbeddedResource Include="Output\Function\*.txt" />
