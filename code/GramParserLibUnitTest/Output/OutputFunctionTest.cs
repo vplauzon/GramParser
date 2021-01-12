@@ -46,7 +46,7 @@ namespace GramParserLibUnitTest.Output
             var samples = new[]
             {
                 (true, "bool", "true", (object?)true),
-                (true, "bool", "false", (object)false)
+                (true, "bool", "false", false)
             };
 
             Test("Function.BooleanFunctions.txt", samples);
@@ -69,11 +69,41 @@ namespace GramParserLibUnitTest.Output
             var samples = new[]
             {
                 (true, "list", "a", (object?)new[]{"a"}),
-                (true, "list", "a,b", (object)new[]{"a", "b"}),
-                (true, "list", "a,b,c", (object)new[]{"a", "b", "c"})
+                (true, "list", "a,b", new[]{"a", "b"}),
+                (true, "list", "a,b,c", new[]{"a", "b", "c"})
             };
 
             Test("Function.Prepend.txt", samples);
+        }
+
+        [TestMethod]
+        public void FlattenFunction()
+        {
+            var samples = new[]
+            {
+                (true, "flat", "ab", (object?)new[]{"a", "b"}),
+                (true, "flat", "aab", new[]{ "a", "a", "b"}),
+                (true, "flat", "aabbb", new[]{ "a", "a", "b", "b", "b"})
+            };
+
+            Test("Function.Flatten.txt", samples);
+        }
+
+        [TestMethod]
+        public void FirstOrNull()
+        {
+            var samples = new[]
+            {
+                (true, "optional", "a=b", (object?)"="),
+                (true, "optional", "aaa=bbbbb", "="),
+                (true, "optional", "aabb", null),
+                (true, "first", "aaa", "a"),
+                (true, "first", "aa", "a"),
+                (true, "first", "a", "a"),
+                (true, "first", "", null)
+            };
+
+            Test("Function.FirstOrNull.txt", samples);
         }
     }
 }

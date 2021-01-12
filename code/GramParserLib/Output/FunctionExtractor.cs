@@ -347,6 +347,9 @@ namespace GramParserLib.Output
                 new FixedFunctionProxyOneParam<
                     IImmutableList<object?>,
                     IEnumerable<object?>>(Flatten),
+                new FixedFunctionProxyOneParam<
+                    IEnumerable<object?>,
+                    object?>(FirstOrNull),
                 new ScalableFunctionProxyBase<string, string>(Concat),
                 new PrependFunctionProxy()
             };
@@ -401,6 +404,13 @@ namespace GramParserLib.Output
                 .ToImmutableArray<object?>();
 
             return flatten;
+        }
+
+        private static object? FirstOrNull(IEnumerable<object?> arrays)
+        {
+            var firstOrNull = arrays.FirstOrDefault();
+
+            return firstOrNull;
         }
         #endregion
     }

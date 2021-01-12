@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 
 namespace GramParserLib.Output
 {
-    internal class IdentityOutput : IRuleOutput
+    internal class DefaultOutput : IRuleOutput
     {
-        private IdentityOutput()
+        private DefaultOutput()
         {
         }
 
-        public static IRuleOutput Instance { get; } = new IdentityOutput();
+        public static IRuleOutput Instance { get; } = new DefaultOutput();
 
         object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
