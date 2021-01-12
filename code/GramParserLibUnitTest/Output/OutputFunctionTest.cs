@@ -75,5 +75,18 @@ namespace GramParserLibUnitTest.Output
 
             Test("Function.Prepend.txt", samples);
         }
+
+        [TestMethod]
+        public void FlattenFunction()
+        {
+            var samples = new[]
+            {
+                (true, "flat", "ab", (object?)new[]{"a", "b"}),
+                (true, "flat", "aab", (object)new[]{ "a", "a", "b"}),
+                (true, "flat", "aabbb", (object)new[]{ "a", "a", "b", "b", "b"})
+            };
+
+            Test("Function.Flatten.txt", samples);
+        }
     }
 }

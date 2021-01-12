@@ -71,6 +71,7 @@
     <None Remove="Output\Function\BooleanFunctions.txt" />
     <None Remove="Output\Function\ChildFunctions.txt" />
     <None Remove="Output\Function\ConstantFunctions.txt" />
+    <None Remove="Output\Function\Flatten.txt" />
     <None Remove="Output\Function\IntegerFunctions.txt" />
     <None Remove="Output\Function\Prepend.txt" />
     <None Remove="Output\Function\WithTextFunctions.txt" />
@@ -115,6 +116,7 @@
     <EmbeddedResource Include="Output\Constant\Constants.txt" />
     <EmbeddedResource Include="Output\Function\BooleanFunctions.txt" />
     <EmbeddedResource Include="Output\Function\IntegerFunctions.txt" />
+    <EmbeddedResource Include="Output\Function\Flatten.txt" />
     <EmbeddedResource Include="Output\Function\Prepend.txt" />
     <EmbeddedResource Include="Output\Function\WithTextFunctions.txt" />
     <EmbeddedResource Include="Output\Function\ConstantFunctions.txt" />
