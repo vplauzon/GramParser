@@ -1,0 +1,1 @@
+﻿rule optional = "a"+ r:"="? "b"+ => firstOrNull(r);
