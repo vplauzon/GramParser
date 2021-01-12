@@ -19,6 +19,7 @@ Here are the primitives in GramParser grammar:
 
 ### Transforming Output
 
+* [Default Output](output/default-output.md)
 * [Output Text](output/text.md)
 * [Output Constants](output/constant.md)
 * [Output Object](output/object.md)
@@ -27,7 +28,7 @@ Here are the primitives in GramParser grammar:
   * [Concat Output Function](output/functions/concat.md)
   * [Prepend Output Function](output/functions/prepend.md)
   * [Flatten Output Function](output/functions/flatten.md)
-  * [FirstOrDefault Output Function](output/functions/first-or-default.md)
+  * [FirstOrNull Output Function](output/functions/first-or-null.md)
 
 ### GramParser Concepts
 
