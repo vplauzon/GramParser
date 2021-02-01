@@ -297,6 +297,28 @@
                         }
                     },
                     {
+                        "name": "devRedirectRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'devFrontendEndpoint')]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "redirectProtocol": "HttpsOnly",
+                                "redirectType": "Found"
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
                         "name": "stagingRoutingRule",
                         "properties": {
                             "frontendEndpoints": [
@@ -321,6 +343,28 @@
                         }
                     },
                     {
+                        "name": "stagingRedirectRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'stagingFrontendEndpoint')]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "redirectProtocol": "HttpsOnly",
+                                "redirectType": "Found"
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
                         "name": "prodRoutingRule",
                         "properties": {
                             "frontendEndpoints": [
@@ -340,6 +384,28 @@
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'prod-web-app')]"
                                 }
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "prodRedirectRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'prodFrontendEndpoint')]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "redirectProtocol": "HttpsOnly",
+                                "redirectType": "Found"
                             },
                             "enabledState": "Enabled"
                         }
