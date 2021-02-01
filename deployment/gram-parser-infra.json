@@ -261,7 +261,7 @@
                         }
                     },
                     {
-                        "name": "stagingRoutingRule",
+                        "name": "prodRoutingRule",
                         "properties": {
                             "frontendEndpoints": [
                                 {
