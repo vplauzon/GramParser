@@ -270,8 +270,8 @@
     ],
     "outputs": {
         "q":{
-            "type": "object",
-            "value":"[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01')]"
+            "type": "string",
+            "value":"[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]"
         }
     }
 }
