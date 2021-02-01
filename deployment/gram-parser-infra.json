@@ -317,9 +317,9 @@
                                 "/*"
                             ],
                             "routeConfiguration": {
-                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
                                 "redirectProtocol": "HttpsOnly",
-                                "redirectType": "Found"
+                                "redirectType": "Moved"
                             },
                             "enabledState": "Enabled"
                         }
@@ -365,7 +365,7 @@
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                                 "redirectProtocol": "HttpsOnly",
-                                "redirectType": "Found"
+                                "redirectType": "Moved"
                             },
                             "enabledState": "Enabled"
                         }
@@ -411,7 +411,7 @@
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                                 "redirectProtocol": "HttpsOnly",
-                                "redirectType": "Found"
+                                "redirectType": "Moved"
                             },
                             "enabledState": "Enabled"
                         }
