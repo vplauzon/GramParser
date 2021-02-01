@@ -150,6 +150,11 @@
             "type": "Microsoft.Network/frontDoors",
             "name": "[variables('Front Door')]",
             "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name)]",
+                "[resourceId('Microsoft.Web/sites', variables('Apps Config')[1].name)]",
+                "[resourceId('Microsoft.Web/sites', variables('Apps Config')[2].name)]"
+            ],
             "properties": {
                 "healthProbeSettings": [
                     {
@@ -171,27 +176,6 @@
                     }
                 ],
                 "backendPools": [
-                    {
-                        "name": "dev-web-app",
-                        "properties": {
-                            "backends": [
-                                {
-                                    "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]",
-                                    "httpPort": 80,
-                                    "httpsPort": 443,
-                                    "weight": 50,
-                                    "priority": 1,
-                                    "enabledState": "Enabled"
-                                }
-                            ],
-                            "loadBalancingSettings": {
-                                "id": "[resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', variables('Front Door'), 'loadBalancingSettings')]"
-                            },
-                            "healthProbeSettings": {
-                                "id": "[resourceId('Microsoft.Network/frontDoors/healthProbeSettings', variables('Front Door'), 'healthProbeSettings')]"
-                            }
-                        }
-                    }
                 ],
                 "frontendEndpoints": [
                     {
@@ -201,19 +185,42 @@
                             "sessionAffinityEnabledState": "Disabled",
                             "sessionAffinityTtlSeconds": 0
                         }
+                    },
+                    {
+                        "name": "devFrontendEndpoint",
+                        "properties": {
+                            "hostName": "dev.gram-parser.vincentlauzon.com",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0
+                        }
+                    },
+                    {
+                        "name": "stagingFrontendEndpoint",
+                        "properties": {
+                            "hostName": "staging.gram-parser.vincentlauzon.com",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0
+                        }
+                    },
+                    {
+                        "name": "prodFrontendEndpoint",
+                        "properties": {
+                            "hostName": "gram-parser.vincentlauzon.com",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0
+                        }
                     }
                 ],
                 "routingRules": [
                     {
-                        "name": "defaultRoutingRule",
+                        "name": "devRoutingRule",
                         "properties": {
                             "frontendEndpoints": [
                                 {
-                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'defaultFrontendEndpoint')]"
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'devFrontendEndpoint')]"
                                 }
                             ],
                             "acceptedProtocols": [
-                                "Http",
                                 "Https"
                             ],
                             "patternsToMatch": [
@@ -224,6 +231,54 @@
                                 "forwardingProtocol": "MatchRequest",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
+                                }
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "stagingRoutingRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'stagingFrontendEndpoint')]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "MatchRequest",
+                                "backendPool": {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'staging-web-app')]"
+                                }
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "stagingRoutingRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('Front Door'), 'prodFrontendEndpoint')]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "MatchRequest",
+                                "backendPool": {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'prod-web-app')]"
                                 }
                             },
                             "enabledState": "Enabled"
