@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "verificationId": {
+            "minLength": 10,
+            "type": "string"
+        }
     },
     "variables": {
         "Unique ID": "[uniqueString(concat(resourceGroup().id, 'kusto-x'))]",
@@ -106,7 +110,9 @@
                 "siteConfig": {
                     "linuxFxVersion": "[concat('DOCKER|', variables('Apps Config')[copyIndex()].containerImage)]"
                 },
-                "clientAffinityEnabled": false
+                "clientAffinityEnabled": false,
+                "customDomainVerificationId": "[parameters('verificationId')]",
+                "httpsOnly": true
             },
             "resources": [
                 {

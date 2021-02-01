@@ -25,4 +25,4 @@ jobs:
     - name: Deploy
       run: |
         cd deployment
-        bash deploy-gram-parser-infra.sh $rg
+        bash deploy-gram-parser-infra.sh $rg ${{ secrets.APP_SERVICE_CUSTOM_DOMAIN_VERIFICATION_ID }}
