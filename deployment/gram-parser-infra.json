@@ -23,7 +23,7 @@
                 "alwaysOn": true
             },
             {
-                "name": "[concat('workbench-', variables('Suffix'))]",
+                "name": "[concat('workbench-prod-', variables('Suffix'))]",
                 "targetEnv": "prod",
                 "containerImage": "vplauzon/gram-parser-workbench:prod",
                 "alwaysOn": true
@@ -183,6 +183,7 @@
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
+                                    "httpPort": 80,
                                     "weight": 100
                                 }
                             ],
@@ -201,6 +202,7 @@
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[1].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
+                                    "httpPort": 80,
                                     "weight": 100
                                 }
                             ],
@@ -219,6 +221,7 @@
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[2].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
+                                    "httpPort": 80,
                                     "weight": 100
                                 }
                             ],
