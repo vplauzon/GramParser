@@ -184,7 +184,8 @@
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
-                                    "weight": 100
+                                    "weight": 100,
+                                    "priority": 1
                                 }
                             ],
                             "loadBalancingSettings": {
@@ -203,7 +204,8 @@
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[1].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
-                                    "weight": 100
+                                    "weight": 100,
+                                    "priority": 1
                                 }
                             ],
                             "loadBalancingSettings": {
@@ -222,7 +224,8 @@
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[2].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
-                                    "weight": 100
+                                    "weight": 100,
+                                    "priority": 1
                                 }
                             ],
                             "loadBalancingSettings": {
