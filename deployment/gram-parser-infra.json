@@ -149,7 +149,7 @@
             "apiVersion": "2019-04-01",
             "type": "Microsoft.Network/frontDoors",
             "name": "[variables('Front Door')]",
-            "location": "[resourceGroup().location]",
+            "location": "global",
             "properties": {
                 "healthProbeSettings": [
                     {
