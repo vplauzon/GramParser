@@ -250,9 +250,7 @@
                             "sessionAffinityEnabledState": "Disabled",
                             "sessionAffinityTtlSeconds": 0,
                             "customHttpsConfiguration": {
-                                "certificateSource": {
-                                    "FrontDoor": ""
-                                },
+                                "certificateSource": "FrontDoor",
                                 "minimumTlsVersion": "1.2"
                             }
                         }
