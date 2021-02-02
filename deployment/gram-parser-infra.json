@@ -332,6 +332,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'staging-web-app')]"
                                 }
                             },
+                            "rulesEngine": {
+                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            },
                             "enabledState": "Enabled"
                         }
                     },
@@ -356,6 +359,9 @@
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'prod-web-app')]"
                                 }
+                            },
+                            "rulesEngine": {
+                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
                             },
                             "enabledState": "Enabled"
                         }
