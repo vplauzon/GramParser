@@ -189,6 +189,7 @@
                             "backends": [
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]",
+                                    "backendHostHeader": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[0].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
                                     "weight": 100,
@@ -209,6 +210,7 @@
                             "backends": [
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[1].name), '2019-08-01').hostNames[0]]",
+                                    "backendHostHeader": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[1].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
                                     "weight": 100,
@@ -229,6 +231,7 @@
                             "backends": [
                                 {
                                     "address": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[2].name), '2019-08-01').hostNames[0]]",
+                                    "backendHostHeader": "[reference(resourceId('Microsoft.Web/sites', variables('Apps Config')[2].name), '2019-08-01').hostNames[0]]",
                                     "httpsPort": 443,
                                     "httpPort": 80,
                                     "weight": 100,
@@ -296,7 +299,7 @@
                             ],
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                                "forwardingProtocol": "MatchRequest",
+                                "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
                                 }
@@ -323,7 +326,7 @@
                             ],
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                                "forwardingProtocol": "MatchRequest",
+                                "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'staging-web-app')]"
                                 }
@@ -347,7 +350,7 @@
                             ],
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                                "forwardingProtocol": "MatchRequest",
+                                "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'prod-web-app')]"
                                 }
