@@ -359,6 +359,35 @@
             },
             "resources": [
                 {
+                    "type": "providers/diagnosticSettings",
+                    "apiVersion": "2017-05-01-preview",
+                    "name": "microsoft.insights/send-to-la",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/frontdoors', variables('Front Door'))]",
+                        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('Log Analytics'))]"
+                    ],
+                    "properties": {
+                        "name": "send-to-la",
+                        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('Log Analytics'))]",
+                        "logs": [
+                            {
+                                "category": "FrontdoorAccessLog",
+                                "enabled": true
+                            },
+                            {
+                                "category": "FrontdoorWebApplicationFirewallLog",
+                                "enabled": true
+                            }
+                        ],
+                        "metrics": [
+                            {
+                                "category": "AllMetrics",
+                                "enabled": true
+                            }
+                        ]
+                    }
+                },
+                {
                     "type": "rulesengines",
                     "apiVersion": "2020-05-01",
                     "name": "[variables('Web App Rule Engine')]",
