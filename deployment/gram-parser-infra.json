@@ -288,6 +288,7 @@
                                 }
                             ],
                             "acceptedProtocols": [
+                                "Http",
                                 "Https"
                             ],
                             "patternsToMatch": [
