@@ -304,6 +304,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
                                 }
                             },
+                            "rulesEngine": {
+                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            },
                             "enabledState": "Enabled"
                         }
                     },
