@@ -375,9 +375,10 @@
                                     "requestHeaderActions": [],
                                     "responseHeaderActions": [],
                                     "routeConfigurationOverride": {
-                                        "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
-                                        "redirectProtocol": "HttpsOnly",
-                                        "redirectType": "Found"
+                                        "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration"
+                                        // ,
+                                        // "redirectProtocol": "HttpsOnly",
+                                        // "redirectType": "Found"
                                     }
                                 },
                                 "matchConditions": [
