@@ -359,7 +359,7 @@
             },
             "resources": [
                 {
-                    "type": "Microsoft.Network/frontdoors/rulesengines",
+                    "type": "rulesengines",
                     "apiVersion": "2020-05-01",
                     "name": "[variables('Web App Rule Engine')]",
                     "dependsOn": [
