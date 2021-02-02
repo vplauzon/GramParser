@@ -300,9 +300,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
-                            },
+                            // "rulesEngine": {
+                            //     "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            // },
                             "enabledState": "Enabled"
                         }
                     },
@@ -375,10 +375,9 @@
                                     "requestHeaderActions": [],
                                     "responseHeaderActions": [],
                                     "routeConfigurationOverride": {
-                                        "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration"
-                                        // ,
-                                        // "redirectProtocol": "HttpsOnly",
-                                        // "redirectType": "Found"
+                                        "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
+                                        "redirectProtocol": "HttpsOnly",
+                                        "redirectType": "Found"
                                     }
                                 },
                                 "matchConditions": [
