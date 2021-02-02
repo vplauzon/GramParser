@@ -248,12 +248,7 @@
                         "properties": {
                             "hostName": "[concat(variables('Front Door'), '.azurefd.net')]",
                             "sessionAffinityEnabledState": "Disabled",
-                            "sessionAffinityTtlSeconds": 0,
-                            "customHttpsConfiguration": {
-                                "certificateSource": "FrontDoor",
-                                "protocolType": "ServerNameIndication",
-                                "minimumTlsVersion": "1.2"
-                            }
+                            "sessionAffinityTtlSeconds": 0
                         }
                     },
                     {
@@ -261,7 +256,12 @@
                         "properties": {
                             "hostName": "dev.gram-parser.vincentlauzon.com",
                             "sessionAffinityEnabledState": "Disabled",
-                            "sessionAffinityTtlSeconds": 0
+                            "sessionAffinityTtlSeconds": 0,
+                            "customHttpsConfiguration": {
+                                "certificateSource": "FrontDoor",
+                                "protocolType": "ServerNameIndication",
+                                "minimumTlsVersion": "1.2"
+                            }
                         }
                     },
                     {
@@ -304,9 +304,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
-                            },
+                            // "rulesEngine": {
+                            //     "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            // },
                             "enabledState": "Enabled"
                         }
                     },
@@ -332,9 +332,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'staging-web-app')]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
-                            },
+                            // "rulesEngine": {
+                            //     "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            // },
                             "enabledState": "Enabled"
                         }
                     },
@@ -360,9 +360,9 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'prod-web-app')]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
-                            },
+                            // "rulesEngine": {
+                            //     "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
+                            // },
                             "enabledState": "Enabled"
                         }
                     }
