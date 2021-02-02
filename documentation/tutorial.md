@@ -25,7 +25,7 @@ Let's say we can describe sample texts (in English) as follow:
   * Config elements can be either one element or multiple elements separated with commas
 * Configurations typically occupy different line but that isn't necessary the case
 
-Let's try to implement this with GramParser.  Let's fire up the [Workbench](https://workbench-gram-parser-jlv6prl7bdhpu.azurewebsites.net/).
+Let's try to implement this with GramParser.  Let's fire up the [Workbench](https://gram-parser.vincentlauzon.com/).
 
 ![Starting state for the Workbench UI](images/workbench-start.png "Workbench UI")
 
@@ -453,4 +453,4 @@ We did a quick tour of the features of GramParser.  We didn't look at everything
 
 There are a few more nuances in the grammar language, for instance recursivity wasn't covered here.
 
-We suggest to go through the [online documentation](README.md) to learn more about GramParser.
+We suggest to go through the [online documentation](README.md) to learn more about GramParser and use the [Workbench](https://gram-parser.vincentlauzon.com/) to practice.
