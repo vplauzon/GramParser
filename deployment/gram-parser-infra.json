@@ -304,9 +304,6 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('Front Door'), 'dev-web-app')]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', variables('Front Door'), variables('Web App Rule Engine'))]"
-                            },
                             "enabledState": "Enabled"
                         }
                     },
@@ -319,6 +316,7 @@
                                 }
                             ],
                             "acceptedProtocols": [
+                                "Http",
                                 "Https"
                             ],
                             "patternsToMatch": [
@@ -343,6 +341,7 @@
                                 }
                             ],
                             "acceptedProtocols": [
+                                "Http",
                                 "Https"
                             ],
                             "patternsToMatch": [
@@ -387,43 +386,6 @@
                             {
                                 "category": "AllMetrics",
                                 "enabled": true
-                            }
-                        ]
-                    }
-                },
-                {
-                    "type": "rulesengines",
-                    "apiVersion": "2020-05-01",
-                    "name": "[variables('Web App Rule Engine')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Network/frontdoors', variables('Front Door'))]"
-                    ],
-                    "properties": {
-                        "rules": [
-                            {
-                                "priority": 0,
-                                "name": "redirectToHttps",
-                                "matchProcessingBehavior": "Continue",
-                                "action": {
-                                    "requestHeaderActions": [],
-                                    "responseHeaderActions": [],
-                                    "routeConfigurationOverride": {
-                                        "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
-                                        "redirectProtocol": "HttpsOnly",
-                                        "redirectType": "Found"
-                                    }
-                                },
-                                "matchConditions": [
-                                    {
-                                        "rulesEngineMatchValue": [
-                                            "HTTP"
-                                        ],
-                                        "rulesEngineMatchVariable": "RequestScheme",
-                                        "rulesEngineOperator": "Equal",
-                                        "transforms": [],
-                                        "negateCondition": false
-                                    }
-                                ]
                             }
                         ]
                     }
