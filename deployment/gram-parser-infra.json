@@ -259,6 +259,9 @@
                             "sessionAffinityTtlSeconds": 0,
                             "customHttpsConfiguration": {
                                 "certificateSource": "FrontDoor",
+                                "frontDoorCertificateSourceParameters": {
+                                    "certificateType": "Dedicated"
+                                },
                                 "protocolType": "ServerNameIndication",
                                 "minimumTlsVersion": "1.2"
                             }
