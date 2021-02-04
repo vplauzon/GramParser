@@ -256,15 +256,7 @@
                         "properties": {
                             "hostName": "dev.gram-parser.vincentlauzon.com",
                             "sessionAffinityEnabledState": "Disabled",
-                            "sessionAffinityTtlSeconds": 0,
-                            "customHttpsConfiguration": {
-                                "certificateSource": "FrontDoor",
-                                "frontDoorCertificateSourceParameters": {
-                                    "certificateType": "Dedicated"
-                                },
-                                "protocolType": "ServerNameIndication",
-                                "minimumTlsVersion": "1.2"
-                            }
+                            "sessionAffinityTtlSeconds": 0
                         }
                     },
                     {
