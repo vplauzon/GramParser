@@ -182,7 +182,7 @@ namespace GramParserLib
                 switch (ruleBodyTag)
                 {
                     case "ruleRef":
-                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, propertyBag);
+                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, propertyBag, outputExtractor);
                     case "literal":
                         return CreateLiteral(
                             ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
@@ -468,7 +468,8 @@ namespace GramParserLib
             private IRule CreateRuleReference(
                 string? ruleID,
                 SubString ruleName,
-                PropertyBag propertyBag)
+                PropertyBag propertyBag,
+                IRuleOutput? outputExtractor)
             {
                 if (!propertyBag.IsDefault)
                 {
@@ -476,7 +477,24 @@ namespace GramParserLib
                 }
 
                 var identifier = ruleName.ToString();
+                var ruleProxy = FindOrCreateRuleProxy(identifier);
 
+                if (outputExtractor == null)
+                {   //  We optimize and return the actual referenced rule
+                    return ruleProxy;
+                }
+                else
+                {
+                    return CreateSequence(
+                        ruleID,
+                        new[] { new TaggedRule(ruleProxy) },
+                        propertyBag,
+                        outputExtractor);
+                }
+            }
+
+            private IRule FindOrCreateRuleProxy(string identifier)
+            {
                 //  If the referenced rule has already been parsed we insert it
                 //  Otherwise, we put a proxy
                 if (_ruleMap.ContainsKey(identifier))
@@ -745,6 +763,15 @@ namespace GramParserLib
                             let rule = CreateRule(r)
                             select CreateTaggedRule(t, rule);
 
+                return CreateSequence(ruleID, rules, bag, outputExtractor);
+            }
+
+            private static IRule CreateSequence(
+                string? ruleID,
+                IEnumerable<TaggedRule> rules,
+                PropertyBag bag,
+                IRuleOutput? outputExtractor)
+            {
                 return new SequenceRule(
                     ruleID,
                     outputExtractor,
