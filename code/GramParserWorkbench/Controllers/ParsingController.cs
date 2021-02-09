@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GramParserLib;
@@ -39,7 +40,9 @@ namespace GramParserWorkbench.Controllers
                     return new BadRequestObjectResult("JSON body should contain 'text'");
                 }
 
+                var grammarWatch = Stopwatch.StartNew();
                 var grammar = GrammarCache.ParseGrammar(body.Grammar);
+                var grammarDuration = grammarWatch.Elapsed;
 
                 if (grammar == null)
                 {
@@ -47,8 +50,13 @@ namespace GramParserWorkbench.Controllers
                 }
                 else
                 {
+                    var matchWatch = Stopwatch.StartNew();
                     var match = grammar.Match(body.Rule, body.Text);
-                    var outputModel = new SingleOutputModel(match);
+                    var matchDuration = matchWatch.Elapsed;
+                    var outputModel = new SingleOutputModel(
+                        match,
+                        grammarDuration,
+                        matchDuration);
 
                     _telemetryClient.TrackEvent("Parsing");
 
