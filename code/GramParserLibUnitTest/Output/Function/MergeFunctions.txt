@@ -1,0 +1,3 @@
+﻿rule two = "1"* => merge({"a":text, "b":42}, {"c":true});
+rule three = "1"* => merge({"a":text, "b":42}, {"c":true}, {"d":"Hi!", "e":75});
+rule withNull = "1"* => merge({"a":text, "b":42}, null, {"d":"Hi!", "e":75});
