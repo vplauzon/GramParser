@@ -16,11 +16,34 @@ namespace GramParserLibUnitTest.Output
         {
             var samples = new[]
             {
-                (true, "oneParam", "Hello", (object?)42 ),
-                (true, "manyParams", "Hello", "HiMyNameIsMax")
+                (true, "oneParam", "Hello", (object?)42 )
             };
 
             Test("Function.ConstantFunctions.txt", samples);
+        }
+
+        [TestMethod]
+        public void ConcatFunction()
+        {
+            var samples = new[]
+            {
+                (true, "manyParams", "Hello", (object?)"HiMyNameIsMax")
+            };
+
+            Test("Function.ConcatFunctions.txt", samples);
+        }
+
+        [TestMethod]
+        public void MergeFunction()
+        {
+            var samples = new[]
+            {
+                (true, "two", "1", (object?)new { a="1", b=42, c=true}),
+                (true, "three", "1", new { a="1", b=42, c=true, d="Hi!", e=75}),
+                (true, "withNull", "1", new { a="1", b=42, d="Hi!", e=75})
+            };
+
+            Test("Function.MergeFunctions.txt", samples);
         }
 
         [TestMethod]
