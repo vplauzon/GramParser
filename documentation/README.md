@@ -23,12 +23,15 @@ Here are the primitives in GramParser grammar:
 * [Output Text](output/text.md)
 * [Output Constants](output/constant.md)
 * [Output Object](output/object.md)
-* Functions
-  * [Cast Output Function](output/functions/cast.md)
-  * [Concat Output Function](output/functions/concat.md)
-  * [Prepend Output Function](output/functions/prepend.md)
-  * [Flatten Output Function](output/functions/flatten.md)
-  * [FirstOrNull Output Function](output/functions/first-or-null.md)
+
+#### Functions
+
+* [Cast](output/functions/cast.md)
+* [Concat](output/functions/concat.md)
+* [Prepend](output/functions/prepend.md)
+* [Flatten](output/functions/flatten.md)
+* [FirstOrNull](output/functions/first-or-null.md)
+* [Merge](output/functions/merge.md)
 
 ### GramParser Concepts
 

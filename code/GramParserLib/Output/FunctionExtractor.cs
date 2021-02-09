@@ -43,21 +43,24 @@ namespace GramParserLib.Output
 
             private void ValidateParameters(IImmutableList<object?> parameters)
             {
-                var isTypes = from p in parameters.Zip(
+                var isTypes = from indexedParam in parameters.Zip(
                     Enumerable.Range(1, parameters.Count),
                     (p, i) => new { Parameter = p, Index = i })
-                              where p.Parameter != null
-                              let isType = p.Parameter.GetType() == typeof(T)
-                              || p.Parameter.GetType().IsInstanceOfType(typeof(T))
+                              where indexedParam.Parameter != null
+                              let isType = indexedParam.Parameter.GetType() == typeof(T)
+                              || typeof(T).IsInstanceOfType(indexedParam.Parameter.GetType())
                               where !isType
-                              select p;
+                              select indexedParam;
                 var firstTypeViolation = isTypes.FirstOrDefault();
 
                 if (firstTypeViolation != null)
                 {
                     throw new ParsingException(
                         $"Function '{((IFunctionProxy)this).FunctionName}' has wrong argument "
-                        + $"at parameter {firstTypeViolation.Index}");
+                        + $"at index {firstTypeViolation.Index}:  "
+                        + firstTypeViolation.Parameter==null
+                        ? $"null instead of {typeof(T).Name}"
+                        : $"{firstTypeViolation.Parameter.GetType().Name} instead of {typeof(T).Name}");
                 }
 
                 if (typeof(T).IsValueType)
@@ -351,6 +354,7 @@ namespace GramParserLib.Output
                     IEnumerable<object?>,
                     object?>(FirstOrNull),
                 new ScalableFunctionProxyBase<string, string>(Concat),
+                new ScalableFunctionProxyBase<object?, object>(Merge),
                 new PrependFunctionProxy()
             };
             var pairs = from p in proxies
@@ -394,6 +398,17 @@ namespace GramParserLib.Output
         private static string Concat(IEnumerable<string> texts)
         {
             return string.Concat(texts);
+        }
+
+        private static IDictionary<string, object> Merge(IEnumerable<object?> objects)
+        {
+            var mergedPairs = objects
+                .Select(o => o as IDictionary<string, object>)
+                .Where(o => o != null)
+                .SelectMany(o => o!);
+            var result = new Dictionary<string, object>(mergedPairs);
+
+            return result;
         }
 
         private static IImmutableList<object?> Flatten(IEnumerable<object?> arrays)
