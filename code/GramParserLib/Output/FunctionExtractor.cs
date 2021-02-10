@@ -58,7 +58,7 @@ namespace GramParserLib.Output
                     throw new ParsingException(
                         $"Function '{((IFunctionProxy)this).FunctionName}' has wrong argument "
                         + $"at index {firstTypeViolation.Index}:  "
-                        + firstTypeViolation.Parameter==null
+                        + firstTypeViolation.Parameter == null
                         ? $"null instead of {typeof(T).Name}"
                         : $"{firstTypeViolation.Parameter.GetType().Name} instead of {typeof(T).Name}");
                 }
@@ -106,37 +106,43 @@ namespace GramParserLib.Output
 
             private void ValidateParameters(IImmutableList<object?> parameters)
             {
-                var types = GetParameterTypes();
+                var expectedTypes = GetParameterTypes();
 
-                if (types.Length != parameters.Count)
+                if (expectedTypes.Length != parameters.Count)
                 {
                     throw new ParsingException(
                         $"Function '{((IFunctionProxy)this).FunctionName}' should have "
-                        + $"{types.Length} parameters, not {parameters.Count}");
+                        + $"{expectedTypes.Length} parameters, not {parameters.Count}");
                 }
 
                 var isTypes = from p in parameters.Zip(
-                    types.Zip(
+                    expectedTypes.Zip(
                         Enumerable.Range(1, parameters.Count),
-                        (t, i) => (t, i)),
+                        (expectedType, i) => (expectedType, i)),
                         (param, pair) => new
                         {
                             Parameter = param,
-                            Type = pair.t,
+                            ExpectedType = pair.expectedType,
                             Index = pair.i
                         })
                               where p.Parameter != null
-                              let isType = p.Parameter.GetType() == p.Type
-                              || p.Type.IsAssignableFrom(p.Parameter.GetType())
+                              let isType = p.Parameter.GetType() == p.ExpectedType
+                              || p.ExpectedType.IsAssignableFrom(p.Parameter.GetType())
                               where !isType
                               select p;
                 var firstTypeViolation = isTypes.FirstOrDefault();
 
                 if (firstTypeViolation != null)
                 {
+                    var parameterIssue = firstTypeViolation.Parameter == null
+                        ? "null"
+                        : $"{firstTypeViolation.Parameter.GetType().Name}";
+
                     throw new ParsingException(
                         $"Function '{((IFunctionProxy)this).FunctionName}' has wrong argument "
-                        + $"at parameter {firstTypeViolation.Index}");
+                        + $"at parameter {firstTypeViolation.Index}:  "
+                        + $"we expect {firstTypeViolation.ExpectedType.Name} but it is "
+                        + parameterIssue);
                 }
             }
         }
@@ -348,8 +354,8 @@ namespace GramParserLib.Output
                 new FixedFunctionProxyOneParam<string, bool>(Boolean),
                 new FixedFunctionProxyOneParam<string, int>(Integer),
                 new FixedFunctionProxyOneParam<
-                    IImmutableList<object?>,
-                    IEnumerable<object?>>(Flatten),
+                    IEnumerable<object?>,
+                    IImmutableList<object?>>(Flatten),
                 new FixedFunctionProxyOneParam<
                     IEnumerable<object?>,
                     object?>(FirstOrNull),
@@ -413,6 +419,15 @@ namespace GramParserLib.Output
 
         private static IImmutableList<object?> Flatten(IEnumerable<object?> arrays)
         {
+            if (arrays.Any(o => o == null))
+            {
+                throw new ParsingException("flatten function can't take null arguments");
+            }
+            if (arrays.Select(o => o as IEnumerable<object?>).Any(o => o == null))
+            {
+                throw new ParsingException("flatten function expects only arrays as argument");
+            }
+
             var flatten = arrays
                 .Cast<IEnumerable<object?>>()
                 .SelectMany(i => i)
