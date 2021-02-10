@@ -411,7 +411,7 @@ namespace GramParserLib
                 {
                     return TextOutput.Instance;
                 }
-                else if (id.Equals("output"))
+                else if (id.Equals("defaultOutput"))
                 {
                     return DefaultOutput.Instance;
                 }
@@ -479,18 +479,12 @@ namespace GramParserLib
                 var identifier = ruleName.ToString();
                 var ruleProxy = FindOrCreateRuleProxy(identifier);
 
-                if (outputExtractor == null)
-                {   //  We optimize and return the actual referenced rule
-                    return ruleProxy;
-                }
-                else
-                {
-                    return CreateSequence(
-                        ruleID,
-                        new[] { new TaggedRule(ruleProxy) },
-                        propertyBag,
-                        outputExtractor);
-                }
+                return new WrappedRule(
+                    ruleID,
+                    outputExtractor,
+                    ruleProxy,
+                    propertyBag.HasInterleave,
+                    propertyBag.IsRecursive);
             }
 
             private IRule FindOrCreateRuleProxy(string identifier)

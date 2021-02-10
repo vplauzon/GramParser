@@ -7,7 +7,7 @@ This is useful to call a function needing that default output as a parameter.
 For instance, the following grammar:
 
 ```Python
-rule main = "42" => integer(output);
+rule main = "42" => integer(defaultOutput);
 ```
 
 would match "42" text and output `42`.

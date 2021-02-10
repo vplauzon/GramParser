@@ -1,4 +1,4 @@
 ﻿rule identifier = ("a".."z")+ => text;
 rule idList = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
 
-rule main = functionName:identifier parameters:(("(" l:idList ")" => l)? => flatten(output));
+rule main = functionName:identifier parameters:(("(" l:idList ")" => l)? => flatten(defaultOutput));
