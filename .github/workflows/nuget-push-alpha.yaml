@@ -1,4 +1,4 @@
-name:  Package Nuget Alpha
+name:  Package Nuget
 
 on:
   workflow_dispatch:
