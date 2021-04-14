@@ -761,14 +761,14 @@ namespace GramParserLib
                 var headTag = ToMap(ruleBodyBody["t"]);
                 var head = ToMap(ruleBodyBody["head"]);
                 var tail = ToList(ruleBodyBody["tail"]);
-                var headRule = CreateTaggedRule(headTag, CreateRule(head));
+                var headRule = CreateTaggedRule(headTag, CreateRule(head, bag));
                 var tailRules = from c in tail
                                 let cMap = ToMap(c)
                                 let tailTag = ToMap(cMap["t"])
                                 let tailDisjunctable = ToMap(cMap["d"])
                                 select CreateTaggedRule(
                                     tailTag,
-                                    CreateRule(tailDisjunctable));
+                                    CreateRule(tailDisjunctable, bag));
                 var rules = new[] { headRule }.Concat(tailRules);
 
                 return new DisjunctionRule(

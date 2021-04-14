@@ -70,6 +70,16 @@ namespace GramParserLibUnitTest.Meta
                 (true, "letterSequence", "OP"));
         }
 
+        [TestMethod]
+        public void LetterDisjunction()
+        {
+            Test(
+                (true, "letterDisjunction", "m"),
+                (true, "letterDisjunction", "M"),
+                (true, "letterDisjunction", "n"),
+                (true, "letterDisjunction", "N"));
+        }
+
         private void Test(params (bool isSuccess, string ruleName, string text)[] samples)
         {
             Test("CaseInsensitive.CaseInsensitive.txt", samples);
