@@ -20,6 +20,18 @@ namespace GramParserLibUnitTest.Meta
                 (false, "letter", "b"));
         }
 
+        [TestMethod]
+        public void Range()
+        {
+            Test(
+                (true, "range", "a"),
+                (true, "range", "C"),
+                (true, "range", "d"),
+                (true, "range", "F"),
+                (false, "range", "h"),
+                (false, "range", "G"));
+        }
+
         private void Test(params (bool isSuccess, string ruleName, string text)[] samples)
         {
             Test("CaseInsensitive.CaseInsensitive.txt", samples);

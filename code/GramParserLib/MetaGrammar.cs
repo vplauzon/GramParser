@@ -629,7 +629,12 @@ namespace GramParserLib
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
-                return new RangeRule(ruleID, outputExtractor, lowerChar, upperChar);
+                return new RangeRule(
+                    ruleID,
+                    outputExtractor,
+                    lowerChar,
+                    upperChar,
+                    propertyBag.IsCaseSensitive);
             }
 
             private IRule CreateRepeat(
