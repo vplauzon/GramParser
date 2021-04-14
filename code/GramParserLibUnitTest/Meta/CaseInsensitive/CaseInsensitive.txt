@@ -1,0 +1,7 @@
+﻿rule(caseSensitive=false) letter = "a";
+rule(caseSensitive=false) range = "a".."f";
+rule(caseSensitive=false) letterRepeat = "f"*;
+rule(caseSensitive=false) rangeRepeat = ("d".."g")*;
+rule(caseSensitive=false) letterSequence = "a" "b";
+rule(caseSensitive=false) letterDisjunction = "a" | "b";
+rule(caseSensitive=true) rangeRepeatRef = range*;

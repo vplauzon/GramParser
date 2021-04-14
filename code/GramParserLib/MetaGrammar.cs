@@ -24,11 +24,15 @@ namespace GramParserLib
 
                 public bool? IsRecursive { get; set; }
 
+                public bool? IsCaseSensitive { get; set; }
+
                 public bool IsDefault
                 {
                     get
                     {
-                        return !HasInterleave.HasValue && !IsRecursive.HasValue;
+                        return !HasInterleave.HasValue
+                            && !IsRecursive.HasValue
+                            && !IsCaseSensitive.HasValue;
                     }
                 }
             }
@@ -242,6 +246,9 @@ namespace GramParserLib
                                 break;
                             case "recursive":
                                 AssignRecursiveToBag(bag, value);
+                                break;
+                            case "caseSensitive":
+                                AssignCaseSensitiveToBag(bag, value);
                                 break;
                             default:
                                 throw new ParsingException(
@@ -465,6 +472,22 @@ namespace GramParserLib
                 }
             }
 
+            private static void AssignCaseSensitiveToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.IsCaseSensitive = true;
+                        break;
+                    case "false":
+                        bag.IsCaseSensitive = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for caseSensitive parameter");
+                }
+            }
+
             private IRule CreateRuleReference(
                 string? ruleID,
                 SubString ruleName,
@@ -484,7 +507,8 @@ namespace GramParserLib
                     outputExtractor,
                     ruleProxy,
                     propertyBag.HasInterleave,
-                    propertyBag.IsRecursive);
+                    propertyBag.IsRecursive,
+                    propertyBag.IsCaseSensitive);
             }
 
             private IRule FindOrCreateRuleProxy(string identifier)
@@ -531,7 +555,11 @@ namespace GramParserLib
                                  let lMap = ToMap(l)
                                  let c = GetCharacter(lMap)
                                  select c;
-                var rule = new LiteralRule(ruleID, outputExtractor, characters);
+                var rule = new LiteralRule(
+                    ruleID,
+                    outputExtractor,
+                    characters,
+                    propertyBag.IsCaseSensitive);
 
                 return rule;
             }
@@ -624,7 +652,8 @@ namespace GramParserLib
                             null,
                             null,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "plus":
                         return new RepeatRule(
                             ruleID,
@@ -633,7 +662,8 @@ namespace GramParserLib
                             1,
                             null,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "question":
                         return new RepeatRule(
                             ruleID,
@@ -642,7 +672,8 @@ namespace GramParserLib
                             0,
                             1,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "exact":
                         {
                             var exact = ToMap(cardinality.First().Value);
@@ -655,7 +686,8 @@ namespace GramParserLib
                                 n,
                                 n,
                                 bag.HasInterleave,
-                                bag.IsRecursive);
+                                bag.IsRecursive,
+                                bag.IsCaseSensitive);
                         }
                     case "minMax":
                         {
@@ -669,7 +701,8 @@ namespace GramParserLib
                                 min,
                                 max,
                                 bag.HasInterleave,
-                                bag.IsRecursive);
+                                bag.IsRecursive,
+                                bag.IsCaseSensitive);
                         }
                     default:
                         throw new NotSupportedException();
@@ -736,7 +769,8 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateSequence(
@@ -771,7 +805,8 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateSubstract(
@@ -791,7 +826,8 @@ namespace GramParserLib
                     primaryRule,
                     excludedRule,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateBracket(
@@ -817,7 +853,8 @@ namespace GramParserLib
                         outputExtractor,
                         new[] { new TaggedRule(innerRule) },
                         bag.HasInterleave,
-                        bag.IsRecursive);
+                        bag.IsRecursive,
+                        bag.IsCaseSensitive);
 
                     return outerRule;
                 }
