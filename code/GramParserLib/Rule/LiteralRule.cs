@@ -8,6 +8,46 @@ namespace GramParserLib.Rule
 {
     internal class LiteralRule : RuleBase
     {
+        #region Inner Types
+        private class CaseInsensitiveCharComparer : IEqualityComparer<char>
+        {
+            public static IEqualityComparer<char> Instance { get; } = new CaseInsensitiveCharComparer();
+
+            private CaseInsensitiveCharComparer()
+            {
+            }
+
+            bool IEqualityComparer<char>.Equals(char x, char y)
+            {
+                return char.ToUpperInvariant(x) == char.ToUpperInvariant(y);
+            }
+
+            int IEqualityComparer<char>.GetHashCode(char obj)
+            {
+                return char.ToUpperInvariant(obj).GetHashCode();
+            }
+        }
+
+        private class CaseSensitiveCharComparer : IEqualityComparer<char>
+        {
+            public static IEqualityComparer<char> Instance { get; } = new CaseSensitiveCharComparer();
+
+            private CaseSensitiveCharComparer()
+            {
+            }
+
+            bool IEqualityComparer<char>.Equals(char x, char y)
+            {
+                return x == y;
+            }
+
+            int IEqualityComparer<char>.GetHashCode(char obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
+        #endregion
+
         private readonly char[] _literal;
 
         public LiteralRule(
@@ -45,10 +85,10 @@ namespace GramParserLib.Rule
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             var text = context.Text;
-
+            
             if (text.HasContent
                 && text.Length >= _literal.Length
-                && text.Take(_literal.Length).SequenceEqual(_literal))
+                && text.Take(_literal.Length).SequenceEqual(_literal, GetCharComparer()))
             {
                 var matchText = text.Take(_literal.Length);
                 var match = new RuleMatch(
@@ -71,6 +111,13 @@ namespace GramParserLib.Rule
             var literal = new string(_literal).Replace("\"", "\\\"");
 
             return ToStringRuleName() + $" (\"{literal}\")";
+        }
+
+        private IEqualityComparer<char> GetCharComparer()
+        {
+            return IsCaseSensitive == false
+                ? CaseInsensitiveCharComparer.Instance
+                : CaseSensitiveCharComparer.Instance;
         }
     }
 }
