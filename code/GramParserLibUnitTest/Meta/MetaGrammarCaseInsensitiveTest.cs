@@ -80,6 +80,14 @@ namespace GramParserLibUnitTest.Meta
                 (true, "letterDisjunction", "N"));
         }
 
+        [TestMethod]
+        public void RangeRepeatRef()
+        {
+            Test(
+                (true, "rangeRepeatRef", "abc"),
+                (true, "rangeRepeatRef", "aBc"));
+        }
+
         private void Test(params (bool isSuccess, string ruleName, string text)[] samples)
         {
             Test("CaseInsensitive.CaseInsensitive.txt", samples);
