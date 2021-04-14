@@ -32,6 +32,19 @@ namespace GramParserLibUnitTest.Meta
                 (false, "range", "G"));
         }
 
+        [TestMethod]
+        public void LetterRepeat()
+        {
+            Test(
+                (true, "letterRepeat", ""),
+                (true, "letterRepeat", "f"),
+                (true, "letterRepeat", "ff"),
+                (true, "letterRepeat", "fff"),
+                (true, "letterRepeat", "fFf"),
+                (true, "letterRepeat", "F"),
+                (true, "letterRepeat", "FF"));
+        }
+
         private void Test(params (bool isSuccess, string ruleName, string text)[] samples)
         {
             Test("CaseInsensitive.CaseInsensitive.txt", samples);

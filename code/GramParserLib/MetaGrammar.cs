@@ -163,6 +163,13 @@ namespace GramParserLib
             }
 
             private IRule CreateRule(
+                IImmutableDictionary<string, object> ruleBody,
+                PropertyBag bag)
+            {
+                return CreateRule(null, bag, ruleBody, null);
+            }
+
+            private IRule CreateRule(
                 string ruleID,
                 IImmutableList<object> parameterAssignationList,
                 IImmutableDictionary<string, object> ruleBody,
@@ -186,7 +193,7 @@ namespace GramParserLib
                 switch (ruleBodyTag)
                 {
                     case "ruleRef":
-                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, propertyBag, outputExtractor);
+                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, outputExtractor);
                     case "literal":
                         return CreateLiteral(
                             ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
@@ -491,14 +498,9 @@ namespace GramParserLib
             private IRule CreateRuleReference(
                 string? ruleID,
                 SubString ruleName,
-                PropertyBag propertyBag,
                 IRuleOutput? outputExtractor)
             {
-                if (!propertyBag.IsDefault)
-                {
-                    throw new ParsingException("Rule reference can't have parameters");
-                }
-
+                var propertyBag = new PropertyBag();
                 var identifier = ruleName.ToString();
                 var ruleProxy = FindOrCreateRuleProxy(identifier);
 
@@ -645,7 +647,7 @@ namespace GramParserLib
             {
                 var subRuleBody = ToMap(ruleBodyBody["rule"]);
                 var cardinality = ToMap(ruleBodyBody["cardinality"]);
-                var rule = CreateRule(subRuleBody);
+                var rule = CreateRule(subRuleBody, bag);
 
                 switch (cardinality.First().Key)
                 {
