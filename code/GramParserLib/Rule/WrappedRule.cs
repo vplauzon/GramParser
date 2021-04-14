@@ -14,12 +14,14 @@ namespace GramParserLib.Rule
             IRuleOutput? ruleOutput,
             IRule referencedRule,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
+            bool? isRecursive = null,
+            bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive)
+                  isRecursive,
+                  isCaseSensitive)
         {
             _referencedRule = referencedRule;
         }

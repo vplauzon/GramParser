@@ -48,10 +48,10 @@ jobs:
       run: dotnet build code --configuration Release --no-restore
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
     - name: Test
-      run: dotnet test code --configuration Release --no-restore --verbosity normal
+      run: dotnet test code --configuration Release --no-build --verbosity normal
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
     - name: .NET Publish Web App
-      run: dotnet publish code/GramParserWorkbench --configuration Release --no-restore --output workbench-pack
+      run: dotnet publish code/GramParserWorkbench --configuration Release --no-build --output workbench-pack
 
     # Docker stuff
     # See https://docs.docker.com/engine/reference/commandline/login/

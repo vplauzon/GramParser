@@ -13,7 +13,8 @@ namespace GramParserLib.Rule
             string? ruleName,
             IRuleOutput? ruleOutput,
             bool? hasInterleave,
-            bool? isRecursive)
+            bool? isRecursive,
+            bool? isCaseSensitive)
         {
             if (ruleName == string.Empty)
             {
@@ -23,6 +24,7 @@ namespace GramParserLib.Rule
             RuleOutput = ruleOutput ?? DefaultOutput.Instance;
             HasInterleave = hasInterleave;
             IsRecursive = isRecursive;
+            IsCaseSensitive = isCaseSensitive;
         }
 
         #region IRuleProperties
@@ -31,6 +33,8 @@ namespace GramParserLib.Rule
         public bool? IsRecursive { get; }
 
         public abstract bool IsTerminalRule { get; }
+        
+        public bool? IsCaseSensitive { get; }
         #endregion
 
         public string? RuleName { get; private set; }

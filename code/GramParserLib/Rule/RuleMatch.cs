@@ -53,7 +53,8 @@ namespace GramParserLib
             return output;
         }
 
-        public T ComputeTypedOutput<T>(JsonSerializerOptions? options = null)
+        public T? ComputeTypedOutput<T>(JsonSerializerOptions? options = null)
+            where T : class
         {
             var output = _outputFactory();
             var localOptions = new JsonSerializerOptions(options ?? _defaultOptions);

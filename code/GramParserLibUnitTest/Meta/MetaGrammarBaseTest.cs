@@ -12,7 +12,7 @@ namespace GramParserLibUnitTest.Meta
     {
         protected void Test(
             string grammarFile,
-            (bool isSuccess, string ruleName, string text)[] samples)
+            params (bool isSuccess, string ruleName, string text)[] samples)
         {
             var grammarText = GetResource(grammarFile);
             var grammar = MetaGrammar.ParseGrammar(grammarText);

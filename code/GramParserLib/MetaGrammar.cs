@@ -24,11 +24,15 @@ namespace GramParserLib
 
                 public bool? IsRecursive { get; set; }
 
+                public bool? IsCaseSensitive { get; set; }
+
                 public bool IsDefault
                 {
                     get
                     {
-                        return !HasInterleave.HasValue && !IsRecursive.HasValue;
+                        return !HasInterleave.HasValue
+                            && !IsRecursive.HasValue
+                            && !IsCaseSensitive.HasValue;
                     }
                 }
             }
@@ -159,6 +163,13 @@ namespace GramParserLib
             }
 
             private IRule CreateRule(
+                IImmutableDictionary<string, object> ruleBody,
+                PropertyBag bag)
+            {
+                return CreateRule(null, bag, ruleBody, null);
+            }
+
+            private IRule CreateRule(
                 string ruleID,
                 IImmutableList<object> parameterAssignationList,
                 IImmutableDictionary<string, object> ruleBody,
@@ -182,7 +193,7 @@ namespace GramParserLib
                 switch (ruleBodyTag)
                 {
                     case "ruleRef":
-                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, propertyBag, outputExtractor);
+                        return CreateRuleReference(ruleID, (SubString)ruleBodyBody, outputExtractor);
                     case "literal":
                         return CreateLiteral(
                             ruleID, ToMap(ruleBodyBody), propertyBag, outputExtractor);
@@ -242,6 +253,9 @@ namespace GramParserLib
                                 break;
                             case "recursive":
                                 AssignRecursiveToBag(bag, value);
+                                break;
+                            case "caseSensitive":
+                                AssignCaseSensitiveToBag(bag, value);
                                 break;
                             default:
                                 throw new ParsingException(
@@ -465,17 +479,28 @@ namespace GramParserLib
                 }
             }
 
+            private static void AssignCaseSensitiveToBag(PropertyBag bag, string value)
+            {
+                switch (value)
+                {
+                    case "true":
+                        bag.IsCaseSensitive = true;
+                        break;
+                    case "false":
+                        bag.IsCaseSensitive = false;
+                        break;
+                    default:
+                        throw new ParsingException(
+                            $"Value '{value}' isn't supported for caseSensitive parameter");
+                }
+            }
+
             private IRule CreateRuleReference(
                 string? ruleID,
                 SubString ruleName,
-                PropertyBag propertyBag,
                 IRuleOutput? outputExtractor)
             {
-                if (!propertyBag.IsDefault)
-                {
-                    throw new ParsingException("Rule reference can't have parameters");
-                }
-
+                var propertyBag = new PropertyBag();
                 var identifier = ruleName.ToString();
                 var ruleProxy = FindOrCreateRuleProxy(identifier);
 
@@ -484,7 +509,8 @@ namespace GramParserLib
                     outputExtractor,
                     ruleProxy,
                     propertyBag.HasInterleave,
-                    propertyBag.IsRecursive);
+                    propertyBag.IsRecursive,
+                    propertyBag.IsCaseSensitive);
             }
 
             private IRule FindOrCreateRuleProxy(string identifier)
@@ -531,7 +557,11 @@ namespace GramParserLib
                                  let lMap = ToMap(l)
                                  let c = GetCharacter(lMap)
                                  select c;
-                var rule = new LiteralRule(ruleID, outputExtractor, characters);
+                var rule = new LiteralRule(
+                    ruleID,
+                    outputExtractor,
+                    characters,
+                    propertyBag.IsCaseSensitive);
 
                 return rule;
             }
@@ -601,7 +631,12 @@ namespace GramParserLib
                 var lowerChar = GetCharacter(lower);
                 var upperChar = GetCharacter(upper);
 
-                return new RangeRule(ruleID, outputExtractor, lowerChar, upperChar);
+                return new RangeRule(
+                    ruleID,
+                    outputExtractor,
+                    lowerChar,
+                    upperChar,
+                    propertyBag.IsCaseSensitive);
             }
 
             private IRule CreateRepeat(
@@ -612,7 +647,7 @@ namespace GramParserLib
             {
                 var subRuleBody = ToMap(ruleBodyBody["rule"]);
                 var cardinality = ToMap(ruleBodyBody["cardinality"]);
-                var rule = CreateRule(subRuleBody);
+                var rule = CreateRule(subRuleBody, bag);
 
                 switch (cardinality.First().Key)
                 {
@@ -624,7 +659,8 @@ namespace GramParserLib
                             null,
                             null,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "plus":
                         return new RepeatRule(
                             ruleID,
@@ -633,7 +669,8 @@ namespace GramParserLib
                             1,
                             null,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "question":
                         return new RepeatRule(
                             ruleID,
@@ -642,7 +679,8 @@ namespace GramParserLib
                             0,
                             1,
                             bag.HasInterleave,
-                            bag.IsRecursive);
+                            bag.IsRecursive,
+                            bag.IsCaseSensitive);
                     case "exact":
                         {
                             var exact = ToMap(cardinality.First().Value);
@@ -655,7 +693,8 @@ namespace GramParserLib
                                 n,
                                 n,
                                 bag.HasInterleave,
-                                bag.IsRecursive);
+                                bag.IsRecursive,
+                                bag.IsCaseSensitive);
                         }
                     case "minMax":
                         {
@@ -669,7 +708,8 @@ namespace GramParserLib
                                 min,
                                 max,
                                 bag.HasInterleave,
-                                bag.IsRecursive);
+                                bag.IsRecursive,
+                                bag.IsCaseSensitive);
                         }
                     default:
                         throw new NotSupportedException();
@@ -721,14 +761,14 @@ namespace GramParserLib
                 var headTag = ToMap(ruleBodyBody["t"]);
                 var head = ToMap(ruleBodyBody["head"]);
                 var tail = ToList(ruleBodyBody["tail"]);
-                var headRule = CreateTaggedRule(headTag, CreateRule(head));
+                var headRule = CreateTaggedRule(headTag, CreateRule(head, bag));
                 var tailRules = from c in tail
                                 let cMap = ToMap(c)
                                 let tailTag = ToMap(cMap["t"])
                                 let tailDisjunctable = ToMap(cMap["d"])
                                 select CreateTaggedRule(
                                     tailTag,
-                                    CreateRule(tailDisjunctable));
+                                    CreateRule(tailDisjunctable, bag));
                 var rules = new[] { headRule }.Concat(tailRules);
 
                 return new DisjunctionRule(
@@ -736,7 +776,8 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateSequence(
@@ -754,7 +795,7 @@ namespace GramParserLib
                             let tagRuleMap = ToMap(tagRule)
                             let t = ToMap(tagRuleMap["t"])
                             let r = ToMap(tagRuleMap["r"])
-                            let rule = CreateRule(r)
+                            let rule = CreateRule(r, bag)
                             select CreateTaggedRule(t, rule);
 
                 return CreateSequence(ruleID, rules, bag, outputExtractor);
@@ -771,7 +812,8 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateSubstract(
@@ -791,7 +833,8 @@ namespace GramParserLib
                     primaryRule,
                     excludedRule,
                     bag.HasInterleave,
-                    bag.IsRecursive);
+                    bag.IsRecursive,
+                    bag.IsCaseSensitive);
             }
 
             private IRule CreateBracket(
@@ -817,7 +860,8 @@ namespace GramParserLib
                         outputExtractor,
                         new[] { new TaggedRule(innerRule) },
                         bag.HasInterleave,
-                        bag.IsRecursive);
+                        bag.IsRecursive,
+                        bag.IsCaseSensitive);
 
                     return outerRule;
                 }

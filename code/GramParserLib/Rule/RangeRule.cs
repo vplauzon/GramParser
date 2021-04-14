@@ -12,8 +12,9 @@ namespace GramParserLib.Rule
             string? ruleName,
             IRuleOutput? ruleOutput,
             char first,
-            char last)
-            : base(ruleName, ruleOutput, false, true)
+            char last,
+            bool? isCaseSensitive = null)
+            : base(ruleName, ruleOutput, false, true, isCaseSensitive)
         {
             if (last < first)
             {
@@ -37,9 +38,12 @@ namespace GramParserLib.Rule
 
             if (text.HasContent)
             {
-                var peek = text.First();
+                var peekRaw = text.First();
+                var peek = IsCaseSensitive==false ? char.ToUpperInvariant(peekRaw) : peekRaw;
+                var first = IsCaseSensitive == false ? char.ToUpperInvariant(First) : First;
+                var last = IsCaseSensitive == false ? char.ToUpperInvariant(Last) : Last;
 
-                if (peek >= First && peek <= Last)
+                if (peek >= first && peek <= last)
                 {
                     var matchText = text.Take(1);
                     var match = new RuleMatch(
