@@ -795,7 +795,7 @@ namespace GramParserLib
                             let tagRuleMap = ToMap(tagRule)
                             let t = ToMap(tagRuleMap["t"])
                             let r = ToMap(tagRuleMap["r"])
-                            let rule = CreateRule(r)
+                            let rule = CreateRule(r, bag)
                             select CreateTaggedRule(t, rule);
 
                 return CreateSequence(ruleID, rules, bag, outputExtractor);

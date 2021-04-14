@@ -45,6 +45,31 @@ namespace GramParserLibUnitTest.Meta
                 (true, "letterRepeat", "FF"));
         }
 
+        [TestMethod]
+        public void RangeRepeat()
+        {
+            Test(
+                (true, "rangeRepeat", ""),
+                (true, "rangeRepeat", "d"),
+                (true, "rangeRepeat", "f"),
+                (true, "rangeRepeat", "g"),
+                (false, "rangeRepeat", "h"),
+                (true, "rangeRepeat", "G"),
+                (true, "rangeRepeat", "D"),
+                (true, "rangeRepeat", "E"),
+                (true, "rangeRepeat", "dEfGGfe"));
+        }
+
+        [TestMethod]
+        public void LetterSequence()
+        {
+            Test(
+                (true, "letterSequence", "op"),
+                (true, "letterSequence", "oP"),
+                (true, "letterSequence", "Op"),
+                (true, "letterSequence", "OP"));
+        }
+
         private void Test(params (bool isSuccess, string ruleName, string text)[] samples)
         {
             Test("CaseInsensitive.CaseInsensitive.txt", samples);
