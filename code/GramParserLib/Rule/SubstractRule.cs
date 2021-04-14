@@ -16,12 +16,14 @@ namespace GramParserLib.Rule
             IRule primary,
             IRule excluded,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
+            bool? isRecursive = null,
+            bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive)
+                  isRecursive,
+                  isCaseSensitive)
         {
             _primary = primary ?? throw new ArgumentNullException(nameof(primary));
             _excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));

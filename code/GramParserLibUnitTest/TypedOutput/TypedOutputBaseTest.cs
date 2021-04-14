@@ -9,7 +9,8 @@ namespace GramParserLibUnitTest.TypedOutput
 {
     public class TypedOutputBaseTest : BaseTest
     {
-        protected T TestTypedOutput<T>(string resourceName, string text)
+        protected T? TestTypedOutput<T>(string resourceName, string text)
+            where T : class
         {
             var grammarText = GetResource(resourceName);
             var grammar = MetaGrammar.ParseGrammar(grammarText);

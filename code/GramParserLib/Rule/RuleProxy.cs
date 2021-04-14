@@ -45,6 +45,8 @@ namespace GramParserLib.Rule
         public bool? IsRecursive => ReferencedRule.IsRecursive;
 
         public bool IsTerminalRule => ReferencedRule.IsTerminalRule;
+        
+        public bool? IsCaseSensitive => ReferencedRule.IsCaseSensitive;
         #endregion
 
         string? IRule.RuleName => ReferencedRule.RuleName;

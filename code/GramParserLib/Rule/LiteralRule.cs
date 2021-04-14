@@ -13,8 +13,9 @@ namespace GramParserLib.Rule
         public LiteralRule(
             string? ruleName,
             IRuleOutput? ruleOutput,
-            IEnumerable<char> literal)
-            : base(ruleName, ruleOutput, false, false)
+            IEnumerable<char> literal,
+            bool? isCaseSensitive = null)
+            : base(ruleName, ruleOutput, false, false, isCaseSensitive)
         {
             if (literal == null)
             {
@@ -27,8 +28,9 @@ namespace GramParserLib.Rule
         public LiteralRule(
             string? ruleName,
             IRuleOutput? outputExtractor,
-            string literal)
-            : base(ruleName, outputExtractor, false, false)
+            string literal,
+            bool? isCaseSensitive = null)
+            : base(ruleName, outputExtractor, false, false, isCaseSensitive)
         {
             if (literal == null)
             {

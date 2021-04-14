@@ -25,8 +25,9 @@ namespace GramParserLibUnitTest.TypedOutput
         {
             var output = TestTypedOutput<FunctionInvocation>("FunctionInvocation.txt", "f()");
 
-            Assert.AreEqual("f", output.FunctionName, "Function name");
-            Assert.AreEqual(0, output.Parameters.Count, "# parameters");
+            Assert.IsNotNull(output, "Output");
+            Assert.AreEqual("f", output!.FunctionName, "Function name");
+            Assert.AreEqual(0, output!.Parameters.Count, "# parameters");
         }
 
         [TestMethod]
@@ -36,9 +37,10 @@ namespace GramParserLibUnitTest.TypedOutput
                 "FunctionInvocation.txt",
                 "g(x)");
 
-            Assert.AreEqual("g", output.FunctionName, "Function name");
-            Assert.AreEqual(1, output.Parameters.Count, "# parameters");
-            Assert.AreEqual("x", output.Parameters[0], "1st parameter");
+            Assert.IsNotNull(output, "Output");
+            Assert.AreEqual("g", output!.FunctionName, "Function name");
+            Assert.AreEqual(1, output!.Parameters.Count, "# parameters");
+            Assert.AreEqual("x", output!.Parameters[0], "1st parameter");
         }
 
         [TestMethod]
@@ -48,10 +50,11 @@ namespace GramParserLibUnitTest.TypedOutput
                 "FunctionInvocation.txt",
                 "h(x,y)");
 
-            Assert.AreEqual("h", output.FunctionName, "Function name");
-            Assert.AreEqual(2, output.Parameters.Count, "# parameters");
-            Assert.AreEqual("x", output.Parameters[0], "1st parameter");
-            Assert.AreEqual("y", output.Parameters[1], "2nd parameter");
+            Assert.IsNotNull(output, "Output");
+            Assert.AreEqual("h", output!.FunctionName, "Function name");
+            Assert.AreEqual(2, output!.Parameters.Count, "# parameters");
+            Assert.AreEqual("x", output!.Parameters[0], "1st parameter");
+            Assert.AreEqual("y", output!.Parameters[1], "2nd parameter");
         }
 
         [TestMethod]
@@ -61,11 +64,12 @@ namespace GramParserLibUnitTest.TypedOutput
                 "FunctionInvocation.txt",
                 "i(x,y,z)");
 
-            Assert.AreEqual("i", output.FunctionName, "Function name");
-            Assert.AreEqual(3, output.Parameters.Count, "# parameters");
-            Assert.AreEqual("x", output.Parameters[0], "1st parameter");
-            Assert.AreEqual("y", output.Parameters[1], "2nd parameter");
-            Assert.AreEqual("z", output.Parameters[2], "3rd parameter");
+            Assert.IsNotNull(output, "Output");
+            Assert.AreEqual("i", output!.FunctionName, "Function name");
+            Assert.AreEqual(3, output!.Parameters.Count, "# parameters");
+            Assert.AreEqual("x", output!.Parameters[0], "1st parameter");
+            Assert.AreEqual("y", output!.Parameters[1], "2nd parameter");
+            Assert.AreEqual("z", output!.Parameters[2], "3rd parameter");
         }
     }
 }

@@ -18,12 +18,14 @@ namespace GramParserLib.Rule
             int? min,
             int? max,
             bool? hasInterleave = null,
-            bool? isRecursive = null)
+            bool? isRecursive = null,
+            bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   outputExtractor,
                   hasInterleave,
-                  isRecursive)
+                  isRecursive,
+                  isCaseSensitive)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
             if (min.HasValue && max.HasValue && min.Value > max.Value)
