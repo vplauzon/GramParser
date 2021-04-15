@@ -40,13 +40,12 @@ namespace GramParserLib
         }
         #endregion
 
-        private const int DEFAULT_MAX_DEPTH = 40;
+        private const int DEFAULT_MAX_DEPTH = 15;
         private static readonly RuleMatch[] EMPTY_RULE_MATCHES = new RuleMatch[0];
 
-        private readonly SubString _text;
         private readonly IRule? _interleaveRule;
-        private readonly int _depth;
-        private readonly ImmutableHashSet<IRule> _ruleExcepts;
+        private readonly bool _isInterleaveMatched;
+        private readonly IImmutableSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
         public ExplorerContext(
@@ -56,6 +55,7 @@ namespace GramParserLib
             : this(
                   text,
                   interleaveRule,
+                  false,
                   depth ?? DEFAULT_MAX_DEPTH,
                   ImmutableHashSet<IRule>.Empty,
                   new AmbiantRuleProperties())
@@ -65,26 +65,27 @@ namespace GramParserLib
         private ExplorerContext(
             SubString text,
             IRule? interleaveRule,
+            bool isInterleaveMatched,
             int depth,
-            ImmutableHashSet<IRule> ruleNameExcepts,
+            IImmutableSet<IRule> ruleNameExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
         {
             if (depth <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(depth));
             }
-            _text = text;
-            _depth = depth;
             _interleaveRule = interleaveRule;
+            _isInterleaveMatched = isInterleaveMatched;
             _ruleExcepts = ruleNameExcepts;
-            _ambiantRuleProperties = ambiantRuleProperties
-                ?? throw new ArgumentNullException(nameof(ambiantRuleProperties));
+            _ambiantRuleProperties = ambiantRuleProperties;
+            Text = text;
+            Depth = depth;
             ContextID = Guid.NewGuid().GetHashCode();
         }
 
-        public SubString Text => _text;
+        public SubString Text { get; }
 
-        public int Depth => _depth;
+        public int Depth { get; }
 
         /// <summary>For debug purposes only.</summary>
         /// <remarks>
@@ -92,21 +93,15 @@ namespace GramParserLib
         /// </remarks>
         public int ContextID { get; }
 
-        public IEnumerable<IRule> RuleExcepts { get { return _ruleExcepts; } }
-
         public ExplorerContext MoveForward(RuleMatch match)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
-
             if (match.LengthWithInterleaves > 0)
             {
                 return new ExplorerContext(
-                    _text.Skip(match.LengthWithInterleaves),
+                    Text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
-                    _depth,
+                    false,
+                    DEFAULT_MAX_DEPTH,
                     ImmutableHashSet<IRule>.Empty,
                     _ambiantRuleProperties);
             }
@@ -122,7 +117,7 @@ namespace GramParserLib
             {
                 throw new ArgumentNullException(nameof(rule));
             }
-            if (_depth <= 1)
+            if (Depth <= 1)
             {
                 throw new ParsingException("Recursion exceeds limits");
             }
@@ -132,12 +127,13 @@ namespace GramParserLib
 
             if (newExcepts != null)
             {
-                var interleaveLength = MatchInterleave();
-                var newText = _text.Skip(interleaveLength);
+                var interleaveLength = _isInterleaveMatched ? 0 : MatchInterleave();
+                var newText = Text.Skip(interleaveLength);
                 var newContext = new ExplorerContext(
                     newText,
                     _interleaveRule,
-                    _depth - 1,
+                    true,
+                    Depth - 1,
                     newExcepts,
                     newAmbiantRuleProperties);
                 var ruleMatches = rule.Match(newContext);
@@ -166,15 +162,16 @@ namespace GramParserLib
 
         public ExplorerContext SubContext(int length)
         {
-            if (length > _text.Length)
+            if (length > Text.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(length));
             }
 
             return new ExplorerContext(
-                _text.Take(length),
+                Text.Take(length),
                 _interleaveRule,
-                _depth,
+                true,
+                Depth,
                 ImmutableHashSet<IRule>.Empty,
                 _ambiantRuleProperties);
         }
@@ -196,7 +193,7 @@ namespace GramParserLib
         #region object methods
         public override string ToString()
         {
-            return $"[{_depth}]{_text}";
+            return $"[{Depth}]{Text}";
         }
         #endregion
 
@@ -208,14 +205,15 @@ namespace GramParserLib
         private ExplorerContext ForInterleave()
         {
             return new ExplorerContext(
-                _text,
+                Text,
                 null,
-                _depth,
+                false,
+                Depth,
                 _ruleExcepts,
                 _ambiantRuleProperties);
         }
 
-        private ImmutableHashSet<IRule>? GetNewRuleExceptions(
+        private IImmutableSet<IRule>? GetNewRuleExceptions(
             AmbiantRuleProperties newAmbiantRuleProperties,
             IRule rule)
         {
