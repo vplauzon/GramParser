@@ -44,6 +44,7 @@ namespace GramParserLib
         private static readonly RuleMatch[] EMPTY_RULE_MATCHES = new RuleMatch[0];
 
         private readonly IRule? _interleaveRule;
+        private readonly bool _isInterleaveMatched;
         private readonly IImmutableSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
 
@@ -54,6 +55,7 @@ namespace GramParserLib
             : this(
                   text,
                   interleaveRule,
+                  false,
                   depth ?? DEFAULT_MAX_DEPTH,
                   ImmutableHashSet<IRule>.Empty,
                   new AmbiantRuleProperties())
@@ -63,6 +65,7 @@ namespace GramParserLib
         private ExplorerContext(
             SubString text,
             IRule? interleaveRule,
+            bool isInterleaveMatched,
             int depth,
             IImmutableSet<IRule> ruleNameExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
@@ -72,6 +75,7 @@ namespace GramParserLib
                 throw new ArgumentOutOfRangeException(nameof(depth));
             }
             _interleaveRule = interleaveRule;
+            _isInterleaveMatched = isInterleaveMatched;
             _ruleExcepts = ruleNameExcepts;
             _ambiantRuleProperties = ambiantRuleProperties;
             Text = text;
@@ -91,16 +95,12 @@ namespace GramParserLib
 
         public ExplorerContext MoveForward(RuleMatch match)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
-
             if (match.LengthWithInterleaves > 0)
             {
                 return new ExplorerContext(
                     Text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
+                    false,
                     DEFAULT_MAX_DEPTH,
                     ImmutableHashSet<IRule>.Empty,
                     _ambiantRuleProperties);
@@ -127,11 +127,12 @@ namespace GramParserLib
 
             if (newExcepts != null)
             {
-                var interleaveLength = MatchInterleave();
+                var interleaveLength = _isInterleaveMatched ? 0 : MatchInterleave();
                 var newText = Text.Skip(interleaveLength);
                 var newContext = new ExplorerContext(
                     newText,
                     _interleaveRule,
+                    true,
                     Depth - 1,
                     newExcepts,
                     newAmbiantRuleProperties);
@@ -169,6 +170,7 @@ namespace GramParserLib
             return new ExplorerContext(
                 Text.Take(length),
                 _interleaveRule,
+                true,
                 Depth,
                 ImmutableHashSet<IRule>.Empty,
                 _ambiantRuleProperties);
@@ -205,6 +207,7 @@ namespace GramParserLib
             return new ExplorerContext(
                 Text,
                 null,
+                false,
                 Depth,
                 _ruleExcepts,
                 _ambiantRuleProperties);
