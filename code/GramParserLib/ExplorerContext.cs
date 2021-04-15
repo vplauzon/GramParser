@@ -40,7 +40,7 @@ namespace GramParserLib
         }
         #endregion
 
-        private const int DEFAULT_MAX_DEPTH = 40;
+        private const int DEFAULT_MAX_DEPTH = 15;
         private static readonly RuleMatch[] EMPTY_RULE_MATCHES = new RuleMatch[0];
 
         private readonly SubString _text;
@@ -106,7 +106,7 @@ namespace GramParserLib
                 return new ExplorerContext(
                     _text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
-                    _depth,
+                    DEFAULT_MAX_DEPTH,
                     ImmutableHashSet<IRule>.Empty,
                     _ambiantRuleProperties);
             }
