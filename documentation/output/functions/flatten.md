@@ -19,7 +19,7 @@ rule identifier = ("a".."z")+ => text;
 rule idList = head:identifier tail:("," id:identifier => id)* => prepend(head, tail);
 rule bracketedIdList = "(" l:idList ")" => l;
 
-rule main = functionName:identifier parameters:(bracketedIdList? => flatten(output));
+rule main = functionName:identifier parameters:bracketedIdList? => flatten(output));
 ```
 
 would have the following matches:
