@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AppInsights.TelemetryInitializers" Version="1.1.908" />
+    <PackageReference Include="AppInsights.TelemetryInitializers" Version="1.2.1371" />
   </ItemGroup>
 
   <ItemGroup>
