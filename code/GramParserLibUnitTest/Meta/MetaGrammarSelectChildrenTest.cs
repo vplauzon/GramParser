@@ -54,7 +54,7 @@ namespace GramParserLibUnitTest.Meta
 
                 Assert.IsNotNull(match, $"Match - {sampleName}");
 
-                var output = match.ComputeOutput();
+                var output = match!.ComputeOutput();
 
                 if (sample.childrenCountMap == null)
                 {

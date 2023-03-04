@@ -244,7 +244,7 @@ namespace GramParserLib
                     {
                         var assignationMap = ToMap(assignation);
                         var id = assignationMap["id"].ToString();
-                        var value = assignationMap["value"].ToString();
+                        var value = assignationMap["value"].ToString()!;
 
                         switch (id)
                         {
@@ -310,10 +310,14 @@ namespace GramParserLib
                 var functionName = functionMap["id"];
                 var listChildren = ToList(functionMap["list"]);
 
+                if (functionName == null)
+                {
+                    throw new NotSupportedException("Do not support null parameter");
+                }
                 if (listChildren.Count == 0)
                 {
                     return new FunctionOutput(
-                        functionName.ToString(),
+                        functionName.ToString()!,
                         ImmutableArray<IRuleOutput>.Empty);
                 }
                 else
@@ -322,7 +326,7 @@ namespace GramParserLib
                     var extractors = from outputBody in outputBodies
                                      select CreateOutputExtractorFromBody(ToMap(outputBody));
 
-                    return new FunctionOutput(functionName.ToString(), extractors);
+                    return new FunctionOutput(functionName.ToString()!, extractors);
                 }
             }
 
@@ -684,7 +688,7 @@ namespace GramParserLib
                     case "exact":
                         {
                             var exact = ToMap(cardinality.First().Value);
-                            var n = int.Parse(exact.First().Value.ToString());
+                            var n = int.Parse(exact.First().Value.ToString()!);
 
                             return new RepeatRule(
                                 ruleID,
@@ -726,8 +730,8 @@ namespace GramParserLib
                 {
                     case "minmax":
                         {
-                            var minText = cardinality["min"].ToString();
-                            var maxText = cardinality["max"].ToString();
+                            var minText = cardinality["min"].ToString()!;
+                            var maxText = cardinality["max"].ToString()!;
                             var min = int.Parse(minText);
                             var max = int.Parse(maxText);
 
@@ -735,14 +739,14 @@ namespace GramParserLib
                         }
                     case "min":
                         {
-                            var minText = cardinality["min"].ToString();
+                            var minText = cardinality["min"].ToString()!;
                             var min = int.Parse(minText);
 
                             return (min, null);
                         }
                     case "max":
                         {
-                            var maxText = cardinality["max"].ToString();
+                            var maxText = cardinality["max"].ToString()!;
                             var max = int.Parse(maxText);
 
                             return (null, max);

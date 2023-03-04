@@ -51,7 +51,7 @@ namespace GramParserLib.Rule
         protected string ToString(IRule rule)
         {
             return string.IsNullOrWhiteSpace(rule.RuleName)
-                ? rule.ToString()
+                ? rule.ToString()!
                 : rule.RuleName;
         }
 

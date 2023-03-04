@@ -1,31 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Label="Globals">
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-  </PropertyGroup>
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-
-    <IsPackable>false</IsPackable>
-
-    <AssemblyName>GramParserLibUnitTest</AssemblyName>
-
-    <RootNamespace>GramParserLibUnitTest</RootNamespace>
-
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>latest</LangVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +21,7 @@
     <None Remove="Output\Identifier\*.txt" />
     <None Remove="Output\Object\*.txt" />
     <None Remove="TypedOutput\*.txt" />
+    <None Remove="Meta\CaseInsensitive\CaseInsensitive.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,13 +36,6 @@
     <EmbeddedResource Include="Output\Identifier\*.txt" />
     <EmbeddedResource Include="Output\Object\*.txt" />
     <EmbeddedResource Include="TypedOutput\*.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Meta\CaseInsensitive\CaseInsensitive.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Meta\CaseInsensitive\CaseInsensitive.txt" />
   </ItemGroup>
 

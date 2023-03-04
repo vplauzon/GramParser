@@ -30,7 +30,7 @@ namespace GramParserLibUnitTest.Rule
                     rule.Match(new ExplorerContext(samples[i])).FirstOrDefault();
 
                 Assert.IsNotNull(match, $"Success - {i}");
-                Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                 Assert.AreEqual(samples[i].Length, match.Text.Length, $"MatchLength - {i}");
                 Assert.AreEqual(1, match.Text.Length, $"Content - {i}");
             }

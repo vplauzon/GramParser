@@ -53,7 +53,7 @@ namespace GramParserLib
             return HasRule(DEFAULT_RULE_NAME);
         }
 
-        public RuleMatch Match(string? ruleName, SubString text, int? depth = null)
+        public RuleMatch? Match(string? ruleName, SubString text, int? depth = null)
         {
             if (string.IsNullOrWhiteSpace(ruleName))
             {
