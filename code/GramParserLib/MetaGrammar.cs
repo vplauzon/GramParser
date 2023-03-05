@@ -511,10 +511,7 @@ namespace GramParserLib
                 return new WrappedRule(
                     ruleID,
                     outputExtractor,
-                    ruleProxy,
-                    propertyBag.HasInterleave,
-                    propertyBag.IsRecursive,
-                    propertyBag.IsCaseSensitive);
+                    ruleProxy);
             }
 
             private IRule FindOrCreateRuleProxy(string identifier)
