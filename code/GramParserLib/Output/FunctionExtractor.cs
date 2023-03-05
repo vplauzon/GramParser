@@ -231,8 +231,10 @@ namespace GramParserLib.Output
 
             protected override object? Invoke(IImmutableList<object?> parameters)
             {
-                var p1 = (T1)parameters[0] ?? throw new NotSupportedException("Do not support null parameter");
-                var p2 = (T2)parameters[1] ?? throw new NotSupportedException("Do not support null parameter");
+                var p1 = (T1?)parameters[0]
+                    ?? throw new NotSupportedException("Do not support null parameter");
+                var p2 = (T2?)parameters[1]
+                    ?? throw new NotSupportedException("Do not support null parameter");
 
                 return _function(p1, p2);
             }
@@ -313,10 +315,13 @@ namespace GramParserLib.Output
             string functionName,
             IEnumerable<IRuleOutput> parameters)
         {
-            if (!_functionMap.TryGetValue(functionName, out _function))
+            IFunctionProxy? function;
+
+            if (!_functionMap.TryGetValue(functionName, out function))
             {
                 throw new ParsingException($"Function '{functionName}' doesn't exist");
             }
+            _function = function;
             _parameters = ImmutableArray<IRuleOutput>
                 .Empty
                 .AddRange(parameters);

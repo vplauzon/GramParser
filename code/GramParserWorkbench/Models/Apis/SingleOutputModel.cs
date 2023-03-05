@@ -8,7 +8,7 @@ namespace GramParserWorkbench.Models.Apis
     internal class SingleOutputModel
     {
         public SingleOutputModel(
-            RuleMatch match,
+            RuleMatch? match,
             TimeSpan grammarDuration,
             TimeSpan matchDuration)
         {

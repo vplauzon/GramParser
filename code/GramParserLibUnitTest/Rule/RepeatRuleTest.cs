@@ -18,7 +18,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext("")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Rule");
             Assert.AreEqual(0, match.Text.Length, "MatchLength");
             Assert.AreEqual(0, ToList(match.ComputeOutput()).Count(), "Contents");
         }
@@ -31,7 +31,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext("ggggg")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Rule");
             Assert.AreEqual(5, match.Text.Length, "MatchLength");
             Assert.AreEqual(5, ToList(match.ComputeOutput()).Count(), "Contents");
         }
@@ -70,7 +70,7 @@ namespace GramParserLibUnitTest.Rule
                 else
                 {
                     Assert.IsNotNull(match, $"Success - {i}");
-                    Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                    Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text.Length, ToList(match.ComputeOutput()).Count(), $"Contents - {i}");
                 }
@@ -91,7 +91,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Rule");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(3, ToList(match.ComputeOutput()).Count(), "Contents");
         }

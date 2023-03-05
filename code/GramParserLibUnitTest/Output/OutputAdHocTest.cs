@@ -23,5 +23,16 @@ namespace GramParserLibUnitTest.Output
 
             Test("AdHoc.FlattenOutput.txt", samples);
         }
+
+        [TestMethod]
+        public void ForeachIdentifier()
+        {
+            var samples = new[]
+            {
+                (true, "main", "n in", (object?)"n")
+            };
+
+            Test("AdHoc.Identifier.txt", samples);
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace GramParserLib.Output
         object? IRuleOutput.ComputeOutput(SubString text, Lazy<object?> lazyDefaultOutput)
         {
             var map = lazyDefaultOutput.Value as IImmutableDictionary<string, object>;
-            object child;
+            object? child;
 
             if (map == null)
             {

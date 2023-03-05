@@ -19,7 +19,7 @@ namespace GramParserLibUnitTest.Rule
             var nomatch = rule.Match(new ExplorerContext("h")).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Rule");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Rule");
             Assert.AreEqual(5, match.Text.Length, "Content");
 
             Assert.IsNull(nomatch, "Failure");

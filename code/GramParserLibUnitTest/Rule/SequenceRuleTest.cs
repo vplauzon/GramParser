@@ -23,7 +23,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(text.ToString().TrimStart(), match.Text.ToString(), "Content");
             Assert.AreEqual(3, ToList(match.ComputeOutput()).Count, "Fragments");
@@ -42,7 +42,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
 
             var output = ToMap(match.ComputeOutput());
@@ -64,7 +64,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext(text)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "Seq");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "Seq");
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
 
             var output = ToMap(match.ComputeOutput());
@@ -89,7 +89,7 @@ namespace GramParserLibUnitTest.Rule
             var match = rule.Match(new ExplorerContext(text, interleave)).FirstOrDefault();
 
             Assert.IsNotNull(match, "Success");
-            Assert.AreEqual(rule.RuleName, match.Rule.RuleName, "seq");
+            Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, "seq");
             Assert.AreEqual(1, ToMap(match.ComputeOutput()).Count(), "Contents");
         }
     }

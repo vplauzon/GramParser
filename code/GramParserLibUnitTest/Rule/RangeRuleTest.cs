@@ -36,7 +36,7 @@ namespace GramParserLibUnitTest.Rule
                 if (isSuccess)
                 {
                     Assert.IsNotNull(match, $"Success - {i}");
-                    Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                    Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(1, match.Text.Length, $"MatchLength - {i}");
                 }
                 else

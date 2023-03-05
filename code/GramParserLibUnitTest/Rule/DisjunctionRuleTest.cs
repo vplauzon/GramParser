@@ -42,7 +42,7 @@ namespace GramParserLibUnitTest.Rule
                 else
                 {
                     Assert.IsNotNull(match, $"Success - {i}");
-                    Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                    Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                     Assert.AreEqual(text, match.Text.ToString(), $"Content - {i}");
                 }
@@ -92,7 +92,7 @@ namespace GramParserLibUnitTest.Rule
                 else
                 {
                     Assert.IsNotNull(match, $"Success - {i}");
-                    Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                    Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
 
                     var output = ToMap(match.ComputeOutput());
@@ -154,7 +154,7 @@ namespace GramParserLibUnitTest.Rule
                 else
                 {
                     Assert.IsNotNull(match, $"Success - {i}");
-                    Assert.AreEqual(rule.RuleName, match.Rule.RuleName, $"Rule - {i}");
+                    Assert.AreEqual(rule.RuleName, match!.Rule.RuleName, $"Rule - {i}");
                     Assert.AreEqual(text.Length, match.Text.Length, $"MatchLength - {i}");
                 }
             }
