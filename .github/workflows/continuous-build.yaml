@@ -53,6 +53,9 @@ jobs:
     - name: .NET Publish Web App
       run: dotnet publish code/GramParserWorkbench --configuration Release --no-build --output workbench-pack
 
+    - name: Test
+      run: ls -l workbench-pack
+
     # Restart web site logic
     # Login
     - name: Azure Login
