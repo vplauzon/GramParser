@@ -53,10 +53,7 @@ jobs:
     - name: .NET Publish Web App
       run: dotnet publish code/GramParserWorkbench --configuration Release --no-build --output workbench-pack
 
-    - name: Test
-      run: ls -l workbench-pack
-
-    # Restart web site logic
+    # Deploy web site logic
     # Login
     - name: Azure Login
       run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
@@ -67,4 +64,5 @@ jobs:
         echo "Target environment:  '$targetEnv'"
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
-        az webapp restart --name $name -g $rg
+        cd workbench-pack
+        az webapp up --name $name -g $rg --os-type linux
