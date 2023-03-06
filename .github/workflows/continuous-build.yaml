@@ -65,5 +65,4 @@ jobs:
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
         cd workbench-pack
-        # cd code/GramParserWorkbench
-        az webapp up --name $name -g $rg --os-type linux
+        az webapp up --name $name -g $rg --os-type linux --runtime "dotnet:7"
