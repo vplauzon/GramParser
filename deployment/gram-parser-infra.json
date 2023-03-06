@@ -13,19 +13,16 @@
             {
                 "name": "[concat('workbench-dev-', variables('Suffix'))]",
                 "targetEnv": "dev",
-                "containerImage": "vplauzon/gram-parser-workbench:dev",
                 "alwaysOn": true
             },
             {
                 "name": "[concat('workbench-staging-', variables('Suffix'))]",
                 "targetEnv": "staging",
-                "containerImage": "vplauzon/gram-parser-workbench:staging",
                 "alwaysOn": true
             },
             {
                 "name": "[concat('workbench-prod-', variables('Suffix'))]",
                 "targetEnv": "prod",
-                "containerImage": "vplauzon/gram-parser-workbench:prod",
                 "alwaysOn": true
             }
         ],
@@ -101,11 +98,11 @@
             "tags": {
                 "targetEnv": "[variables('Apps Config')[copyIndex()].targetEnv]"
             },
-            "kind": "app,linux,container",
+            "kind": "app,linux",
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]",
                 "siteConfig": {
-                    "linuxFxVersion": "[concat('DOCKER|', variables('Apps Config')[copyIndex()].containerImage)]"
+                    "linuxFxVersion": "DOTNETCORE|7.0"
                 },
                 "clientAffinityEnabled": false,
                 "httpsOnly": true
