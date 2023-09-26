@@ -128,5 +128,24 @@ namespace GramParserLibUnitTest.Output
 
             Test("Function.FirstOrNull.txt", samples);
         }
+
+        [TestMethod]
+        public void Coalesce()
+        {
+            var samples = new[]
+            {
+                (true, "optional", "a=b", (object?)"="),
+                (true, "optional", "aaa=bbbbb", "="),
+                (true, "optional", "aabb", null),
+                (true, "first", "aaa", "a"),
+                (true, "first", "aa", "a"),
+                (true, "first", "a", "a"),
+                (true, "first", "", null),
+                (true, "optionalBoolean", "a=b", true),
+                (true, "optionalBoolean", "ab", false)
+            };
+
+            Test("Function.Coalesce.txt", samples);
+        }
     }
 }

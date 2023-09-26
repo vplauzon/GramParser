@@ -31,6 +31,7 @@ Here are the primitives in GramParser grammar:
 * [Prepend](output/functions/prepend.md)
 * [Flatten](output/functions/flatten.md)
 * [FirstOrNull](output/functions/first-or-null.md)
+* [Coalesce](output/functions/coalesce.md)
 * [Merge](output/functions/merge.md)
 
 ### GramParser Concepts

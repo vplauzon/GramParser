@@ -364,6 +364,9 @@ namespace GramParserLib.Output
                 new FixedFunctionProxyOneParam<
                     IEnumerable<object?>,
                     object?>(FirstOrNull),
+                new FixedFunctionProxyOneParam<
+                    IEnumerable<object?>,
+                    object?>(Coalesce),
                 new ScalableFunctionProxyBase<string, string>(Concat),
                 new ScalableFunctionProxyBase<object?, object>(Merge),
                 new PrependFunctionProxy()
@@ -441,11 +444,20 @@ namespace GramParserLib.Output
             return flatten;
         }
 
-        private static object? FirstOrNull(IEnumerable<object?> arrays)
+        private static object? FirstOrNull(IEnumerable<object?> array)
         {
-            var firstOrNull = arrays.FirstOrDefault();
+            var firstOrNull = array.FirstOrDefault();
 
             return firstOrNull;
+        }
+
+        private static object? Coalesce(IEnumerable<object?> array)
+        {
+            var coalescedValue = array
+                .Where(o => o != null)
+                .FirstOrDefault();
+
+            return coalescedValue;
         }
         #endregion
     }

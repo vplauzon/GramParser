@@ -1,0 +1,3 @@
+﻿rule optional = "a"+ r:"="? "b"+ => coalesce(r);
+rule first = "a"* => firstOrNull(defaultOutput);
+rule optionalBoolean = "a"+ r:("=" => true)? "b"+ => coalesce([coalesce(r), false]);
