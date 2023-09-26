@@ -1,6 +1,6 @@
 # GramParser
 
-![Continuous Build / Test for dev](https://github.com/vplauzon/GramParser/workflows/Continuous%20Build%20/%20Test%20for%20dev/badge.svg)
+[![Continuous Build / Test](https://github.com/vplauzon/GramParser/actions/workflows/continuous-build.yaml/badge.svg)](https://github.com/vplauzon/GramParser/actions/workflows/continuous-build.yaml)
 
 See the <span style="background:yellow">[following blog article](http://todo.com)</span> introducing it.
 
