@@ -58,11 +58,19 @@ jobs:
     - name: Azure Login
       run: az login --service-principal -u ${{ secrets.sp_id }} -p ${{ secrets.sp_secret }} --tenant ${{ secrets.tenant_id }}
     # Restart web site
+    # - name: Deploy web site
+    #   run:  |
+    #     targetEnv=${{ steps.environment-name.outputs.targetEnv }}
+    #     echo "Target environment:  '$targetEnv'"
+    #     name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
+    #     echo "Name of webapp:  '$name'"
+    #     cd workbench-pack
+    #     az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:7.0"
     - name: Deploy web site
       run:  |
         targetEnv=${{ steps.environment-name.outputs.targetEnv }}
         echo "Target environment:  '$targetEnv'"
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
-        cd workbench-pack
+        cd code/GramParserWorkbench
         az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:7.0"
