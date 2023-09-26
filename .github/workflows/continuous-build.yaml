@@ -18,8 +18,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: az version
-      run: az --version
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
