@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <WarningLevel>9999</WarningLevel>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <Authors>Vincent-Philippe Lauzon</Authors>
     <PackageProjectUrl>https://github.com/vplauzon/GramParser/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vplauzon/GramParser/</RepositoryUrl>
@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
-    <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.3" />
+    <PackageReference Include="System.Text.Json" Version="9.0.3" />
   </ItemGroup>
 </Project>
