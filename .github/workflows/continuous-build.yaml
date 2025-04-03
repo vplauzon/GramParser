@@ -7,12 +7,17 @@ on:
       - staging
       - prod
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   IMAGE:  gram-parser-workbench
   rg:  gram-parser
 
 jobs:
   build:
+    environment:  dev
 
     runs-on: ubuntu-latest
 
@@ -64,4 +69,4 @@ jobs:
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
         cd workbench-pack
-        az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:7.0"
+        az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:9.0"
