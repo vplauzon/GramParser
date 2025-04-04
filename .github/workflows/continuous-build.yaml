@@ -75,4 +75,4 @@ jobs:
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
         cd workbench-pack
-        az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:9.0"
+        az webapp deploy --resource-group $rg --name $name --src-path ../workbench-pack.zip --type zip
