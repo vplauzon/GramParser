@@ -102,7 +102,7 @@
             "properties": {
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('App Plan'))]",
                 "siteConfig": {
-                    "linuxFxVersion": "DOTNETCORE|7.0"
+                    "linuxFxVersion": "DOTNETCORE|9.0"
                 },
                 "clientAffinityEnabled": false,
                 "httpsOnly": true
