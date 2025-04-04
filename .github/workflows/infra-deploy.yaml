@@ -17,6 +17,7 @@ env:
 
 jobs:
   deploy:
+    environment:  dev
 
     runs-on: ubuntu-latest
 
