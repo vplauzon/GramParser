@@ -8,6 +8,10 @@ on:
       - deployment/gram-parser-infra.json
       - .github/workflows/infra-deploy.yaml
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   rg:  gram-parser
 
