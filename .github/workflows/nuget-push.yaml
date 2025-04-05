@@ -30,4 +30,4 @@ jobs:
       run: dotnet build code/GramParserLib --configuration Release --no-restore
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-push
     - name: Publish Nuget
-      run:  dotnet nuget push code/GramParserLib/bin/Release/*.nupkg -k ${{ secrets.nuget }}
+      run:  dotnet nuget push code/GramParserLib/bin/Release/*.nupkg -k ${{ secrets.nuget }} -s https://api.nuget.org/v3/index.json
