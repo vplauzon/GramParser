@@ -57,8 +57,6 @@ jobs:
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
     - name: .NET Publish Web App
       run: dotnet publish code/GramParserWorkbench --configuration Release --no-build --output workbench-pack
-    - name: Zip package
-      run:  zip -r workbench-pack.zip workbench-pack
 
     # Deploy web site logic
 
@@ -76,4 +74,5 @@ jobs:
         echo "Target environment:  '$targetEnv'"
         name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
         echo "Name of webapp:  '$name'"
-        az webapp deploy --resource-group $rg --name $name --src-path workbench-pack.zip --type zip
+        cd workbench-pack
+        az webapp up --name $name -g $rg --os-type linux --runtime "DOTNETCORE:9.0"
