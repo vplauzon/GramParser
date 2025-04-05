@@ -57,6 +57,8 @@ jobs:
     # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
     - name: .NET Publish Web App
       run: dotnet publish code/GramParserWorkbench --configuration Release --no-build --output workbench-pack
+    - name: List package
+      run: ls -l workbench-pack
 
     # Deploy web site logic
 
