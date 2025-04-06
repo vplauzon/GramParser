@@ -27,12 +27,12 @@ Here are the primitives in GramParser grammar:
 #### Functions
 
 * [Cast](output/functions/cast.md)
-* [Concat](output/functions/concat.md)
-* [Prepend](output/functions/prepend.md)
-* [Flatten](output/functions/flatten.md)
-* [FirstOrNull](output/functions/first-or-null.md)
 * [Coalesce](output/functions/coalesce.md)
+* [Concat](output/functions/concat.md)
+* [FirstOrNull](output/functions/first-or-null.md)
+* [Flatten](output/functions/flatten.md)
 * [Merge](output/functions/merge.md)
+* [Prepend](output/functions/prepend.md)
 
 ### GramParser Concepts
 

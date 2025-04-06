@@ -357,17 +357,18 @@ namespace GramParserLib.Output
             var proxies = new IFunctionProxy[]
             {
                 new FixedFunctionProxyOneParam<string, bool>(Boolean),
-                new FixedFunctionProxyOneParam<string, int>(Integer),
                 new FixedFunctionProxyOneParam<
                     IEnumerable<object?>,
-                    IImmutableList<object?>>(Flatten),
+                    object?>(Coalesce),
+                new ScalableFunctionProxyBase<string, string>(Concat),
+                new FixedFunctionProxyOneParam<string, int>(Integer),
                 new FixedFunctionProxyOneParam<
                     IEnumerable<object?>,
                     object?>(FirstOrNull),
                 new FixedFunctionProxyOneParam<
                     IEnumerable<object?>,
-                    object?>(Coalesce),
-                new ScalableFunctionProxyBase<string, string>(Concat),
+                    IImmutableList<object?>>(Flatten),
+                new FixedFunctionProxyOneParam<string, double>(Float),
                 new ScalableFunctionProxyBase<object?, object>(Merge),
                 new PrependFunctionProxy()
             };
@@ -395,6 +396,18 @@ namespace GramParserLib.Output
             }
 
             return integer;
+        }
+
+        private static double Float(string text)
+        {
+            double floatValue;
+
+            if (!double.TryParse(text, out floatValue))
+            {
+                throw new ParsingException($"Can't parse '{text}' to a float");
+            }
+
+            return floatValue;
         }
 
         private static bool Boolean(string text)
