@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GramParserLib;
 using GramParserLib.Rule;
 using System.Collections.Immutable;
-using GramParserLib.Output;
 
 namespace GramParserLibUnitTest.Rule
 {

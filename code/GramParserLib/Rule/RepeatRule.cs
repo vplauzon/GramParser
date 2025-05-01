@@ -17,6 +17,7 @@ namespace GramParserLib.Rule
             IRule? rule,
             int? min,
             int? max,
+            bool isGreedy = true,
             bool? hasInterleave = null,
             bool? isRecursive = null,
             bool? isCaseSensitive = null)
