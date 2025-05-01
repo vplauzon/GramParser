@@ -1,0 +1,80 @@
+name:  Web app deploy
+
+on:
+  push:
+    branches:
+      - master
+      - staging
+      - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  IMAGE:  gram-parser-workbench
+  rg:  gram-parser
+
+jobs:
+  build:
+    environment:  dev
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 9.x
+    # Declare the target environment where to deploy container image
+    - name: Declare name of environment
+      id:  environment-name
+      run: |
+        branch=$(echo "${GITHUB_REF#refs/heads/}")
+        echo "Current branch is '$branch'"
+        if [ "$branch" = "master" ]
+        then
+          targetEnv="dev"
+        else
+          targetEnv="$branch"
+        fi
+        echo "Export target environment (targetEnv) '$targetEnv'"
+        echo "##[set-output name=targetEnv;]$targetEnv"
+    # Patch the version of the library package with this run number
+    - name: Patch version
+      id:  patch-version
+      run: python3 deployment/patch-version.py code/GramParserLib/GramParserLib.csproj ${{ github.run_number }} false
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
+    - name: Install dependencies
+      run: dotnet restore code
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+    - name: Build
+      run: dotnet build code --configuration Release --no-restore
+    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
+    - name: .NET Publish Web App
+      run: dotnet publish code/GramParserWorkbench/ --configuration Release --no-build --output workbench-pack
+    - name: List package
+      run: ls -l workbench-pack
+    - name: Zip
+      run: |
+        cd workbench-pack
+        zip -r workbench-pack.zip .
+
+    # Deploy web site logic
+
+    # Using the user MI as exposed in https://yourazurecoach.com/2022/12/29/use-github-actions-with-user-assigned-managed-identity/
+    - name: Log into Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.CLIENT_ID }}
+        tenant-id: ${{ secrets.TENANT_ID }}
+        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+
+    - name: Deploy web site
+      run:  |
+        targetEnv=${{ steps.environment-name.outputs.targetEnv }}
+        echo "Target environment:  '$targetEnv'"
+        name=$(az webapp list -g $rg -o tsv --query "[?tags.targetEnv=='$targetEnv'].name")
+        echo "Name of webapp:  '$name'"
+        az webapp deploy --resource-group $rg --name $name --src-path workbench-pack/workbench-pack.zip
