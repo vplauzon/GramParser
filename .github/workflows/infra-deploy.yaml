@@ -3,7 +3,7 @@ name:  Infra Deploy
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - deployment/gram-parser-infra.json
       - .github/workflows/infra-deploy.yaml

@@ -3,7 +3,7 @@ name:  Web app deploy
 on:
   push:
     branches:
-      - master
+      - main
       - staging
       - prod
 
@@ -33,7 +33,7 @@ jobs:
       run: |
         branch=$(echo "${GITHUB_REF#refs/heads/}")
         echo "Current branch is '$branch'"
-        if [ "$branch" = "master" ]
+        if [ "$branch" = "main" ]
         then
           targetEnv="dev"
         else
