@@ -95,5 +95,37 @@ namespace GramParserLibUnitTest.Rule
             Assert.AreEqual(text.Length, match.Text.Length, "MatchLength");
             Assert.AreEqual(3, ToList(match.ComputeOutput()).Count(), "Contents");
         }
-   }
+
+        [TestMethod]
+        public void GreedyWithWildcard()
+        {
+            var text = "a123b456b";
+            Func<bool, IRule> ruleFactory = isGreedy =>
+            {
+                var aRule = new LiteralRule(null, null, "a");
+                var bRule = new LiteralRule(null, null, "b");
+                var anyStarRule = new RepeatRule(
+                    null,
+                    null,
+                    new MatchAnyCharacterRule(null, null),
+                    null,
+                    null,
+                    isGreedy: isGreedy);
+                var rule = new SequenceRule(
+                    null,
+                    null,
+                    [new TaggedRule(aRule), new TaggedRule(anyStarRule), new TaggedRule(bRule)]);
+
+                return rule;
+            };
+            var matchGreedy = ruleFactory(true).Match(new ExplorerContext(text)).FirstOrDefault();
+            var matchNonGreedy =
+                ruleFactory(false).Match(new ExplorerContext(text)).FirstOrDefault();
+
+            Assert.IsNotNull(matchGreedy, "Success - Greedy");
+            Assert.IsNotNull(matchNonGreedy, "Success - Non Greedy");
+            Assert.AreEqual(9, matchGreedy.Text.Length, "MatchLength - Greedy");
+            Assert.AreEqual(5, matchNonGreedy.Text.Length, "MatchLength - Non Greedy");
+        }
+    }
 }
