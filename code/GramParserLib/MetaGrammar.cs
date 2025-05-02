@@ -647,11 +647,13 @@ namespace GramParserLib
                 IRuleOutput? outputExtractor)
             {
                 var subRuleBody = ToMap(ruleBodyBody["rule"]);
-                var cardinality = ToMap(ruleBodyBody["cardinality"]);
+                var cardinalityArray = (IEnumerable<object>)ruleBodyBody["cardinality"];
+                var greedy = (IEnumerable<object>)cardinalityArray.Last();
+                var quantifier = ToMap(cardinalityArray.First());
                 var rule = CreateRule(subRuleBody, bag);
-                var isGreedy = true;
+                var isGreedy = greedy.Count() == 0;
 
-                switch (cardinality.First().Key)
+                switch (quantifier.First().Key)
                 {
                     case "star":
                         return new RepeatRule(
@@ -688,7 +690,7 @@ namespace GramParserLib
                             bag.IsCaseSensitive);
                     case "exact":
                         {
-                            var exact = ToMap(cardinality.First().Value);
+                            var exact = ToMap(quantifier.First().Value);
                             var n = int.Parse(exact.First().Value.ToString()!);
 
                             return new RepeatRule(
@@ -704,7 +706,7 @@ namespace GramParserLib
                         }
                     case "minMax":
                         {
-                            var minMaxCardinality = cardinality.First().Value;
+                            var minMaxCardinality = quantifier.First().Value;
                             (var min, var max) = GetMinMaxCardinality(ToMap(minMaxCardinality));
 
                             return new RepeatRule(
@@ -1192,7 +1194,7 @@ namespace GramParserLib
                 [
                     new TaggedRule(
                         new DisjunctionRule(
-                            null,
+                            "quantifier",
                             null,
                             [
                                 new TaggedRule("star", new LiteralRule(null, null, "*")),
