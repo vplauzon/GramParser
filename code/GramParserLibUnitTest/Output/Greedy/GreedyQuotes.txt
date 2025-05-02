@@ -1,0 +1,8 @@
+﻿rule doubleSingleQuote = "''";
+#	Here we use * which is greedy
+rule quotedString = doubleSingleQuote s:.* doubleSingleQuote => s;
+rule identifier = ("a".."z")+;
+rule assignation = id:identifier "=" s:quotedString ";"
+	=> { "id":id, "text":s };
+
+rule main = assignation*;

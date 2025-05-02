@@ -37,6 +37,8 @@
     <EmbeddedResource Include="Output\Object\*.txt" />
     <EmbeddedResource Include="TypedOutput\*.txt" />
     <EmbeddedResource Include="Meta\CaseInsensitive\CaseInsensitive.txt" />
+    <EmbeddedResource Include="Output\Greedy\GreedyQuotes.txt" />
+    <EmbeddedResource Include="Output\Greedy\NonGreedyQuotes.txt" />
   </ItemGroup>
 
   <ItemGroup>
