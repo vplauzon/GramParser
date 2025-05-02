@@ -10,6 +10,7 @@ namespace GramParserLib.Rule
         private readonly IRule _rule;
         private readonly int? _min;
         private readonly int? _max;
+        private readonly bool _isGreedy;
 
         public RepeatRule(
             string? ruleName,
@@ -36,6 +37,7 @@ namespace GramParserLib.Rule
 
             _min = min;
             _max = max;
+            _isGreedy = isGreedy;
         }
 
         public override bool IsTerminalRule => false;
@@ -93,6 +95,20 @@ namespace GramParserLib.Rule
                 var newTotalMatchLength = totalMatchLength + match.LengthWithInterleaves;
                 var newChildrenMatches = childrenMatches.Add(match);
 
+                if (!_isGreedy)
+                {   //  We are returning the matches in increasing order of text length
+                    //  so the "current" one goes first
+                    if (IsRepeatCountInRange(iteration))
+                    {
+                        var matchText = originalText.Take(newTotalMatchLength);
+                        var completeMatch = new RuleMatch(
+                            this,
+                            matchText,
+                            () => ComputeOutput(matchText, newChildrenMatches));
+
+                        yield return completeMatch;
+                    }
+                }
                 if (IsRepeatCountBelowMaximum(iteration + 1))
                 {   //  Recurse to next iteration
                     var newContext = context.MoveForward(match);
@@ -109,16 +125,19 @@ namespace GramParserLib.Rule
                         yield return m;
                     }
                 }
-                //  We are returning the matches in decreasing order of text length, so the "current" one goes last
-                if (IsRepeatCountInRange(iteration))
-                {
-                    var matchText = originalText.Take(newTotalMatchLength);
-                    var completeMatch = new RuleMatch(
-                        this,
-                        matchText,
-                        () => ComputeOutput(matchText, newChildrenMatches));
+                if (_isGreedy)
+                {   //  We are returning the matches in decreasing order of text length,
+                    //  so the "current" one goes last
+                    if (IsRepeatCountInRange(iteration))
+                    {
+                        var matchText = originalText.Take(newTotalMatchLength);
+                        var completeMatch = new RuleMatch(
+                            this,
+                            matchText,
+                            () => ComputeOutput(matchText, newChildrenMatches));
 
-                    yield return completeMatch;
+                        yield return completeMatch;
+                    }
                 }
             }
         }

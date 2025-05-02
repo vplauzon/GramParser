@@ -916,7 +916,14 @@ namespace GramParserLib
                 carriageReturn,
                 false);
             var commentContent =
-                new RepeatRule(null, null, commentContentChar, null, null, false, false);
+                new RepeatRule(
+                    null,
+                    null,
+                    commentContentChar,
+                    null,
+                    null,
+                    hasInterleave: false,
+                    isRecursive: false);
             var comment = new SequenceRule(
                 "comment",
                 null,
@@ -967,6 +974,7 @@ namespace GramParserLib
                             identifierSuffixChar,
                             null,
                             null,
+                            true,
                             false,
                             false))
                 },
@@ -978,8 +986,8 @@ namespace GramParserLib
                 new RangeRule(null, null, '0', '9'),
                 1,
                 null,
-                false,
-                false);
+                hasInterleave: false,
+                isRecursive: false);
             var doubleRule = new SequenceRule(
                 "double",
                 TextOutput.Instance,
@@ -1315,8 +1323,8 @@ namespace GramParserLib
                         interleave,
                         1,
                         null,
-                        false,
-                        false)),
+                        hasInterleave:false,
+                        isRecursive:false)),
                     new TaggedRule("s", innerSequenceable)
                 ],
                 hasInterleave: false,
@@ -1666,8 +1674,8 @@ namespace GramParserLib
                                 false),
                             2,
                             2,
-                            false,
-                            false))
+                            hasInterleave:false,
+                            isRecursive:false))
                 ],
                 false,
                 false);
