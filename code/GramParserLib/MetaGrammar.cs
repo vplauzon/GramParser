@@ -1203,7 +1203,7 @@ namespace GramParserLib
                                 new TaggedRule("exact", exactCardinality),
                                 new TaggedRule("minMax", minMaxCardinality)
                             ],
-                            hasInterleave: true,
+                            hasInterleave: false,
                             isRecursive: false)),
                     new TaggedRule(
                         new RepeatRule(
@@ -1211,8 +1211,12 @@ namespace GramParserLib
                             null,
                             new LiteralRule(null, null, "?"),
                             0,
-                            1))
-                ]);
+                            1,
+                            hasInterleave: false,
+                            isRecursive: false))
+                ],
+                hasInterleave: false,
+                isRecursive: false);
             var ruleBodyOutputProxy = new RuleProxy();
             var bracket = new SequenceRule(
                 "bracket",
