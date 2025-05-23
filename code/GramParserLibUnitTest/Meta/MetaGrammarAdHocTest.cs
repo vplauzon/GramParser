@@ -73,5 +73,17 @@ namespace GramParserLibUnitTest.Meta
                     (true, "scopedBlackBoxes", "{}")
                 });
         }
-   }
+
+        [TestMethod]
+        public void Parenthesis()
+        {
+            Test(
+                "AdHoc.Parenthesis.txt",
+                new[]
+                {
+                    (true, "main", "1+2"),
+                    (true, "main", "(1+2)+3")
+                });
+        }
+    }
 }
