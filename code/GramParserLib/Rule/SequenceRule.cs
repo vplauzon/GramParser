@@ -35,6 +35,16 @@ namespace GramParserLib.Rule
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
+            if(RuleName=="integer")
+            {
+                int a = 3;
+                ++a;
+            }
+            if (RuleName == "add")
+            {
+                int a = 3;
+                ++a;
+            }
             return RecurseMatch(
                 _rules,
                 context.ContextID,
