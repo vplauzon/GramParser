@@ -9,7 +9,8 @@ rule(interleave=false) number = ("0".."9");
 rule(interleave=false) integer = "-"? number+ => integer(text);
 
 #	Arithmetic
-rule add = e1:expression "+" e2:expression => { "left" : e1, "right" : e2};
+rule(interleave=false) plus = "+";
+rule add = e1:expression plus e2:expression => { "left" : e1, "right" : e2};
 #rule parenthesis = "(" e:expression ")" => e;
 
 #	Expression
