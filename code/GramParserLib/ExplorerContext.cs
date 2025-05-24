@@ -81,7 +81,7 @@ namespace GramParserLib
             _ambiantRuleProperties = ambiantRuleProperties;
             Text = text;
             Depth = depth;
-            ContextID = Guid.NewGuid().GetHashCode();
+            ContextID = Guid.NewGuid().ToString();
         }
 
         public SubString Text { get; }
@@ -92,7 +92,7 @@ namespace GramParserLib
         /// <remarks>
         /// Ease the use of conditional breakpoints in the highly recursive rule resolution.
         /// </remarks>
-        public int ContextID { get; }
+        public string ContextID { get; }
 
         public ExplorerContext MoveForward(RuleMatch match)
         {
@@ -141,19 +141,7 @@ namespace GramParserLib
                 var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
                     .Select(m => m.AddInterleaveLength(interleaveLength));
 
-#if DEBUG
-                //  Useful when debugging and faster than a breakpoint condition
-                //if (rule.RuleName == "outputDeclaration")
-                //{
-                //}
-
-                //  No yield, easier to debug
-                var ruleMatchList = uniqueRuleMatchesWithInterleaves.ToArray();
-
-                return ruleMatchList;
-#else
                 return uniqueRuleMatchesWithInterleaves;
-#endif
             }
             else
             {

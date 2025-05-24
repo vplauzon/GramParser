@@ -35,7 +35,7 @@ namespace GramParserLib.Rule
 
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
-            if(RuleName=="integer")
+            if (RuleName == "integer")
             {
                 int a = 3;
                 ++a;
@@ -47,7 +47,6 @@ namespace GramParserLib.Rule
             }
             return RecurseMatch(
                 _rules,
-                context.ContextID,
                 context,
                 context.Text,
                 0,
@@ -67,8 +66,6 @@ namespace GramParserLib.Rule
 
         private IEnumerable<RuleMatch> RecurseMatch(
             IEnumerable<TaggedRule> rules,
-            //  Used only for debugging purposes, to hook on the context ID of the entire sequence
-            int masterContextID,
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
@@ -88,7 +85,6 @@ namespace GramParserLib.Rule
                     var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
                         remainingRules,
-                        masterContextID,
                         newContext,
                         originalText,
                         newTotalMatchLength,
