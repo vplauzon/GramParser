@@ -53,7 +53,7 @@ namespace GramParserLib
             return HasRule(DEFAULT_RULE_NAME);
         }
 
-        public RuleMatch? Match(string? ruleName, SubString text, int? depth = null)
+        public RuleMatch? Match(string? ruleName, SubString text, int? maxDepth = null)
         {
             if (string.IsNullOrWhiteSpace(ruleName))
             {
@@ -65,7 +65,7 @@ namespace GramParserLib
             }
 
             var rule = _ruleMap[ruleName];
-            var context = new ExplorerContext(text, _interleaveRule, depth);
+            var context = new ExplorerContext(text, _interleaveRule, maxDepth);
             var matches = GetMatches(rule, context);
             var exactLengthMatches = from m in matches
                                      where m.LengthWithInterleaves == text.Length

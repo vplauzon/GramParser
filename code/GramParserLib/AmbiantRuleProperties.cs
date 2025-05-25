@@ -4,15 +4,13 @@ using System.Text;
 
 namespace GramParserLib
 {
-    internal class AmbiantRuleProperties
+    internal struct AmbiantRuleProperties
     {
+        #region Constructors
         /// <summary>Initialize to default values.</summary>
         public AmbiantRuleProperties()
+            : this(true, false, false, true)
         {
-            HasInterleave = true;
-            IsRecursive = false;
-            IsTerminalRule = false;
-            IsCaseSensitive = true;
         }
 
         private AmbiantRuleProperties(
@@ -26,6 +24,7 @@ namespace GramParserLib
             IsTerminalRule = isTerminalRule;
             IsCaseSensitive = isCaseSensitive;
         }
+        #endregion
 
         public bool HasInterleave { get; }
 

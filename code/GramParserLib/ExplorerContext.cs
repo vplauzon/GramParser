@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace GramParserLib
@@ -48,16 +49,20 @@ namespace GramParserLib
         private readonly bool _isInterleaveMatched;
         private readonly IImmutableSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
+        private readonly bool _isTracing;
 
+        #region Constructors
         public ExplorerContext(
             SubString text,
             IRule? interleaveRule = null,
-            int? depth = null)
+            int? maxDepth = null,
+            bool isTracing = false)
             : this(
                   text,
                   interleaveRule,
                   false,
-                  depth ?? DEFAULT_MAX_DEPTH,
+                  maxDepth ?? DEFAULT_MAX_DEPTH,
+                  isTracing,
                   ImmutableHashSet<IRule>.Empty,
                   new AmbiantRuleProperties())
         {
@@ -68,7 +73,8 @@ namespace GramParserLib
             IRule? interleaveRule,
             bool isInterleaveMatched,
             int depth,
-            IImmutableSet<IRule> ruleNameExcepts,
+            bool isTracing,
+            IImmutableSet<IRule> ruleExcepts,
             AmbiantRuleProperties ambiantRuleProperties)
         {
             if (depth <= 0)
@@ -77,12 +83,14 @@ namespace GramParserLib
             }
             _interleaveRule = interleaveRule;
             _isInterleaveMatched = isInterleaveMatched;
-            _ruleExcepts = ruleNameExcepts;
+            _isTracing = isTracing;
+            _ruleExcepts = ruleExcepts;
             _ambiantRuleProperties = ambiantRuleProperties;
             Text = text;
             Depth = depth;
             ContextID = Guid.NewGuid().ToString();
         }
+        #endregion
 
         public SubString Text { get; }
 
@@ -103,6 +111,7 @@ namespace GramParserLib
                     _interleaveRule,
                     false,
                     DEFAULT_MAX_DEPTH,
+                    _isTracing,
                     ImmutableHashSet<IRule>.Empty,
                     _ambiantRuleProperties);
             }
@@ -135,11 +144,18 @@ namespace GramParserLib
                     _interleaveRule,
                     true,
                     Depth - 1,
+                    _isTracing,
                     newExcepts,
                     newAmbiantRuleProperties);
                 var ruleMatches = rule.Match(newContext);
                 var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
                     .Select(m => m.AddInterleaveLength(interleaveLength));
+
+                if (_isTracing && !string.IsNullOrWhiteSpace(rule.RuleName))
+                {
+                    Trace.WriteLine($"'{rule.RuleName}' ({Depth}):  " +
+                        $"{uniqueRuleMatchesWithInterleaves.Any()}");
+                }
 
                 return uniqueRuleMatchesWithInterleaves;
             }
@@ -161,6 +177,7 @@ namespace GramParserLib
                 _interleaveRule,
                 true,
                 Depth,
+                _isTracing,
                 ImmutableHashSet<IRule>.Empty,
                 _ambiantRuleProperties);
         }
@@ -198,6 +215,7 @@ namespace GramParserLib
                 null,
                 false,
                 Depth,
+                _isTracing,
                 _ruleExcepts,
                 _ambiantRuleProperties);
         }
