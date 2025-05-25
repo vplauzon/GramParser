@@ -11,12 +11,28 @@ rule(interleave=false) integer = "-"? number+ => integer(text);
 #	Arithmetic
 rule(interleave=false) plus = "+";
 rule add = e1:expression plus e2:expression => { "left" : e1, "right" : e2};
-rule parenthesis = "(" e:expression ")" => e;
+rule open = "(";
+rule close = ")";
+rule parenthesis = open e:expression close => e;
 
 #	Expression
 rule(recursive=true) expression = integer:integer
-	| add:add
-	| parenthesis:parenthesis;
+	| parenthesis:parenthesis
+	| add:add;
 
 #	main rule
 rule main = expression;
+#(1+2)+3
+#integer - (1+2)+3
+#parenthesis - (1+2)+3
+#integer - 1+2)+3
+#parenthesis - 1+2)+3
+#add - 1+2)+3
+#integer - 1+2)+3
+#integer - 2)+3
+#add - (1+2)+3
+#integer - (1+2)+3
+#parenthesis - (1+2)+3
+#integer - 1+2)+3
+#integer - 2)+3
+#integer - 3
