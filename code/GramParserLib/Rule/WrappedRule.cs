@@ -28,7 +28,7 @@ namespace GramParserLib.Rule
         public bool? IsCaseSensitive => ReferencedRule.IsCaseSensitive;
         #endregion
 
-        public string? RuleName => _ruleName;
+        public string? RuleName => _ruleName ?? ReferencedRule.RuleName;
 
         public IRule ReferencedRule { get; }
 
