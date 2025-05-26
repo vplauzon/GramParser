@@ -9,11 +9,8 @@ rule(interleave=false) number = ("0".."9");
 rule(interleave=false) integer = "-"? number+ => integer(text);
 
 #	Arithmetic
-rule(interleave=false) plus = "+";
-rule add = e1:expression plus e2:expression => { "left" : e1, "right" : e2};
-rule open = "(";
-rule close = ")";
-rule parenthesis = open e:expression close => e;
+rule add = e1:expression "+" e2:expression => { "left" : e1, "right" : e2};
+rule parenthesis = "(" e:expression ")" => e;
 
 #	Expression
 rule(recursive=true) expression = integer:integer
@@ -22,17 +19,4 @@ rule(recursive=true) expression = integer:integer
 
 #	main rule
 rule main = expression;
-#(1+2)+3
-#integer - (1+2)+3
-#parenthesis - (1+2)+3
-#integer - 1+2)+3
-#parenthesis - 1+2)+3
-#add - 1+2)+3
-#integer - 1+2)+3
-#integer - 2)+3
-#add - (1+2)+3
-#integer - (1+2)+3
-#parenthesis - (1+2)+3
-#integer - 1+2)+3
-#integer - 2)+3
-#integer - 3
+#	(1+2)+3

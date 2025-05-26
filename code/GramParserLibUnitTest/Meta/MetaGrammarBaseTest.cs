@@ -21,7 +21,7 @@ namespace GramParserLibUnitTest.Meta
             for (int i = 0; i != samples.Length; ++i)
             {
                 (var isSuccess, var ruleName, var text) = samples[i];
-                var match = grammar!.Match(ruleName, text);
+                var match = grammar!.Match(ruleName, text, isTracing: true);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
 
