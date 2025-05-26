@@ -13,7 +13,7 @@ rule add = e1:expression "+" e2:expression => { "left" : e1, "right" : e2};
 rule parenthesis = "(" e:expression ")" => e;
 
 #	Expression
-rule(recursive=true) expression = integer:integer
+rule expression = integer:integer
 	| parenthesis:parenthesis
 	| add:add;
 
