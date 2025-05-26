@@ -155,8 +155,8 @@ namespace GramParserLib
                 {
                     var indent = new string(' ', Depth);
 
-                    Trace.WriteLine($"{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
-                    Trace.WriteLine($"{indent}'{rule.RuleName}' ({Depth}):  " +
+                    Trace.WriteLine($"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
+                    Trace.WriteLine($"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  " +
                         $"({uniqueRuleMatchesWithInterleaves.Any()})");
                 }
 
