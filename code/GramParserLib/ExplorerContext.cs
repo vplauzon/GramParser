@@ -1,5 +1,4 @@
-﻿using GramParserLib.Rule;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -43,7 +42,6 @@ namespace GramParserLib
         #endregion
 
         private const int DEFAULT_MAX_DEPTH = 15;
-        private static readonly RuleMatch[] EMPTY_RULE_MATCHES = Array.Empty<RuleMatch>();
 
         private readonly IRule? _interleaveRule;
         private readonly bool _isInterleaveMatched;
