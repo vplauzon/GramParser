@@ -153,8 +153,11 @@ namespace GramParserLib
 
                 if (_isTracing && !string.IsNullOrWhiteSpace(rule.RuleName))
                 {
-                    Trace.WriteLine($"'{rule.RuleName}' ({Depth}):  " +
-                        $"{uniqueRuleMatchesWithInterleaves.Any()}");
+                    var indent = new string(' ', Depth);
+
+                    Trace.WriteLine($"{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
+                    Trace.WriteLine($"{indent}'{rule.RuleName}' ({Depth}):  " +
+                        $"({uniqueRuleMatchesWithInterleaves.Any()})");
                 }
 
                 return uniqueRuleMatchesWithInterleaves;
