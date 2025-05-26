@@ -60,6 +60,9 @@ namespace GramParserLib
                   false,
                   maxDepth ?? DEFAULT_MAX_DEPTH,
                   isTracing,
+#if DEBUG
+                  ImmutableArray<string>.Empty,
+#endif
                   new AmbiantRuleProperties())
         {
         }
@@ -70,6 +73,9 @@ namespace GramParserLib
             bool isInterleaveMatched,
             int depth,
             bool isTracing,
+#if DEBUG
+            IImmutableList<string> parentContextIDs,
+#endif
             AmbiantRuleProperties ambiantRuleProperties)
         {
             if (depth <= 0)
@@ -83,6 +89,9 @@ namespace GramParserLib
             Text = text;
             Depth = depth;
             ContextID = Guid.NewGuid().ToString();
+#if DEBUG
+            ParentContextIDs = parentContextIDs;
+#endif
         }
         #endregion
 
@@ -96,6 +105,10 @@ namespace GramParserLib
         /// </remarks>
         public string ContextID { get; }
 
+#if DEBUG
+        public IImmutableList<string> ParentContextIDs { get; }
+#endif
+
         public ExplorerContext MoveForward(RuleMatch match)
         {
             if (match.LengthWithInterleaves > 0)
@@ -106,6 +119,9 @@ namespace GramParserLib
                     false,
                     DEFAULT_MAX_DEPTH,
                     _isTracing,
+#if DEBUG
+                    ParentContextIDs.Add(ContextID),
+#endif
                     _ambiantRuleProperties);
             }
             else
@@ -134,6 +150,9 @@ namespace GramParserLib
                 true,
                 Depth - 1,
                 _isTracing,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
                 newAmbiantRuleProperties);
             var ruleMatches = rule.Match(newContext);
             var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
@@ -164,6 +183,9 @@ namespace GramParserLib
                 true,
                 Depth,
                 _isTracing,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
                 _ambiantRuleProperties);
         }
 
@@ -201,6 +223,9 @@ namespace GramParserLib
                 false,
                 Depth,
                 _isTracing,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
                 _ambiantRuleProperties);
         }
 
