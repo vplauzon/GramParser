@@ -9,18 +9,16 @@ namespace GramParserLib
         #region Constructors
         /// <summary>Initialize to default values.</summary>
         public AmbiantRuleProperties()
-            : this(true, false, false, true)
+            : this(true, false, true)
         {
         }
 
         private AmbiantRuleProperties(
             bool hasInterleave,
-            bool isRecursive,
             bool isTerminalRule,
             bool isCaseSensitive)
         {
             HasInterleave = hasInterleave;
-            IsRecursive = isRecursive;
             IsTerminalRule = isTerminalRule;
             IsCaseSensitive = isCaseSensitive;
         }
@@ -28,7 +26,6 @@ namespace GramParserLib
 
         public bool HasInterleave { get; }
 
-        public bool IsRecursive { get; }
 
         public bool IsTerminalRule { get; }
         
@@ -38,7 +35,6 @@ namespace GramParserLib
         {
             return new AmbiantRuleProperties(
                 Merge(HasInterleave, properties.HasInterleave),
-                Merge(IsRecursive, properties.IsRecursive),
                 Merge(IsTerminalRule, properties.IsTerminalRule),
                 Merge(IsCaseSensitive, properties.IsCaseSensitive));
         }

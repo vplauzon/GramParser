@@ -22,8 +22,6 @@ namespace GramParserLib
 
                 public bool? HasInterleave { get; set; }
 
-                public bool? IsRecursive { get; set; }
-
                 public bool? IsCaseSensitive { get; set; }
 
                 public bool IsDefault
@@ -31,7 +29,6 @@ namespace GramParserLib
                     get
                     {
                         return !HasInterleave.HasValue
-                            && !IsRecursive.HasValue
                             && !IsCaseSensitive.HasValue;
                     }
                 }
@@ -251,9 +248,6 @@ namespace GramParserLib
                             case "interleave":
                                 AssignInterleaveToBag(bag, value);
                                 break;
-                            case "recursive":
-                                AssignRecursiveToBag(bag, value);
-                                break;
                             case "caseSensitive":
                                 AssignCaseSensitiveToBag(bag, value);
                                 break;
@@ -467,22 +461,6 @@ namespace GramParserLib
                 }
             }
 
-            private static void AssignRecursiveToBag(PropertyBag bag, string value)
-            {
-                switch (value)
-                {
-                    case "true":
-                        bag.IsRecursive = true;
-                        break;
-                    case "false":
-                        bag.IsRecursive = false;
-                        break;
-                    default:
-                        throw new ParsingException(
-                            $"Value '{value}' isn't supported for recursive parameter");
-                }
-            }
-
             private static void AssignCaseSensitiveToBag(PropertyBag bag, string value)
             {
                 switch (value)
@@ -664,7 +642,6 @@ namespace GramParserLib
                             null,
                             isGreedy,
                             bag.HasInterleave,
-                            bag.IsRecursive,
                             bag.IsCaseSensitive);
                     case "plus":
                         return new RepeatRule(
@@ -675,7 +652,6 @@ namespace GramParserLib
                             null,
                             isGreedy,
                             bag.HasInterleave,
-                            bag.IsRecursive,
                             bag.IsCaseSensitive);
                     case "question":
                         return new RepeatRule(
@@ -686,7 +662,6 @@ namespace GramParserLib
                             1,
                             isGreedy,
                             bag.HasInterleave,
-                            bag.IsRecursive,
                             bag.IsCaseSensitive);
                     case "exact":
                         {
@@ -701,7 +676,6 @@ namespace GramParserLib
                                 n,
                                 isGreedy,
                                 bag.HasInterleave,
-                                bag.IsRecursive,
                                 bag.IsCaseSensitive);
                         }
                     case "minMax":
@@ -717,7 +691,6 @@ namespace GramParserLib
                                 max,
                                 isGreedy,
                                 bag.HasInterleave,
-                                bag.IsRecursive,
                                 bag.IsCaseSensitive);
                         }
                     default:
@@ -785,7 +758,6 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive,
                     bag.IsCaseSensitive);
             }
 
@@ -821,7 +793,6 @@ namespace GramParserLib
                     outputExtractor,
                     rules,
                     bag.HasInterleave,
-                    bag.IsRecursive,
                     bag.IsCaseSensitive);
             }
 
@@ -842,7 +813,6 @@ namespace GramParserLib
                     primaryRule,
                     excludedRule,
                     bag.HasInterleave,
-                    bag.IsRecursive,
                     bag.IsCaseSensitive);
             }
 
@@ -869,7 +839,6 @@ namespace GramParserLib
                         outputExtractor,
                         new[] { new TaggedRule(innerRule) },
                         bag.HasInterleave,
-                        bag.IsRecursive,
                         bag.IsCaseSensitive);
 
                     return outerRule;
@@ -922,8 +891,7 @@ namespace GramParserLib
                     commentContentChar,
                     null,
                     null,
-                    hasInterleave: false,
-                    isRecursive: false);
+                    hasInterleave: false);
             var comment = new SequenceRule(
                 "comment",
                 null,
@@ -986,8 +954,7 @@ namespace GramParserLib
                 new RangeRule(null, null, '0', '9'),
                 1,
                 null,
-                hasInterleave: false,
-                isRecursive: false);
+                hasInterleave: false);
             var doubleRule = new SequenceRule(
                 "double",
                 TextOutput.Instance,
@@ -1166,8 +1133,7 @@ namespace GramParserLib
                                 new TaggedRule(new LiteralRule(null, null, ",")),
                                 new TaggedRule("max", number),
                                 new TaggedRule(new LiteralRule(null, null, "}"))
-                            },
-                            isRecursive: false)),
+                            })),
                     new TaggedRule(
                         "min",
                         new SequenceRule(
@@ -1179,8 +1145,7 @@ namespace GramParserLib
                                 new TaggedRule("min", number),
                                 new TaggedRule(new LiteralRule(null, null, ",")),
                                 new TaggedRule(new LiteralRule(null, null, "}"))
-                            },
-                            isRecursive: false)),
+                            })),
                     new TaggedRule(
                         "max",
                         new SequenceRule(
@@ -1192,8 +1157,7 @@ namespace GramParserLib
                                 new TaggedRule(new LiteralRule(null, null, ",")),
                                 new TaggedRule("max", number),
                                 new TaggedRule(new LiteralRule(null, null, "}"))
-                            },
-                            isRecursive: false))
+                            }))
                 },
                 hasInterleave: true);
             var cardinality = new SequenceRule(
@@ -1211,8 +1175,7 @@ namespace GramParserLib
                                 new TaggedRule("exact", exactCardinality),
                                 new TaggedRule("minMax", minMaxCardinality)
                             ],
-                            hasInterleave: false,
-                            isRecursive: false)),
+                            hasInterleave: false)),
                     new TaggedRule(
                         new RepeatRule(
                             "greedy",
@@ -1220,11 +1183,9 @@ namespace GramParserLib
                             new LiteralRule(null, null, "?"),
                             0,
                             1,
-                            hasInterleave: false,
-                            isRecursive: false))
+                            hasInterleave: false))
                 ],
-                hasInterleave: false,
-                isRecursive: false);
+                hasInterleave: false);
             var ruleBodyOutputProxy = new RuleProxy();
             var bracket = new SequenceRule(
                 "bracket",
@@ -1244,8 +1205,7 @@ namespace GramParserLib
                     new TaggedRule("bracket", bracket),
                     new TaggedRule("any", any)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var repeat = new SequenceRule(
                 "repeat",
                 null,
@@ -1253,8 +1213,7 @@ namespace GramParserLib
                     new TaggedRule("rule", repeatable),
                     new TaggedRule("cardinality", cardinality)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var disjunctionable = new DisjunctionRule(
                 "disjunctionable",
                 null,
@@ -1266,8 +1225,7 @@ namespace GramParserLib
                     new TaggedRule("any", any),
                     new TaggedRule("repeat", repeat)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var disjunction = new SequenceRule(
                 "disjunction",
                 null,
@@ -1289,8 +1247,7 @@ namespace GramParserLib
                         1,
                         null))
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var sequenceable = new DisjunctionRule(
                 "sequenceable",
                 null,
@@ -1302,8 +1259,7 @@ namespace GramParserLib
                     new TaggedRule("any", any),
                     new TaggedRule("repeat", repeat)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var innerSequenceable = new SequenceRule(
                 "innerSequenceable",
                 null,
@@ -1311,8 +1267,7 @@ namespace GramParserLib
                     new TaggedRule("t", tag),
                     new TaggedRule("r", sequenceable)
                 ],
-                hasInterleave: false,
-                isRecursive: false);
+                hasInterleave: false);
             var tailSequenceable = new SequenceRule(
                 "tailSequenceable",
                 null,
@@ -1323,12 +1278,10 @@ namespace GramParserLib
                         interleave,
                         1,
                         null,
-                        hasInterleave:false,
-                        isRecursive:false)),
+                        hasInterleave:false)),
                     new TaggedRule("s", innerSequenceable)
                 ],
-                hasInterleave: false,
-                isRecursive: false);
+                hasInterleave: false);
             var sequence = new SequenceRule(
                 "sequence",
                 null,
@@ -1338,8 +1291,7 @@ namespace GramParserLib
                         "tail",
                         new RepeatRule(null, null, tailSequenceable, 1, null, hasInterleave:false))
                 ],
-                hasInterleave: false,
-                isRecursive: false);
+                hasInterleave: false);
             var substractable = new DisjunctionRule(
                 "substractable",
                 null,
@@ -1351,8 +1303,7 @@ namespace GramParserLib
                     new TaggedRule("any", any),
                     new TaggedRule("repeat", repeat)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var substracted = new DisjunctionRule(
                 "substracted",
                 null,
@@ -1362,8 +1313,7 @@ namespace GramParserLib
                     new TaggedRule("range", range),
                     new TaggedRule("bracket", bracket),
                     new TaggedRule("repeat", repeat)
-                ],
-                isRecursive: false);
+                ]);
             var substract = new SequenceRule(
                 "substract",
                 null,
@@ -1372,8 +1322,7 @@ namespace GramParserLib
                     new TaggedRule(new LiteralRule(null, null, "-")),
                     new TaggedRule("excluded", substracted)
                 ],
-                hasInterleave: true,
-                isRecursive: false);
+                hasInterleave: true);
             var ruleBody = new DisjunctionRule(
                 "ruleBody",
                 null,
@@ -1513,8 +1462,7 @@ namespace GramParserLib
                     new TaggedRule("object", outputObject),
                     new TaggedRule("function", outputFunction)
                 ],
-                hasInterleave: true,
-                isRecursive: true);
+                hasInterleave: true);
             var outputDeclaration = new SequenceRule(
                 "outputDeclaration",
                 null,
@@ -1602,7 +1550,7 @@ namespace GramParserLib
                 ]);
 
             //  Main rule
-            var main = new RepeatRule("main", null, declaration, 1, null, isRecursive: false);
+            var main = new RepeatRule("main", null, declaration, 1, null);
 
             ruleBodyOutputProxy.ReferencedRule = ruleBodyOutput;
             outputBodyProxy.ReferencedRule = outputBody;
@@ -1674,8 +1622,7 @@ namespace GramParserLib
                                 false),
                             2,
                             2,
-                            hasInterleave:false,
-                            isRecursive:false))
+                            hasInterleave:false))
                 ],
                 false,
                 false);

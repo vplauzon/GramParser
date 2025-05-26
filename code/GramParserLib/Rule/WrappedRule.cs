@@ -21,8 +21,6 @@ namespace GramParserLib.Rule
         #region IRuleProperties
         public bool? HasInterleave => ReferencedRule.HasInterleave;
 
-        public bool? IsRecursive => ReferencedRule.IsRecursive;
-
         public bool IsTerminalRule => false;
 
         public bool? IsCaseSensitive => ReferencedRule.IsCaseSensitive;

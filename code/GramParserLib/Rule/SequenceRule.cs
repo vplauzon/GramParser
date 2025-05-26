@@ -14,13 +14,11 @@ namespace GramParserLib.Rule
             IRuleOutput? ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
             bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive,
                   isCaseSensitive)
         {
             if (rules == null || !rules.Any())

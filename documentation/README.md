@@ -41,7 +41,6 @@ Here are grammar concepts transversals to different rules:
 * [Interleaves](interleave.md)
 * [Tagging](tagging.md)
 * [Referencing rules](referencing.md)
-* [Recursivity](recursivity.md)
 
 ## GramParser NuGet Package
 

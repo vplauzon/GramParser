@@ -20,13 +20,11 @@ namespace GramParserLib.Rule
             int? max,
             bool isGreedy = true,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
             bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   outputExtractor,
                   hasInterleave,
-                  isRecursive,
                   isCaseSensitive)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
