@@ -117,7 +117,7 @@ namespace GramParserLib
                     Text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
                     false,
-                    DEFAULT_MAX_DEPTH,
+                    Depth,
                     _isTracing,
 #if DEBUG
                     ParentContextIDs.Add(ContextID),
