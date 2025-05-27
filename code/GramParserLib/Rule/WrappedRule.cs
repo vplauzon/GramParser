@@ -5,6 +5,10 @@ using System.Text;
 
 namespace GramParserLib.Rule
 {
+    /// <summary>
+    /// A rule that actually reference another rule, 
+    /// e.g. rule A = B;
+    /// </summary>
     internal class WrappedRule : IRule
     {
         private readonly string? _ruleName;
