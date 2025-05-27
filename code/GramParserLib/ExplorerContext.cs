@@ -41,7 +41,11 @@ namespace GramParserLib
         }
         #endregion
 
-        private const int DEFAULT_MAX_DEPTH = 15;
+        private const int DEFAULT_MAX_DEPTH = 100;
+
+#if DEBUG
+        private static volatile int _contextIdGenerator = 0;
+#endif
 
         private readonly IRule? _interleaveRule;
         private readonly bool _isInterleaveMatched;
@@ -61,7 +65,7 @@ namespace GramParserLib
                   maxDepth ?? DEFAULT_MAX_DEPTH,
                   isTracing,
 #if DEBUG
-                  ImmutableArray<string>.Empty,
+                  ImmutableArray<int>.Empty,
 #endif
                   new AmbiantRuleProperties())
         {
@@ -74,7 +78,7 @@ namespace GramParserLib
             int depth,
             bool isTracing,
 #if DEBUG
-            IImmutableList<string> parentContextIDs,
+            IImmutableList<int> parentContextIDs,
 #endif
             AmbiantRuleProperties ambiantRuleProperties)
         {
@@ -88,8 +92,8 @@ namespace GramParserLib
             _ambiantRuleProperties = ambiantRuleProperties;
             Text = text;
             Depth = depth;
-            ContextID = Guid.NewGuid().ToString();
 #if DEBUG
+            ContextID = Interlocked.Increment(ref _contextIdGenerator);
             ParentContextIDs = parentContextIDs;
 #endif
         }
@@ -99,14 +103,18 @@ namespace GramParserLib
 
         public int Depth { get; }
 
+#if DEBUG
         /// <summary>For debug purposes only.</summary>
         /// <remarks>
         /// Ease the use of conditional breakpoints in the highly recursive rule resolution.
         /// </remarks>
-        public string ContextID { get; }
+        public int ContextID { get; }
 
-#if DEBUG
-        public IImmutableList<string> ParentContextIDs { get; }
+        /// <summary>For debug purposes only.</summary>
+        /// <remarks>
+        /// Resolve the parent of <see cref="ContextID"/>.
+        /// </remarks>
+        public IImmutableList<int> ParentContextIDs { get; }
 #endif
 
         public ExplorerContext MoveForward(RuleMatch match)
@@ -158,6 +166,7 @@ namespace GramParserLib
             var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
                 .Select(m => m.AddInterleaveLength(interleaveLength));
 
+#if DEBUG
             if (_isTracing && !string.IsNullOrWhiteSpace(rule.RuleName))
             {
                 var indent = new string(' ', Depth);
@@ -166,6 +175,7 @@ namespace GramParserLib
                 Trace.WriteLine($"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  " +
                     $"({uniqueRuleMatchesWithInterleaves.Any()})");
             }
+#endif
 
             return uniqueRuleMatchesWithInterleaves;
         }
