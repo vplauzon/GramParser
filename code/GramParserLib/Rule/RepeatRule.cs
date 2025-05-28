@@ -20,13 +20,11 @@ namespace GramParserLib.Rule
             int? max,
             bool isGreedy = true,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
             bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   outputExtractor,
                   hasInterleave,
-                  isRecursive,
                   isCaseSensitive)
         {
             _rule = rule ?? throw new ArgumentNullException(nameof(rule));
@@ -45,7 +43,6 @@ namespace GramParserLib.Rule
         protected override IEnumerable<RuleMatch> OnMatch(ExplorerContext context)
         {
             var matches = RecurseMatch(
-                context.ContextID,
                 context,
                 context.Text,
                 0,
@@ -79,8 +76,6 @@ namespace GramParserLib.Rule
         }
 
         private IEnumerable<RuleMatch> RecurseMatch(
-            //  Used only for debugging purposes, to hook on the context ID of the entire sequence
-            int masterContextID,
             ExplorerContext context,
             SubString originalText,
             int totalMatchLength,
@@ -113,7 +108,6 @@ namespace GramParserLib.Rule
                 {   //  Recurse to next iteration
                     var newContext = context.MoveForward(match);
                     var downstreamMatches = RecurseMatch(
-                        masterContextID,
                         newContext,
                         originalText,
                         newTotalMatchLength,

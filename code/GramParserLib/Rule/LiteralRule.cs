@@ -55,7 +55,7 @@ namespace GramParserLib.Rule
             IRuleOutput? ruleOutput,
             IEnumerable<char> literal,
             bool? isCaseSensitive = null)
-            : base(ruleName, ruleOutput, false, false, isCaseSensitive)
+            : base(ruleName, ruleOutput, false, isCaseSensitive)
         {
             if (literal == null)
             {
@@ -70,7 +70,7 @@ namespace GramParserLib.Rule
             IRuleOutput? outputExtractor,
             string literal,
             bool? isCaseSensitive = null)
-            : base(ruleName, outputExtractor, false, false, isCaseSensitive)
+            : base(ruleName, outputExtractor, false, isCaseSensitive)
         {
             if (literal == null)
             {

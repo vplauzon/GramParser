@@ -14,13 +14,11 @@ namespace GramParserLib.Rule
             IRuleOutput? ruleOutput,
             IEnumerable<TaggedRule> rules,
             bool? hasInterleave = null,
-            bool? isRecursive = null,
             bool? isCaseSensitive = null)
             : base(
                   ruleName,
                   ruleOutput,
                   hasInterleave,
-                  isRecursive,
                   isCaseSensitive)
         {
             if (rules == null || rules.Count() == 0)
@@ -70,7 +68,7 @@ namespace GramParserLib.Rule
 
         private static IImmutableDictionary<string, object?> MakeMap(string? tag, object? output)
         {
-            if(tag==null)
+            if (tag == null)
             {
                 throw new NotSupportedException("Tag can't be null here");
             }

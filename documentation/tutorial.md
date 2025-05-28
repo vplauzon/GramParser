@@ -451,6 +451,4 @@ To keep the tutorial short we won't do it here.  But consult the [SDK for detail
 
 We did a quick tour of the features of GramParser.  We didn't look at everything though.
 
-There are a few more nuances in the grammar language, for instance recursivity wasn't covered here.
-
-We suggest to go through the [online documentation](README.md) to learn more about GramParser and use the [Workbench](https://gram-parser.vincentlauzon.com/) to practice.
+There are a few more nuances in the grammar language.  We suggest to go through the [online documentation](README.md) to learn more about GramParser and use the [Workbench](https://gram-parser.vincentlauzon.com/) to practice.

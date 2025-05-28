@@ -10,27 +10,35 @@ namespace GramParserLib
     public class ExplorerContext
     {
         #region Inner Types
-        private class UniqueRuleMatchEnumerable : IEnumerable<RuleMatch>
+        private class TraceableEnumerable : IEnumerable<RuleMatch>
         {
             private readonly IEnumerable<RuleMatch> _source;
+            private readonly Action<bool> _traceAction;
 
-            public UniqueRuleMatchEnumerable(IEnumerable<RuleMatch> source)
+            public TraceableEnumerable(
+                IEnumerable<RuleMatch> source,
+                Action<bool> traceAction)
             {
                 _source = source;
+                _traceAction = traceAction;
             }
 
             IEnumerator<RuleMatch> IEnumerable<RuleMatch>.GetEnumerator()
             {
-                var lengthSet = new HashSet<int>();
+                bool hasTraced = false;
 
                 foreach (var match in _source)
                 {
-                    if (!lengthSet.Contains(match.LengthWithInterleaves))
+                    if (!hasTraced)
                     {
-                        lengthSet.Add(match.LengthWithInterleaves);
-
-                        yield return match;
+                        hasTraced = true;
+                        _traceAction(true);
                     }
+                    yield return match;
+                }
+                if (!hasTraced)
+                {
+                    _traceAction(false);
                 }
             }
 
@@ -41,12 +49,14 @@ namespace GramParserLib
         }
         #endregion
 
-        private const int DEFAULT_MAX_DEPTH = 15;
-        private static readonly RuleMatch[] EMPTY_RULE_MATCHES = Array.Empty<RuleMatch>();
+        private const int DEFAULT_MAX_DEPTH = 100;
+
+#if DEBUG
+        private static volatile int _contextIdGenerator = 0;
+#endif
 
         private readonly IRule? _interleaveRule;
         private readonly bool _isInterleaveMatched;
-        private readonly IImmutableSet<IRule> _ruleExcepts;
         private readonly AmbiantRuleProperties _ambiantRuleProperties;
         private readonly bool _isTracing;
 
@@ -62,7 +72,9 @@ namespace GramParserLib
                   false,
                   maxDepth ?? DEFAULT_MAX_DEPTH,
                   isTracing,
-                  ImmutableHashSet<IRule>.Empty,
+#if DEBUG
+                  ImmutableArray<int>.Empty,
+#endif
                   new AmbiantRuleProperties())
         {
         }
@@ -73,7 +85,9 @@ namespace GramParserLib
             bool isInterleaveMatched,
             int depth,
             bool isTracing,
-            IImmutableSet<IRule> ruleExcepts,
+#if DEBUG
+            IImmutableList<int> parentContextIDs,
+#endif
             AmbiantRuleProperties ambiantRuleProperties)
         {
             if (depth <= 0)
@@ -83,11 +97,13 @@ namespace GramParserLib
             _interleaveRule = interleaveRule;
             _isInterleaveMatched = isInterleaveMatched;
             _isTracing = isTracing;
-            _ruleExcepts = ruleExcepts;
             _ambiantRuleProperties = ambiantRuleProperties;
             Text = text;
             Depth = depth;
-            ContextID = Guid.NewGuid().GetHashCode();
+#if DEBUG
+            ContextID = Interlocked.Increment(ref _contextIdGenerator);
+            ParentContextIDs = parentContextIDs;
+#endif
         }
         #endregion
 
@@ -95,11 +111,19 @@ namespace GramParserLib
 
         public int Depth { get; }
 
+#if DEBUG
         /// <summary>For debug purposes only.</summary>
         /// <remarks>
         /// Ease the use of conditional breakpoints in the highly recursive rule resolution.
         /// </remarks>
         public int ContextID { get; }
+
+        /// <summary>For debug purposes only.</summary>
+        /// <remarks>
+        /// Resolve the parent of <see cref="ContextID"/>.
+        /// </remarks>
+        public IImmutableList<int> ParentContextIDs { get; }
+#endif
 
         public ExplorerContext MoveForward(RuleMatch match)
         {
@@ -109,9 +133,11 @@ namespace GramParserLib
                     Text.Skip(match.LengthWithInterleaves),
                     _interleaveRule,
                     false,
-                    DEFAULT_MAX_DEPTH,
+                    Depth,
                     _isTracing,
-                    ImmutableHashSet<IRule>.Empty,
+#if DEBUG
+                    ParentContextIDs.Add(ContextID),
+#endif
                     _ambiantRuleProperties);
             }
             else
@@ -132,36 +158,44 @@ namespace GramParserLib
             }
 
             var newAmbiantRuleProperties = _ambiantRuleProperties.Merge(rule);
-            var newExcepts = GetNewRuleExceptions(newAmbiantRuleProperties, rule);
+            var interleaveLength = _isInterleaveMatched ? 0 : MatchInterleave();
+            var newText = Text.Skip(interleaveLength);
+            var newContext = new ExplorerContext(
+                newText,
+                _interleaveRule,
+                true,
+                Depth - 1,
+                _isTracing,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
+                newAmbiantRuleProperties);
+            var ruleMatches = rule.Match(newContext);
+#if DEBUG
+            var doTracing = _isTracing && !string.IsNullOrWhiteSpace(rule.RuleName);
+            var indent = new string(' ', Depth);
+            var matches = !doTracing
+                ? ruleMatches
+                : new TraceableEnumerable(
+                    ruleMatches,
+                    hasMatch =>
+                    {
+                        Trace.WriteLine(
+                            $"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  ({hasMatch})");
+                    });
 
-            if (newExcepts != null)
+            if (doTracing)
             {
-                var interleaveLength = _isInterleaveMatched ? 0 : MatchInterleave();
-                var newText = Text.Skip(interleaveLength);
-                var newContext = new ExplorerContext(
-                    newText,
-                    _interleaveRule,
-                    true,
-                    Depth - 1,
-                    _isTracing,
-                    newExcepts,
-                    newAmbiantRuleProperties);
-                var ruleMatches = rule.Match(newContext);
-                var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
-                    .Select(m => m.AddInterleaveLength(interleaveLength));
-
-                if (_isTracing && !string.IsNullOrWhiteSpace(rule.RuleName))
-                {
-                    Trace.WriteLine($"'{rule.RuleName}' ({Depth}):  " +
-                        $"{uniqueRuleMatchesWithInterleaves.Any()}");
-                }
-
-                return uniqueRuleMatchesWithInterleaves;
+                Trace.WriteLine(
+                    $"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
             }
-            else
-            {
-                return EMPTY_RULE_MATCHES;
-            }
+#else
+            var matches = ruleMatches;
+#endif
+            var matchesWithInterleave = matches
+                .Select(m => m.AddInterleaveLength(interleaveLength));
+
+            return matchesWithInterleave;
         }
 
         public ExplorerContext SubContext(int length)
@@ -177,7 +211,9 @@ namespace GramParserLib
                 true,
                 Depth,
                 _isTracing,
-                ImmutableHashSet<IRule>.Empty,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
                 _ambiantRuleProperties);
         }
 
@@ -215,31 +251,10 @@ namespace GramParserLib
                 false,
                 Depth,
                 _isTracing,
-                _ruleExcepts,
+#if DEBUG
+                ParentContextIDs.Add(ContextID),
+#endif
                 _ambiantRuleProperties);
-        }
-
-        private IImmutableSet<IRule>? GetNewRuleExceptions(
-            AmbiantRuleProperties newAmbiantRuleProperties,
-            IRule rule)
-        {
-            if (!string.IsNullOrWhiteSpace(rule.RuleName)
-                && !newAmbiantRuleProperties.IsRecursive
-                && !newAmbiantRuleProperties.IsTerminalRule)
-            {
-                if (_ruleExcepts.Contains(rule))
-                {   //  Recursion into the same rule has been exhausted
-                    return null;
-                }
-                else
-                {
-                    return _ruleExcepts.Add(rule);
-                }
-            }
-            else
-            {
-                return _ruleExcepts;
-            }
         }
 
         private int MatchInterleave(ExplorerContext interleaveContext)

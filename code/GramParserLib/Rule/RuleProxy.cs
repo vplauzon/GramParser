@@ -5,6 +5,10 @@ using System.Text;
 
 namespace GramParserLib.Rule
 {
+    /// <summary>
+    /// Proxy to a rule that might not have been instantiated yet and can be set later.
+    /// This is used to resolve circular dependency.
+    /// </summary>
     internal class RuleProxy : IRule
     {
         private IRule? _referencedRule = null;
@@ -41,8 +45,6 @@ namespace GramParserLib.Rule
 
         #region IRuleProperties
         public bool? HasInterleave => ReferencedRule.HasInterleave;
-
-        public bool? IsRecursive => ReferencedRule.IsRecursive;
 
         public bool IsTerminalRule => ReferencedRule.IsTerminalRule;
         

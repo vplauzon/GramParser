@@ -14,7 +14,7 @@ namespace GramParserLib.Rule
             char first,
             char last,
             bool? isCaseSensitive = null)
-            : base(ruleName, ruleOutput, false, true, isCaseSensitive)
+            : base(ruleName, ruleOutput, true, isCaseSensitive)
         {
             if (last < first)
             {

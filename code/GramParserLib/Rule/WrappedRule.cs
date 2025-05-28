@@ -5,10 +5,13 @@ using System.Text;
 
 namespace GramParserLib.Rule
 {
+    /// <summary>
+    /// A rule that actually reference another rule, 
+    /// e.g. rule A = B;
+    /// </summary>
     internal class WrappedRule : IRule
     {
         private readonly string? _ruleName;
-        private readonly IRule _referencedRule;
 
         public WrappedRule(
             string? ruleName,
@@ -16,24 +19,24 @@ namespace GramParserLib.Rule
             IRule referencedRule)
         {
             _ruleName = ruleName;
-            _referencedRule = referencedRule;
+            ReferencedRule = referencedRule;
         }
 
         #region IRuleProperties
-        public bool? HasInterleave => _referencedRule.HasInterleave;
-
-        public bool? IsRecursive => _referencedRule.IsRecursive;
+        public bool? HasInterleave => ReferencedRule.HasInterleave;
 
         public bool IsTerminalRule => false;
 
-        public bool? IsCaseSensitive => _referencedRule.IsCaseSensitive;
+        public bool? IsCaseSensitive => ReferencedRule.IsCaseSensitive;
         #endregion
 
-        public string? RuleName => _ruleName;
+        public string? RuleName => _ruleName ?? ReferencedRule.RuleName;
+
+        public IRule ReferencedRule { get; }
 
         public IEnumerable<RuleMatch> Match(ExplorerContext context)
         {
-            return _referencedRule.Match(context);
+            return ReferencedRule.Match(context);
         }
     }
 }
