@@ -9,12 +9,13 @@ rule(interleave=false) number = ("0".."9");
 rule(interleave=false) integer = "-"? number+ => integer(text);
 
 #	Arithmetic
-rule add = e1:expression "+" e2:expression => { "left" : e1, "right" : e2};
+rule add = e1:nonBinaryExpression "+" e2:expression => { "left" : e1, "right" : e2};
 rule parenthesis = "(" e:expression ")" => e;
 
 #	Expression
-rule expression = integer:integer
-	| parenthesis:parenthesis
+rule nonBinaryExpression = integer:integer
+	| parenthesis:parenthesis;
+rule expression = nonBinaryExpression:nonBinaryExpression
 	| add:add;
 
 #	main rule

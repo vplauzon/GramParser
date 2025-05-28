@@ -77,18 +77,8 @@ namespace GramParserLibUnitTest.Meta
             Test(
                 "AdHoc.Parenthesis.txt",
                 [
-                    //(true, "main", "1+2"),
+                    (true, "main", "1+2"),
                     (true, "main", "(1+2)+3")
-                ]);
-        }
-
-        [TestMethod]
-        public void SubParenthesis()
-        {
-            Test(
-                "AdHoc.Sub-Parenthesis.txt",
-                [
-                    (true, "main", "1+2)+3")
                 ]);
         }
     }

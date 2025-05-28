@@ -486,10 +486,17 @@ namespace GramParserLib
                 var identifier = ruleName.ToString();
                 var ruleProxy = FindOrCreateRuleProxy(identifier);
 
-                return new WrappedRule(
-                    ruleID,
-                    outputExtractor,
-                    ruleProxy);
+                if (ruleID == null && outputExtractor == null)
+                {
+                    return ruleProxy;
+                }
+                else
+                {
+                    return new WrappedRule(
+                        ruleID,
+                        outputExtractor,
+                        ruleProxy);
+                }
             }
 
             private IRule FindOrCreateRuleProxy(string identifier)

@@ -10,27 +10,35 @@ namespace GramParserLib
     public class ExplorerContext
     {
         #region Inner Types
-        private class UniqueRuleMatchEnumerable : IEnumerable<RuleMatch>
+        private class TraceableEnumerable : IEnumerable<RuleMatch>
         {
             private readonly IEnumerable<RuleMatch> _source;
+            private readonly Action<bool> _traceAction;
 
-            public UniqueRuleMatchEnumerable(IEnumerable<RuleMatch> source)
+            public TraceableEnumerable(
+                IEnumerable<RuleMatch> source,
+                Action<bool> traceAction)
             {
                 _source = source;
+                _traceAction = traceAction;
             }
 
             IEnumerator<RuleMatch> IEnumerable<RuleMatch>.GetEnumerator()
             {
-                var lengthSet = new HashSet<int>();
+                bool hasTraced = false;
 
                 foreach (var match in _source)
                 {
-                    if (!lengthSet.Contains(match.LengthWithInterleaves))
+                    if (!hasTraced)
                     {
-                        lengthSet.Add(match.LengthWithInterleaves);
-
-                        yield return match;
+                        hasTraced = true;
+                        _traceAction(true);
                     }
+                    yield return match;
+                }
+                if (!hasTraced)
+                {
+                    _traceAction(false);
                 }
             }
 
@@ -163,21 +171,31 @@ namespace GramParserLib
 #endif
                 newAmbiantRuleProperties);
             var ruleMatches = rule.Match(newContext);
-            var uniqueRuleMatchesWithInterleaves = new UniqueRuleMatchEnumerable(ruleMatches)
+#if DEBUG
+            var doTracing = _isTracing && !string.IsNullOrWhiteSpace(rule.RuleName);
+            var indent = new string(' ', Depth);
+            var matches = !doTracing
+                ? ruleMatches
+                : new TraceableEnumerable(
+                    ruleMatches,
+                    hasMatch =>
+                    {
+                        Trace.WriteLine(
+                            $"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  ({hasMatch})");
+                    });
+
+            if (doTracing)
+            {
+                Trace.WriteLine(
+                    $"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
+            }
+#else
+            var matches = ruleMatches;
+#endif
+            var matchesWithInterleave = matches
                 .Select(m => m.AddInterleaveLength(interleaveLength));
 
-#if DEBUG
-            if (_isTracing && !string.IsNullOrWhiteSpace(rule.RuleName))
-            {
-                var indent = new string(' ', Depth);
-
-                Trace.WriteLine($"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  '{Text}'");
-                Trace.WriteLine($"{ContextID}|{indent}'{rule.RuleName}' ({Depth}):  " +
-                    $"({uniqueRuleMatchesWithInterleaves.Any()})");
-            }
-#endif
-
-            return uniqueRuleMatchesWithInterleaves;
+            return matchesWithInterleave;
         }
 
         public ExplorerContext SubContext(int length)
