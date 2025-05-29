@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using GramParserLib.Output;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using System.Xml.Linq;
 
 namespace GramParserLib
 {
@@ -57,14 +59,22 @@ namespace GramParserLib
             where T : class
         {
             var output = _outputFactory();
-            var localOptions = new JsonSerializerOptions(options ?? _defaultOptions);
-
-            localOptions.Converters.Add(SubString.JsonConverter);
-
-            var serialized = JsonSerializer.Serialize(output, localOptions);
-            var typedOutput = JsonSerializer.Deserialize<T>(serialized, localOptions);
+            var serialized = JsonSerializer.Serialize(output, _defaultOptions);
+            var typedOutput = JsonSerializer.Deserialize<T>(
+                serialized,
+                options ?? _defaultOptions);
 
             return typedOutput;
+        }
+
+        public T? ComputeTypedOutput<T>(JsonTypeInfo jsonTypeInfo)
+            where T : class
+        {
+            var output = _outputFactory();
+            var serialized = JsonSerializer.Serialize(output, _defaultOptions);
+            var typedOutput = JsonSerializer.Deserialize(serialized, jsonTypeInfo);
+
+            return (T?)typedOutput;
         }
 
         public RuleMatch AddInterleaveLength(int length)
@@ -130,6 +140,7 @@ namespace GramParserLib
             var options = new JsonSerializerOptions();
 
             options.PropertyNameCaseInsensitive = true;
+            options.Converters.Add(SubString.JsonConverter);
 
             return options;
         }
