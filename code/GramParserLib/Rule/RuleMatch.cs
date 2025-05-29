@@ -60,7 +60,9 @@ namespace GramParserLib
         {
             var output = _outputFactory();
             var serialized = JsonSerializer.Serialize(output, _defaultOptions);
-            var typedOutput = JsonSerializer.Deserialize<T>(serialized, options);
+            var typedOutput = JsonSerializer.Deserialize<T>(
+                serialized,
+                options ?? _defaultOptions);
 
             return typedOutput;
         }
