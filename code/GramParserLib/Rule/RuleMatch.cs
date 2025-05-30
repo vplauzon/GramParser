@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using GramParserLib.Output;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using System.Xml.Linq;
+using System.Text.Json.Serialization;
 
 namespace GramParserLib
 {
@@ -137,9 +136,12 @@ namespace GramParserLib
 
         private static JsonSerializerOptions CreateDefaultOptions()
         {
-            var options = new JsonSerializerOptions();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
 
-            options.PropertyNameCaseInsensitive = true;
             options.Converters.Add(SubString.JsonConverter);
 
             return options;
