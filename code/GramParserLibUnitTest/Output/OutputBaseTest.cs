@@ -24,7 +24,6 @@ namespace GramParserLibUnitTest.Output
                 var match = grammar!.Match(ruleName, text);
 
                 Assert.AreEqual(isSuccess, match != null, $"Success - {i}");
-
                 if (isSuccess)
                 {
                     Assert.AreEqual(text, match!.Text.ToString(), $"Text - {i}");
@@ -48,7 +47,7 @@ namespace GramParserLibUnitTest.Output
             }
         }
 
-        private static string StandardizeObject(object? obj)
+        protected static string StandardizeObject(object? obj)
         {
             var options = new JsonSerializerOptions();
 
