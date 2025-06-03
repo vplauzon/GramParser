@@ -98,7 +98,7 @@ namespace GramParserLib.Rule
                         matchText,
                         new Lazy<object?>(() => matchText)));
 
-                return new[] { match };
+                return [match];
             }
             else
             {
