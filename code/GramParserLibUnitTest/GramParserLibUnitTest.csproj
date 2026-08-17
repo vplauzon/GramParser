@@ -1,34 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<WarningLevel>9999</WarningLevel>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <WarningLevel>9999</WarningLevel>
-  </PropertyGroup>
+	<ItemGroup>
+		<None Remove="**\*.txt" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="**\*.txt" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="**\*.txt" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="**\*.txt" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\GramParserLib\GramParserLib.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GramParserLib\GramParserLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Rule\" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<Folder Include="Rule\" />
+	</ItemGroup>
 </Project>

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GramParserLib;
 using GramParserWorkbench.Models.Apis;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GramParserWorkbench.Controllers
@@ -14,11 +13,8 @@ namespace GramParserWorkbench.Controllers
     [Route("api")]
     public class ParsingController : Controller
     {
-        private readonly TelemetryClient _telemetryClient;
-
-        public ParsingController(TelemetryClient telemetryClient)
+        public ParsingController()
         {
-            _telemetryClient = telemetryClient;
         }
 
         [Route("single")]
@@ -57,8 +53,6 @@ namespace GramParserWorkbench.Controllers
                         match,
                         grammarDuration,
                         matchDuration);
-
-                    _telemetryClient.TrackEvent("Parsing");
 
                     return new ObjectResult(outputModel)
                     {
