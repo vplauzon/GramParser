@@ -17,9 +17,6 @@ param appName string
 @minLength(1)
 param pullIdentityName string
 
-@description('Image repository and immutable digest within the registry.')
-param imageName string
-
 resource registry 'Microsoft.ContainerRegistry/registries@2025-04-01' existing = {
   name: acrName
   scope: resourceGroup(acrResourceGroupName)
@@ -76,7 +73,7 @@ resource app 'Microsoft.App/containerApps@2025-07-01' = {
 	  containers: [
 		{
 		  name: 'workbench'
-		  image: '${registry.properties.loginServer}/${imageName}'
+		  image: '${registry.properties.loginServer}/gram-parser-workbench:latest'
 		  resources: {
 			cpu: json('0.25')
 			memory: '0.5Gi'

@@ -105,6 +105,8 @@ jobs:
           fi
           echo "image=$login_server/$IMAGE_NAME@$digest" >> "$GITHUB_OUTPUT"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "tagged_image=$image" >> "$GITHUB_OUTPUT"
+          echo "latest_image=$login_server/$IMAGE_NAME:latest" >> "$GITHUB_OUTPUT"
           echo "Published $image ($digest)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Check that the build is still current
@@ -125,6 +127,17 @@ jobs:
             echo "Skipping deployment of an older main commit."
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Publish latest tag
+        if: steps.current.outputs.deploy == 'true'
+        shell: bash
+        env:
+          TAGGED_IMAGE: ${{ steps.push-image.outputs.tagged_image }}
+          LATEST_IMAGE: ${{ steps.push-image.outputs.latest_image }}
+        run: |
+          docker tag "$TAGGED_IMAGE" "$LATEST_IMAGE"
+          docker push "$LATEST_IMAGE"
+          echo "Published $LATEST_IMAGE"
 
       - name: Log into Azure with the infrastructure deployment identity
         if: steps.current.outputs.deploy == 'true'
