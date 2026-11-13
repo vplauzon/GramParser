@@ -9,6 +9,13 @@ param acrName string
 @description('Resource group containing the existing registry, in the deployment subscription.')
 param acrResourceGroupName string = resourceGroup().name
 
+@description('Pull role GUID appropriate for the registry permission mode.')
+@allowed([
+  'b93aa761-3e63-49ed-ac28-beffa264f7ac'
+  '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+])
+param pullRoleId string
+
 @description('Name of the Container App.')
 @minLength(1)
 param appName string
@@ -36,6 +43,7 @@ module registryAccess 'registry-pull-access.bicep' = {
   params: {
     acrName: acrName
     principalId: pullIdentity.properties.principalId
+    pullRoleId: pullRoleId
   }
 }
 

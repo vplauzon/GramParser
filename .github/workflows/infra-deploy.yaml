@@ -49,6 +49,21 @@ jobs:
             echo "Could not resolve the resource group for registry '$ACR_NAME'." >&2
             exit 1
           fi
+          acr_id=$(az acr show --name "$ACR_NAME" --query id --output tsv)
+          acr_role_mode=$(az rest --method get --url "${acr_id}?api-version=2025-11-01" \
+            --query properties.roleAssignmentMode --output tsv)
+          case "$acr_role_mode" in
+            AbacRepositoryPermissions)
+              pull_role_id=b93aa761-3e63-49ed-ac28-beffa264f7ac
+              ;;
+            LegacyRegistryPermissions)
+              pull_role_id=7f951dda-4ed3-4680-a7ca-43fe172d538d
+              ;;
+            *)
+              echo "Unsupported or missing registry role assignment mode: '$acr_role_mode'." >&2
+              exit 1
+              ;;
+          esac
           app_url=$(az deployment group create \
             --name "gram-parser-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --resource-group "$RESOURCE_GROUP" \
@@ -56,6 +71,7 @@ jobs:
             --template-file deployment/gram-parser-infra.bicep \
             --parameters acrName="$ACR_NAME" acrResourceGroupName="$acr_resource_group" \
               appName="$CONTAINER_APP_NAME" pullIdentityName="$ACR_PULL_IDENTITY_NAME" \
+              pullRoleId="$pull_role_id" \
             --query properties.outputs.appUrl.value --output tsv)
           echo "Container App: $app_url"
           echo "Container App: $app_url" >> "$GITHUB_STEP_SUMMARY"
