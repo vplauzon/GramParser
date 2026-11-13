@@ -1,6 +1,7 @@
 name: Build and push container
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows:
       - Continuous Build / Test
@@ -16,29 +17,38 @@ permissions:
 jobs:
   build-and-push:
     if: >-
-      ${{ github.event.workflow_run.conclusion == 'success' &&
+      ${{ (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.head_repository.full_name == github.repository }}
+      github.event.workflow_run.head_repository.full_name == github.repository) }}
     environment: dev
     runs-on: ubuntu-latest
     env:
-      ACR_NAME: ${{ vars.ACR_NAME }}
       IMAGE_NAME: gram-parser-workbench
-      IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
-      CI_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
-      CI_COMMIT: ${{ github.event.workflow_run.head_sha }}
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+      CI_RUN_NUMBER: ${{ github.event.workflow_run.run_number || github.run_number }}
+      CI_COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
 
     steps:
-      - name: Check out tested commit
+      - name: Check out build commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.x
+
+      - name: Build and test manual run
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          dotnet restore code
+          dotnet build code --configuration Release --no-restore
+          dotnet test code --configuration Release --no-build
 
       - name: Calculate application version
         id: app-version
@@ -62,6 +72,8 @@ jobs:
 
       - name: Log into Azure Container Registry
         shell: bash
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
         run: |
           if [[ -z "$ACR_NAME" ]]; then
             echo "Set the ACR_NAME variable in the dev GitHub environment to your registry name (without .azurecr.io)." >&2
@@ -72,6 +84,7 @@ jobs:
       - name: Build and push image
         shell: bash
         env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
           APP_VERSION: ${{ steps.app-version.outputs.value }}
         run: |
           login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
