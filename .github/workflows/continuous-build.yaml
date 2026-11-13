@@ -1,26 +1,95 @@
-name:  Continuous Build / Test
+name: Continuous Build / Test
 
 on:
+  workflow_dispatch:
   push:
     paths-ignore:
-    - documentation/**
+      - documentation/**
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 10.x
-    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-restore
-    - name: Install dependencies
-      run: dotnet restore code
-    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-    - name: Build
-      run: dotnet build code --configuration Release --no-restore
-    # See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test
-    - name: Test
-      run: dotnet test code --configuration Release --no-build --verbosity normal
+      - uses: actions/checkout@v4
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+      - name: Restore
+        run: dotnet restore code
+      - name: Build
+        run: dotnet build code --configuration Release --no-restore
+      - name: Test
+        run: dotnet test code --configuration Release --no-build --verbosity normal
+
+  build-and-push:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    environment: dev
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      IMAGE_NAME: gram-parser-workbench
+      IMAGE_TAG: ${{ github.sha }}
+      CI_RUN_NUMBER: ${{ github.run_number }}
+      CI_COMMIT: ${{ github.sha }}
+
+    steps:
+      - name: Check out build commit
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Calculate application version
+        id: app-version
+        shell: bash
+        run: |
+          base_version=$(dotnet msbuild code/GramParserLib/GramParserLib.csproj -getProperty:Version)
+          if [[ ! "$base_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a stable three-part SemVer in GramParserLib.csproj, got '$base_version'." >&2
+            exit 1
+          fi
+          version="${base_version}-ci.${CI_RUN_NUMBER}+${CI_COMMIT:0:12}"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+          echo "Application version: $version"
+
+      - name: Log into Azure with the managed identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+
+      - name: Log into Azure Container Registry
+        shell: bash
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+        run: |
+          if [[ -z "$ACR_NAME" ]]; then
+            echo "Set the ACR_NAME variable in the dev GitHub environment to your registry name (without .azurecr.io)." >&2
+            exit 1
+          fi
+          az acr login --name "$ACR_NAME"
+
+      - name: Build and push image
+        shell: bash
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          APP_VERSION: ${{ steps.app-version.outputs.value }}
+        run: |
+          login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          image="$login_server/$IMAGE_NAME:$IMAGE_TAG"
+          docker build --pull --file deployment/Dockerfile \
+            --build-arg APP_VERSION="$APP_VERSION" \
+            --tag "$image" code
+          docker push "$image"
+          echo "Pushed $image"
