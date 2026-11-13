@@ -1,38 +1,61 @@
-name:  Infra Deploy
+name: Infra Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - deployment/gram-parser-infra.json
+      - deployment/*.bicep
       - .github/workflows/infra-deploy.yaml
 
 permissions:
   id-token: write
   contents: read
 
-env:
-  rg:  gram-parser
+concurrency:
+  group: gram-parser-infrastructure
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    environment:  dev
-
+    if: github.ref == 'refs/heads/main'
+    environment: dev
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    # Login
-    # Using the user MI as exposed in https://yourazurecoach.com/2022/12/29/use-github-actions-with-user-assigned-managed-identity/
-    - name: Log into Azure
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.CLIENT_ID }}
-        tenant-id: ${{ secrets.TENANT_ID }}
-        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-    # Deploy
-    - name: Deploy
-      run: |
-        cd deployment
-        bash deploy-gram-parser-infra.sh $rg
+      - uses: actions/checkout@v4
+
+      - name: Validate Bicep
+        run: az bicep build --file deployment/gram-parser-infra.bicep --stdout > /dev/null
+
+      - name: Log into Azure with the infrastructure deployment identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.INFRA_CLIENT_ID }}
+          tenant-id: ${{ secrets.INFRA_TENANT_ID }}
+          subscription-id: ${{ secrets.INFRA_SUBSCRIPTION_ID }}
+
+      - name: Deploy Container App infrastructure
+        shell: bash
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+        run: |
+          if [[ -z "$ACR_NAME" ]]; then
+            echo "Set the ACR_NAME variable in the dev GitHub environment to your registry name (without .azurecr.io)." >&2
+            exit 1
+          fi
+          acr_resource_group=$(az acr show --name "$ACR_NAME" --query resourceGroup --output tsv)
+          if [[ -z "$acr_resource_group" ]]; then
+            echo "Could not resolve the resource group for registry '$ACR_NAME'." >&2
+            exit 1
+          fi
+          app_url=$(az deployment group create \
+            --name "gram-parser-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --resource-group gram-parser \
+            --mode Incremental \
+            --template-file deployment/gram-parser-infra.bicep \
+            --parameters acrName="$ACR_NAME" acrResourceGroupName="$acr_resource_group" \
+            --query properties.outputs.appUrl.value --output tsv)
+          echo "Container App: $app_url"
+          echo "Container App: $app_url" >> "$GITHUB_STEP_SUMMARY"
