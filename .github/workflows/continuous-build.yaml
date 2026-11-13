@@ -25,21 +25,25 @@ jobs:
         run: dotnet build code --configuration Release --no-restore
       - name: Test
         run: dotnet test code --configuration Release --no-build --verbosity normal
+      - name: Test image cleanup
+        run: python3 -m unittest discover -s deployment -p 'test_cleanup_images.py' -v
 
-  build-and-push:
+  build-and-deploy:
     needs: build-and-test
     if: github.ref == 'refs/heads/main'
     environment: dev
     runs-on: ubuntu-latest
+    concurrency:
+      group: gram-parser-infrastructure
+      cancel-in-progress: false
     permissions:
       contents: read
       id-token: write
     env:
       IMAGE_NAME: gram-parser-workbench
-      IMAGE_TAG: ${{ github.sha }}
+      IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
       CI_RUN_NUMBER: ${{ github.run_number }}
       CI_COMMIT: ${{ github.sha }}
-
     steps:
       - name: Check out build commit
         uses: actions/checkout@v4
@@ -81,6 +85,7 @@ jobs:
           az acr login --name "$ACR_NAME"
 
       - name: Build and push image
+        id: push-image
         shell: bash
         env:
           ACR_NAME: ${{ vars.ACR_NAME }}
@@ -88,11 +93,102 @@ jobs:
         run: |
           login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
           image="$login_server/$IMAGE_NAME:$IMAGE_TAG"
-          latest_image="$login_server/$IMAGE_NAME:latest"
           docker build --pull --file deployment/Dockerfile \
             --build-arg APP_VERSION="$APP_VERSION" \
             --tag "$image" code
           docker push "$image"
-          docker tag "$image" "$latest_image"
-          docker push "$latest_image"
-          echo "Pushed $image and $latest_image"
+          digest=$(az acr manifest show-metadata --registry "$ACR_NAME" \
+            --name "$IMAGE_NAME:$IMAGE_TAG" --query digest --output tsv)
+          if [[ ! "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "Could not resolve a valid digest for $image." >&2
+            exit 1
+          fi
+          echo "image=$login_server/$IMAGE_NAME@$digest" >> "$GITHUB_OUTPUT"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Published $image ($digest)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Check that the build is still current
+        id: current
+        shell: bash
+        env:
+          BUILD_SHA: ${{ github.sha }}
+        run: |
+          git fetch --no-tags origin refs/heads/main
+          if git diff --quiet "$BUILD_SHA" FETCH_HEAD -- . ':(exclude)documentation/**'; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            status=$?
+            if [[ "$status" -ne 1 ]]; then
+              echo "Could not compare the build with main." >&2
+              exit "$status"
+            fi
+            echo "Skipping deployment of an older main commit."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Log into Azure with the infrastructure deployment identity
+        if: steps.current.outputs.deploy == 'true'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.INFRA_CLIENT_ID }}
+          tenant-id: ${{ secrets.INFRA_TENANT_ID }}
+          subscription-id: ${{ secrets.INFRA_SUBSCRIPTION_ID }}
+
+      - name: Deploy and wait for the revision
+        if: steps.current.outputs.deploy == 'true'
+        shell: bash
+        env:
+          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+          IMAGE: ${{ steps.push-image.outputs.image }}
+        run: |
+          for variable in RESOURCE_GROUP CONTAINER_APP_NAME IMAGE; do
+            if [[ -z "${!variable}" ]]; then
+              echo "Missing required deployment value: $variable." >&2
+              exit 1
+            fi
+          done
+          az containerapp update --resource-group "$RESOURCE_GROUP" \
+            --name "$CONTAINER_APP_NAME" --container-name workbench --image "$IMAGE" --output none
+          for ((attempt=0; attempt<60; attempt++)); do
+            app=$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$CONTAINER_APP_NAME" --output json)
+            latest=$(jq -r '.properties.latestRevisionName // empty' <<< "$app")
+            ready=$(jq -r '.properties.latestReadyRevisionName // empty' <<< "$app")
+            configured_image=$(jq -r '.properties.template.containers[] | select(.name == "workbench") | .image' <<< "$app")
+            if [[ "$configured_image" != "$IMAGE" ]]; then
+              echo "Container App image changed unexpectedly; refusing cleanup." >&2
+              exit 1
+            fi
+            if [[ -n "$latest" && "$latest" == "$ready" ]]; then
+              echo "Revision $latest is ready: $IMAGE" | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if [[ -n "$latest" ]]; then
+              state=$(az containerapp revision show --resource-group "$RESOURCE_GROUP" \
+                --name "$CONTAINER_APP_NAME" --revision "$latest" --query properties.provisioningState --output tsv)
+              if [[ "$state" == "Provisioning failed" || "$state" == "Failed" ]]; then
+                echo "Revision $latest failed provisioning." >&2
+                exit 1
+              fi
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for the new revision; no images were deleted." >&2
+          exit 1
+
+      - name: Log into Azure with the registry publishing identity
+        if: steps.current.outputs.deploy == 'true'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.ACR_CLIENT_ID }}
+          tenant-id: ${{ secrets.ACR_TENANT_ID }}
+          subscription-id: ${{ secrets.ACR_SUBSCRIPTION_ID }}
+
+      - name: Keep the five newest images
+        if: steps.current.outputs.deploy == 'true'
+        shell: bash
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          IMAGE_DIGEST: ${{ steps.push-image.outputs.digest }}
+        run: |
+          python deployment/cleanup-images.py "$ACR_NAME" gram-parser-workbench "$IMAGE_DIGEST"

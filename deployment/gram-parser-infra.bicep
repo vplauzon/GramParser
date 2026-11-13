@@ -17,8 +17,8 @@ param appName string
 @minLength(1)
 param pullIdentityName string
 
-@description('Image repository and tag within the registry.')
-param imageName string = 'gram-parser-workbench:latest'
+@description('Image repository and immutable digest within the registry.')
+param imageName string
 
 resource registry 'Microsoft.ContainerRegistry/registries@2025-04-01' existing = {
   name: acrName

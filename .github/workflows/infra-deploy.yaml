@@ -2,6 +2,11 @@ name: Infra Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      image_digest:
+        description: 'Image digest (sha256:...) for the first deployment; leave blank to preserve the current image'
+        required: false
+        type: string
 
 permissions:
   id-token: write
@@ -37,6 +42,7 @@ jobs:
           RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
           CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
           ACR_PULL_IDENTITY_NAME: ${{ vars.ACR_PULL_IDENTITY_NAME }}
+          IMAGE_DIGEST: ${{ inputs.image_digest }}
         run: |
           for variable in ACR_NAME RESOURCE_GROUP CONTAINER_APP_NAME ACR_PULL_IDENTITY_NAME; do
             if [[ -z "${!variable}" ]]; then
@@ -49,6 +55,33 @@ jobs:
             echo "Could not resolve the resource group for registry '$ACR_NAME'." >&2
             exit 1
           fi
+          login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          if [[ -z "$login_server" ]]; then
+            echo "Could not resolve the registry login server." >&2
+            exit 1
+          fi
+          if [[ -z "$IMAGE_DIGEST" ]]; then
+            app_id=$(az resource list --resource-group "$RESOURCE_GROUP" \
+              --resource-type Microsoft.App/containerApps --name "$CONTAINER_APP_NAME" \
+              --query '[0].id' --output tsv)
+            if [[ -z "$app_id" ]]; then
+              echo "For the first deployment, supply image_digest from a published build." >&2
+              exit 1
+            fi
+            current_image=$(az containerapp show --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --query "properties.template.containers[?name=='workbench'].image | [0]" --output tsv)
+            image_prefix="$login_server/gram-parser-workbench@"
+            if [[ "$current_image" != "$image_prefix"* ]]; then
+              echo "The current image is not a pinned workbench image; supply image_digest explicitly." >&2
+              exit 1
+            fi
+            IMAGE_DIGEST="${current_image#"$image_prefix"}"
+          fi
+          if [[ ! "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "image_digest must be a sha256 digest with 64 lowercase hexadecimal digits." >&2
+            exit 1
+          fi
           app_url=$(az deployment group create \
             --name "gram-parser-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --resource-group "$RESOURCE_GROUP" \
@@ -56,6 +89,7 @@ jobs:
             --template-file deployment/gram-parser-infra.bicep \
             --parameters acrName="$ACR_NAME" acrResourceGroupName="$acr_resource_group" \
               appName="$CONTAINER_APP_NAME" pullIdentityName="$ACR_PULL_IDENTITY_NAME" \
+              imageName="gram-parser-workbench@$IMAGE_DIGEST" \
             --query properties.outputs.appUrl.value --output tsv)
           echo "Container App: $app_url"
           echo "Container App: $app_url" >> "$GITHUB_STEP_SUMMARY"
