@@ -2,12 +2,6 @@ name: Infra Deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - deployment/*.bicep
-      - .github/workflows/infra-deploy.yaml
 
 permissions:
   id-token: write

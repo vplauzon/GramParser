@@ -20,18 +20,8 @@ resource registry 'Microsoft.ContainerRegistry/registries@2025-04-01' existing =
   scope: resourceGroup(acrResourceGroupName)
 }
 
-resource pullIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
+resource pullIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
   name: '${appName}-pull'
-  location: location
-}
-
-module registryAccess 'registry-pull-access.bicep' = {
-  name: '${appName}-registry-access'
-  scope: resourceGroup(acrResourceGroupName)
-  params: {
-	acrName: acrName
-	principalId: pullIdentity.properties.principalId
-  }
 }
 
 resource environment 'Microsoft.App/managedEnvironments@2025-07-01' = {
@@ -119,9 +109,6 @@ resource app 'Microsoft.App/containerApps@2025-07-01' = {
 	  }
 	}
   }
-  dependsOn: [
-	registryAccess
-  ]
 }
 
 output appUrl string = 'https://${app.properties.configuration.ingress.fqdn}'
