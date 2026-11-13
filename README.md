@@ -4,46 +4,46 @@
 
 See the <span style="background:yellow">[following blog article](http://todo.com)</span> introducing it.
 
-GramParser is a grammar-based parser distributed as a [.NET Standard 2.1 Nuget Package](https://www.nuget.org/packages/GramParser/).  It allows to quickly implement Domain Specific Languages (DSLs).
-
-The workbench lets you experiment interactively. GitHub Actions builds and tests the solution and, on `main`, publishes the workbench image with a unique tag and `latest` to Azure Container Registry, then deploys its immutable digest to the Container App.
+GramParser is a grammar-based parser for building DSLs, available as a [.NET Standard 2.1 NuGet package](https://www.nuget.org/packages/GramParser/). Its workbench lets you experiment interactively.
 
 ## Azure deployment
 
-Manually run **Infra Deploy** from GitHub Actions on `main`. Infrastructure deployment does not run automatically on pushes. The workflow deploys `deployment/gram-parser-infra.bicep` into the existing resource group specified by `RESOURCE_GROUP`, using its region. It discovers the existing registry's resource group in the same subscription from `ACR_NAME`. Each infrastructure deployment configures the app to use `gram-parser-workbench:latest`; subsequent continuous deployments replace it with an immutable digest.
+Infrastructure is deployed manually via **Infra Deploy** on `main`; the app resource group and registry must already exist in the same subscription. Register `Microsoft.App` on that subscription.
 
 Configure these variables in the GitHub `dev` environment:
 
 | Variable | Value |
 | --- | --- |
 | `ACR_NAME` | Existing registry name, without `.azurecr.io` |
-| `RESOURCE_GROUP` | Existing resource group for the app and environment, containing the pull identity |
-| `CONTAINER_APP_NAME` | Container App name; the managed environment name is derived by appending `-env` |
-| `ACR_PULL_IDENTITY_NAME` | Existing user-assigned image-pull identity name in `RESOURCE_GROUP` |
+| `RESOURCE_GROUP` | App resource group, also containing the pull identity |
+| `CONTAINER_APP_NAME` | Container App name; environment name is `<name>-env` |
+| `ACR_PULL_IDENTITY_NAME` | Existing user-assigned pull identity in `RESOURCE_GROUP` |
 
-Configure two sets of identity secrets:
+Configure secrets for two identities, each with a federated credential for this repository's `dev` environment:
 
 | Purpose | Client ID | Tenant ID | Subscription ID |
 | --- | --- | --- | --- |
 | Image publishing | `ACR_CLIENT_ID` | `ACR_TENANT_ID` | `ACR_SUBSCRIPTION_ID` |
 | Infrastructure deployment | `INFRA_CLIENT_ID` | `INFRA_TENANT_ID` | `INFRA_SUBSCRIPTION_ID` |
 
-Both GitHub identities need their own federated credential for this repository's `dev` environment. Give the infrastructure identity Contributor on the resource group specified by `RESOURCE_GROUP` to deploy the app and attach the existing pull identity. Grant it Reader on the existing registry for ARM metadata. It does not need permission to assign roles or deploy resources in the registry's resource group. The registry and app must be in the same subscription with the current template. Register the `Microsoft.App` resource provider in that subscription before deploying.
+Assign Azure roles:
 
-The publishing identity needs `AcrPush` and `AcrDelete` on the registry in RBAC Registry Permissions mode, or `Container Registry Repository Contributor` in ABAC-enabled mode (which can be scoped to the workbench repository). Cleanup deletes image manifests and their tags from that repository; ensure no other consumers need the older images.
+| Identity | Scope | Roles |
+| --- | --- | --- |
+| Infrastructure | App resource group; registry | Contributor; Reader |
+| Publishing | Registry | `AcrPush` and `AcrDelete`, or `Container Registry Repository Contributor` for ABAC mode |
+| Pull | Registry | `AcrPull`, or `Container Registry Repository Reader` for ABAC mode |
 
-Publish `gram-parser-workbench:latest` before the first infrastructure deployment. The build's image deployment step cannot succeed until the Container App exists, but the image is pushed before that step. The template creates a Consumption environment and one Container App with 0.25 vCPU, 0.5 GiB memory, zero minimum replicas, one maximum replica, and a 300-second cooldown. Scale-to-zero timing is approximate, not an exact last-request timer. Azure provides the app's `azurecontainerapps.io` HTTPS hostname and certificate and redirects HTTP to HTTPS; no custom domain or certificate management is required. The deployment outputs the HTTPS URL in the workflow summary.
+ABAC repository roles can be scoped to the workbench repository. The pull identity and its role assignment must exist before deployment; allow time for role propagation.
 
-The environment uses an empty log destination to avoid configuring persistent log storage. Real-time log streaming remains available, but past logs are not retained.
+Publish `gram-parser-workbench:latest` before the first infra deployment. Until the app exists, the build publishes the image but its deployment step fails. Infra deploys `latest`; continuous builds on `main` deploy an immutable digest. Rerunning infra switches the app back to the mutable `latest` tag, so subsequent starts may pick up a newer image without a revision change.
 
-Before deploying, grant the existing user-assigned identity named by `ACR_PULL_IDENTITY_NAME` pull access on the registry: `AcrPull` for RBAC Registry Permissions mode, or `Container Registry Repository Reader` for RBAC Registry + ABAC Repository Permissions mode. The deployment attaches the identity but does not create it or manage its role assignments. Check for an existing pull-role assignment before adding one; Azure role propagation can delay the first private-image pull.
+The Consumption app uses 0.25 vCPU, 0.5 GiB memory, 0–1 replicas and an approximately five-minute scale-down cooldown. Azure supplies HTTPS and the certificate. Logs are streamed but not retained. The app URL appears in the infra workflow summary.
 
-After a new revision becomes ready, the pipeline keeps the five most recently created workbench images, including referenced manifests, and deletes older manifests and their tags. It refuses cleanup if the deployed digest is not among those five. Cleanup does not run when deployment fails or is skipped; if a deletion fails partway through, prior deletions remain in effect. Older Container App revisions remain visible but cannot be restarted or rolled back if their image has been deleted. An infrastructure redeployment switches the app back to the mutable `latest` tag, so later container starts can pull a newer image without a revision change. Infrastructure deployment is incremental: **old Web Apps, the App Service plan, and monitoring resources are not deleted**. Retire those resources separately after verifying the Container App to stop their remaining charges.
+After a successful deployment, cleanup retains the five newest images and deletes older manifests and tags. It refuses to delete the deployed digest; older revisions cannot roll back if their image has been removed. Cleanup may be partially completed if a deletion fails. Ensure no other consumers need the old images.
+
+Infra deployment is incremental: **old Web Apps, App Service plans and monitoring resources remain billable** until retired separately.
 
 ## Using the workbench
 
-A typical workflow would be to develop grammar using the workbench.
-
-GramParser is based on the defunct project 'M' from Microsoft, circa 2008.  The workbench takes inspiration from the three columns M editor.
-
-Follow the [tutorial](documentation/tutorial.md) to have a quick tour of capabilities.  The formal documentation is [available here](documentation).
+The workbench takes inspiration from Microsoft's former M editor. See the [tutorial](documentation/tutorial.md) and [documentation](documentation).
