@@ -10,7 +10,12 @@ param acrName string
 param acrResourceGroupName string = resourceGroup().name
 
 @description('Name of the Container App.')
-param appName string = 'gram-parser-workbench'
+@minLength(1)
+param appName string
+
+@description('Name of the image-pull identity to create in the deployment resource group.')
+@minLength(1)
+param pullIdentityName string
 
 @description('Image repository and tag within the registry.')
 param imageName string = 'gram-parser-workbench:latest'
@@ -20,8 +25,18 @@ resource registry 'Microsoft.ContainerRegistry/registries@2025-04-01' existing =
   scope: resourceGroup(acrResourceGroupName)
 }
 
-resource pullIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
-  name: '${appName}-pull'
+resource pullIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
+  name: pullIdentityName
+  location: location
+}
+
+module registryAccess 'registry-pull-access.bicep' = {
+  name: '${appName}-registry-access'
+  scope: resourceGroup(acrResourceGroupName)
+  params: {
+    acrName: acrName
+    principalId: pullIdentity.properties.principalId
+  }
 }
 
 resource environment 'Microsoft.App/managedEnvironments@2025-07-01' = {
@@ -109,6 +124,9 @@ resource app 'Microsoft.App/containerApps@2025-07-01' = {
 	  }
 	}
   }
+  dependsOn: [
+    registryAccess
+  ]
 }
 
 output appUrl string = 'https://${app.properties.configuration.ingress.fqdn}'

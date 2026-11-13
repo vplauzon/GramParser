@@ -34,11 +34,16 @@ jobs:
         shell: bash
         env:
           ACR_NAME: ${{ vars.ACR_NAME }}
+          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+          ACR_PULL_IDENTITY_NAME: ${{ vars.ACR_PULL_IDENTITY_NAME }}
         run: |
-          if [[ -z "$ACR_NAME" ]]; then
-            echo "Set the ACR_NAME variable in the dev GitHub environment to your registry name (without .azurecr.io)." >&2
-            exit 1
-          fi
+          for variable in ACR_NAME RESOURCE_GROUP CONTAINER_APP_NAME ACR_PULL_IDENTITY_NAME; do
+            if [[ -z "${!variable}" ]]; then
+              echo "Set the $variable variable in the dev GitHub environment before deploying." >&2
+              exit 1
+            fi
+          done
           acr_resource_group=$(az acr show --name "$ACR_NAME" --query resourceGroup --output tsv)
           if [[ -z "$acr_resource_group" ]]; then
             echo "Could not resolve the resource group for registry '$ACR_NAME'." >&2
@@ -46,10 +51,11 @@ jobs:
           fi
           app_url=$(az deployment group create \
             --name "gram-parser-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --resource-group gram-parser \
+            --resource-group "$RESOURCE_GROUP" \
             --mode Incremental \
             --template-file deployment/gram-parser-infra.bicep \
             --parameters acrName="$ACR_NAME" acrResourceGroupName="$acr_resource_group" \
+              appName="$CONTAINER_APP_NAME" pullIdentityName="$ACR_PULL_IDENTITY_NAME" \
             --query properties.outputs.appUrl.value --output tsv)
           echo "Container App: $app_url"
           echo "Container App: $app_url" >> "$GITHUB_STEP_SUMMARY"

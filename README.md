@@ -10,20 +10,29 @@ The workbench lets you experiment interactively. GitHub Actions builds and tests
 
 ## Azure deployment
 
-Manually run **Infra Deploy** from GitHub Actions on `main`. Infrastructure deployment does not run automatically on pushes. The workflow deploys `deployment/gram-parser-infra.bicep` into the existing `gram-parser` resource group, using its region. It discovers the existing registry's resource group in the same subscription from the `ACR_NAME` variable.
+Manually run **Infra Deploy** from GitHub Actions on `main`. Infrastructure deployment does not run automatically on pushes. The workflow deploys `deployment/gram-parser-infra.bicep` into the existing resource group specified by `RESOURCE_GROUP`, using its region. It discovers the existing registry's resource group in the same subscription from `ACR_NAME`.
 
-Configure the GitHub `dev` environment with the `ACR_NAME` variable (registry name only) and two sets of identity secrets:
+Configure these variables in the GitHub `dev` environment:
+
+| Variable | Value |
+| --- | --- |
+| `ACR_NAME` | Existing registry name, without `.azurecr.io` |
+| `RESOURCE_GROUP` | Existing resource group for the app, environment, and pull identity |
+| `CONTAINER_APP_NAME` | Container App name; the managed environment name is derived by appending `-env` |
+| `ACR_PULL_IDENTITY_NAME` | User-assigned image-pull identity name to create |
+
+Configure two sets of identity secrets:
 
 | Purpose | Client ID | Tenant ID | Subscription ID |
 | --- | --- | --- | --- |
 | Image publishing | `ACR_CLIENT_ID` | `ACR_TENANT_ID` | `ACR_SUBSCRIPTION_ID` |
 | Infrastructure deployment | `INFRA_CLIENT_ID` | `INFRA_TENANT_ID` | `INFRA_SUBSCRIPTION_ID` |
 
-The infrastructure identity needs Contributor on `gram-parser` (including permission to attach the existing pull identity) and the built-in Azure Reader role scoped to the registry for ARM metadata access. It does not need registry image-pull permissions, role-assignment permissions, or deployment permissions on the registry's resource group.
+Both GitHub identities need their own federated credential for this repository's `dev` environment. Give the infrastructure identity Contributor on the resource group specified by `RESOURCE_GROUP` to create the app and its pull identity. On the existing registry, grant it Reader for ARM metadata and Role Based Access Control Administrator to create the pull-role assignment. Prefer a condition on the administrator assignment limiting delegation to `AcrPull` or `Container Registry Repository Reader` and, where possible, the pull identity's principal. Contributor alone cannot assign roles. The cross-resource-group module also requires `Microsoft.Resources/deployments/*` on the registry's resource group; grant a deployment-only custom role there, or Contributor if broader resource-management access is acceptable. The registry and app must be in the same subscription with the current template.
 
 Publish `gram-parser-workbench:latest` to the registry before the first infrastructure deployment. The template creates a Consumption environment and one Container App with 0.25 vCPU, 0.5 GiB memory, zero minimum replicas, one maximum replica, and a 300-second cooldown. Scale-to-zero timing is approximate, not an exact last-request timer. Azure provides the app's `azurecontainerapps.io` HTTPS hostname and certificate and redirects HTTP to HTTPS; no custom domain or certificate management is required. The deployment outputs the HTTPS URL in the workflow summary.
 
-Before the first deployment, manually create the user-assigned managed identity `gram-parser-workbench-pull` in `gram-parser` (or `${appName}-pull` if overriding the app name). Assign that identity `AcrPull` on the registry, or `Container Registry Repository Reader` for an ABAC-enabled registry, and allow time for permissions to propagate before deploying. The template references this existing identity to pull images without registry passwords; it does not create identities or role assignments.
+The template creates the user-assigned managed identity named by `ACR_PULL_IDENTITY_NAME` in `RESOURCE_GROUP`. The `registry-pull-access.bicep` module grants it `AcrPull` on the registry, or `Container Registry Repository Reader` for an ABAC-enabled registry, before creating the app. Azure role propagation can delay the first private-image pull even after the assignment deployment succeeds. If the identity already has an equivalent manually created assignment, remove that assignment before deployment to avoid a `RoleAssignmentExists` conflict; let the template manage the replacement.
 
 Updating `latest` does not replace running replicas; new container starts check the tag again. Infrastructure deployment is incremental: **old Web Apps, the App Service plan, and monitoring resources are not deleted**. Retire those resources separately after verifying the Container App to stop their remaining charges.
 
