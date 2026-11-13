@@ -88,8 +88,11 @@ jobs:
         run: |
           login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
           image="$login_server/$IMAGE_NAME:$IMAGE_TAG"
+          latest_image="$login_server/$IMAGE_NAME:latest"
           docker build --pull --file deployment/Dockerfile \
             --build-arg APP_VERSION="$APP_VERSION" \
             --tag "$image" code
           docker push "$image"
-          echo "Pushed $image"
+          docker tag "$image" "$latest_image"
+          docker push "$latest_image"
+          echo "Pushed $image and $latest_image"
