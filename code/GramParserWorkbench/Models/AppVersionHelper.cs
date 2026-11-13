@@ -1,13 +1,14 @@
 ﻿using GramParserLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace GramParserWorkbench.Models
 {
     public static class AppVersionHelper
     {
-        public static string ParserVersion => typeof(MetaGrammar).Assembly.GetName()!.Version!.ToString();
+        public static string ParserVersion =>
+            typeof(MetaGrammar).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? typeof(MetaGrammar).Assembly.GetName().Version?.ToString()
+            ?? "Unknown";
     }
 }

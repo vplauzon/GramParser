@@ -1,0 +1,83 @@
+name: Build and push container
+
+on:
+  workflow_run:
+    workflows:
+      - Continuous Build / Test
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository }}
+    environment: dev
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: ${{ vars.ACR_NAME }}
+      IMAGE_NAME: gram-parser-workbench
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+      CI_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+      CI_COMMIT: ${{ github.event.workflow_run.head_sha }}
+
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Calculate application version
+        id: app-version
+        shell: bash
+        run: |
+          base_version=$(dotnet msbuild code/GramParserLib/GramParserLib.csproj -getProperty:Version)
+          if [[ ! "$base_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a stable three-part SemVer in GramParserLib.csproj, got '$base_version'." >&2
+            exit 1
+          fi
+          version="${base_version}-ci.${CI_RUN_NUMBER}+${CI_COMMIT:0:12}"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+          echo "Application version: $version"
+
+      - name: Log into Azure with the managed identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+
+      - name: Log into Azure Container Registry
+        shell: bash
+        run: |
+          if [[ -z "$ACR_NAME" ]]; then
+            echo "Set the ACR_NAME variable in the dev GitHub environment to your registry name (without .azurecr.io)." >&2
+            exit 1
+          fi
+          az acr login --name "$ACR_NAME"
+
+      - name: Build and push image
+        shell: bash
+        env:
+          APP_VERSION: ${{ steps.app-version.outputs.value }}
+        run: |
+          login_server=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          image="$login_server/$IMAGE_NAME:$IMAGE_TAG"
+          docker build --pull --file deployment/Dockerfile \
+            --build-arg APP_VERSION="$APP_VERSION" \
+            --tag "$image" code
+          docker push "$image"
+          echo "Pushed $image"
