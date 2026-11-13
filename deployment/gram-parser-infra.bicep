@@ -31,7 +31,7 @@ resource environment 'Microsoft.App/managedEnvironments@2025-07-01' = {
   location: location
   properties: {
 	appLogsConfiguration: {
-	  destination: 'none'
+	  destination: ''
 	}
 	workloadProfiles: [
 	  {
