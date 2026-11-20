@@ -13,3 +13,7 @@ See the [Azure deployment guide](documentation/azure-deployment.md).
 ## Using the workbench
 
 The workbench takes inspiration from Microsoft's former M editor. See the [tutorial](documentation/tutorial.md) and [documentation](documentation).
+
+## Coding standard
+
+See [CodingStandard](CodingStandard.md) for details

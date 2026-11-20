@@ -11,6 +11,8 @@ namespace GramParserLib
     public class RuleMatch
     {
         private static readonly JsonSerializerOptions _defaultOptions = CreateDefaultOptions();
+        private static readonly BuiltInOutputJsonContext _outputJsonContext =
+            new BuiltInOutputJsonContext(CreateDefaultOptions());
 
         private readonly Func<object?> _outputFactory;
 
@@ -70,10 +72,61 @@ namespace GramParserLib
             where T : class
         {
             var output = _outputFactory();
-            var serialized = JsonSerializer.Serialize(output, _defaultOptions);
+            var outputJsonTypeInfo = GetBuiltInOutputJsonTypeInfo(output);
+
+            return ComputeTypedOutput<T>(
+                output,
+                jsonTypeInfo,
+                outputJsonTypeInfo);
+        }
+
+        /// <summary>
+        /// Computes typed output using explicit metadata for serialization and deserialization.
+        /// </summary>
+        /// <param name="jsonTypeInfo">Metadata for the requested typed output.</param>
+        /// <param name="outputJsonTypeInfo">Metadata for the intermediate output value.</param>
+        /// <returns>The typed output, or <see langword="null"/>.</returns>
+        public T? ComputeTypedOutput<T>(
+            JsonTypeInfo jsonTypeInfo,
+            JsonTypeInfo outputJsonTypeInfo)
+            where T : class
+        {
+            var output = _outputFactory();
+
+            return ComputeTypedOutput<T>(
+                output,
+                jsonTypeInfo,
+                outputJsonTypeInfo);
+        }
+
+        private static T? ComputeTypedOutput<T>(
+            object? output,
+            JsonTypeInfo jsonTypeInfo,
+            JsonTypeInfo outputJsonTypeInfo)
+            where T : class
+        {
+            ArgumentNullException.ThrowIfNull(jsonTypeInfo);
+            ArgumentNullException.ThrowIfNull(outputJsonTypeInfo);
+
+            var serialized = JsonSerializer.Serialize(output, outputJsonTypeInfo);
             var typedOutput = JsonSerializer.Deserialize(serialized, jsonTypeInfo);
 
             return (T?)typedOutput;
+        }
+
+        private static JsonTypeInfo GetBuiltInOutputJsonTypeInfo(object? output)
+        {
+            var outputType = output?.GetType() ?? typeof(object);
+            var jsonTypeInfo = _outputJsonContext.GetTypeInfo(outputType);
+
+            if (jsonTypeInfo == null && output is IEnumerable<object?>)
+            {
+                jsonTypeInfo = _outputJsonContext.IEnumerableObject;
+            }
+
+            return jsonTypeInfo ?? throw new NotSupportedException(
+                $"No built-in JSON metadata is available for output type '{outputType}'. "
+                + "Pass serialization metadata for custom output types.");
         }
 
         public RuleMatch AddInterleaveLength(int length)
